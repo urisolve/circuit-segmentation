@@ -1,0 +1,7 @@
+Checks:                 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,'
+WarningsAsErrors:       true
+HeaderFilterRegex:      ''
+AnalyzeTemporaryDtors:  false
+FormatStyle:            none
+User:                   user
+CheckOptions:

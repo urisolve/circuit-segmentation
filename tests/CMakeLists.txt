@@ -1,0 +1,6 @@
+# ----------------------------------------------------------------------------
+# Build
+
+# Subdirectories
+add_subdirectory(mocks)
+add_subdirectory(unit)
