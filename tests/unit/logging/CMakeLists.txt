@@ -1,0 +1,41 @@
+# ----------------------------------------------------------------------------
+# Project setup
+project(UtLogger)
+
+# ----------------------------------------------------------------------------
+# Test
+include(GoogleTest)
+enable_testing()
+
+# ----------------------------------------------------------------------------
+# Source files
+set(Sources
+    ut_Logger.cpp
+)
+
+# ----------------------------------------------------------------------------
+# Executables
+add_executable(${PROJECT_NAME}
+    ${Sources}
+)
+
+# ----------------------------------------------------------------------------
+# Tests
+# add_test(${PROJECT_NAME}
+#     ${PROJECT_NAME}
+# )
+include(GoogleTest)
+gtest_discover_tests(${PROJECT_NAME})
+
+# ----------------------------------------------------------------------------
+# Build
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE gtest
+    PRIVATE gtest_main
+    PRIVATE gmock
+    PRIVATE pthread
+    PRIVATE CircuitSegmentation::Logger
+)
+target_include_directories(${PROJECT_NAME}
+    PRIVATE ${CMAKE_SOURCE_DIR}/src
+)
