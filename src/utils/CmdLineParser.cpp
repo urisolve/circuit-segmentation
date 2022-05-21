@@ -45,7 +45,7 @@ std::string CmdLineParser::getOption(const std::string& option) const
 
 void CmdLineParser::setAppName(const std::string& name)
 {
-    mAppName = std::move(name);
+    mAppName = name;
 }
 
 std::string CmdLineParser::getAppName() const
@@ -55,7 +55,7 @@ std::string CmdLineParser::getAppName() const
 
 void CmdLineParser::setAppVersion(const std::string& version)
 {
-    mAppVersion = std::move(version);
+    mAppVersion = version;
 }
 
 std::string CmdLineParser::getAppVersion() const
@@ -65,7 +65,7 @@ std::string CmdLineParser::getAppVersion() const
 
 void CmdLineParser::setAppDescription(const std::string& description)
 {
-    mAppDescription = std::move(description);
+    mAppDescription = description;
 }
 
 std::string CmdLineParser::getAppDescription() const
@@ -81,10 +81,10 @@ void CmdLineParser::showVersion() const
 
 void CmdLineParser::setAppUsageInfo(const std::string& exeName,
                                     const std::string& optionsUsageInfo,
-                                    const std::map<std::string, std::string> options)
+                                    const std::map<std::string, std::string>& options)
 {
-    mExeAppName = std::move(exeName);
-    mOptionsUsageInfo = std::move(optionsUsageInfo);
+    mExeAppName = exeName;
+    mOptionsUsageInfo = optionsUsageInfo;
     mOptions = options;
 }
 

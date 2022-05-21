@@ -24,47 +24,52 @@ class CommandLineParser
 {
 public:
     /**
+     * @brief Destructor.
+     */
+    virtual ~CommandLineParser() = default;
+
+    /**
      * @brief Parses the command line arguments.
      *
      * @param argc Number of command line arguments.
      * @param argv Command line arguments.
      */
-    void parse(const int argc, char const* argv[]);
+    virtual void parse(const int argc, char const* argv[]);
 
     /**
      * @brief Checks if help option was passed.
      *
      * @return Returns true if the option was passed, otherwise false.
      */
-    [[nodiscard]] bool hasHelp() const;
+    [[nodiscard]] virtual bool hasHelp() const;
 
     /**
      * @brief Checks if version option was passed.
      *
      * @return Returns true if the option was passed, otherwise false.
      */
-    [[nodiscard]] bool hasVersion() const;
+    [[nodiscard]] virtual bool hasVersion() const;
 
     /**
      * @brief Checks if verbose option was passed.
      *
      * @return Returns true if the option was passed, otherwise false.
      */
-    [[nodiscard]] bool hasVerboseLog() const;
+    [[nodiscard]] virtual bool hasVerboseLog() const;
 
     /**
      * @brief Gets image file path option passed.
      *
      * @return Image file path passed, or an empty string if option was not passed.
      */
-    [[nodiscard]] std::string getImagePath() const;
+    [[nodiscard]] virtual std::string getImagePath() const;
 
     /**
      * @brief Checks if save images option was passed.
      *
      * @return Returns true if the option was passed, otherwise false.
      */
-    [[nodiscard]] bool hasSaveImages() const;
+    [[nodiscard]] virtual bool hasSaveImages() const;
 
 private:
     /** Parser of the command line arguments. */

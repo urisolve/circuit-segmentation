@@ -13,13 +13,13 @@ using namespace circuitSegmentation::logging;
 
 Logger::Logger(std::ostream& ostream, LogLevel level)
     : mOstream{ostream}
-    , mLogLevel{level}
+    , mLogLevel{std::move(level)}
 {
 }
 
-void Logger::setLogLevel(Logger::LogLevel level)
+void Logger::setLogLevel(LogLevel level)
 {
-    mLogLevel = level;
+    mLogLevel = std::move(level);
 }
 
 Logger::LogLevel Logger::getLogLevel() const

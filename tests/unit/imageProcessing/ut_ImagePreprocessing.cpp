@@ -4,7 +4,7 @@
 
 #include "imageProcessing/ImagePreprocessing.h"
 #include "imageProcessing/MockImageProcUtils.h"
-#include "logging/MockLogger.h"
+#include "logging/Logger.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -24,10 +24,10 @@ protected:
     void SetUp() override
     {
         mMockImageProcUtils = std::make_shared<NaggyMock<circuitSegmentation::imageProcessing::MockImageProcUtils>>();
-        mMockLogger = std::make_shared<NiceMock<circuitSegmentation::logging::MockLogger>>(std::cout);
+        mLogger = std::make_shared<circuitSegmentation::logging::Logger>(std::cout);
 
         mImagePreprocessing = std::make_unique<circuitSegmentation::imageProcessing::ImagePreprocessing>(
-            mMockImageProcUtils, mMockLogger, false);
+            mMockImageProcUtils, mLogger, false);
     }
 
     /**
@@ -40,7 +40,7 @@ protected:
     /** Image processing utils. */
     std::shared_ptr<NaggyMock<circuitSegmentation::imageProcessing::MockImageProcUtils>> mMockImageProcUtils;
     /** Logger. */
-    std::shared_ptr<NiceMock<circuitSegmentation::logging::MockLogger>> mMockLogger;
+    std::shared_ptr<circuitSegmentation::logging::Logger> mLogger;
 
     /** Image to be used in tests. */
     cv::Mat mTestImage{300, 300, CV_8UC3, cv::Scalar(128, 128, 128)};

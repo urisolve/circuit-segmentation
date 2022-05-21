@@ -22,7 +22,7 @@ class ImageProcManager
 {
 public:
     /**
-     * @brief Constructor of a new object.
+     * @brief Constructor.
      *
      * @param imageReceiver Image receiver.
      * @param imagePreprocessing Image preprocessing.
@@ -37,6 +37,11 @@ public:
                      std::shared_ptr<logging::Logger> logger,
                      bool logMode = false,
                      bool saveImages = false);
+
+    /**
+     * @brief Destructor.
+     */
+    virtual ~ImageProcManager() = default;
 
     /**
      * @brief Creates an image processing manager.
@@ -61,35 +66,35 @@ public:
      *
      * @return Returns true if the processing terminated successfully, otherwise false.
      */
-    bool processImage(const std::string imageFilePath);
+    virtual bool processImage(const std::string imageFilePath);
 
     /**
      * @brief Sets the log mode.
      *
      * @param logMode Log mode: verbose = true, silent = false.
      */
-    void setLogMode(bool logMode);
+    virtual void setLogMode(const bool& logMode);
 
     /**
      * @brief Gets the log mode setted.
      *
      * @return Returns the log mode: verbose = true, silent = false.
      */
-    [[nodiscard]] bool getLogMode() const;
+    [[nodiscard]] virtual bool getLogMode() const;
 
     /**
      * @brief Sets the flag to save images obtained during the processing.
      *
      * @param saveImages Save images obtained during the processing.
      */
-    void setSaveImages(bool saveImages);
+    virtual void setSaveImages(const bool& saveImages);
 
     /**
      * @brief Gets the flag to save images obtained during the processing.
      *
      * @return Returns the flag to save images obtained during the processing.
      */
-    [[nodiscard]] bool getSaveImages() const;
+    [[nodiscard]] virtual bool getSaveImages() const;
 
 private:
     /** Image receiver. */
@@ -121,12 +126,12 @@ private:
      *
      * @return Returns true if image is okay, otherwise false.
      */
-    bool receiveOriginalImage(const std::string& filePath);
+    virtual bool receiveOriginalImage(const std::string& filePath);
 
     /**
      * @brief Preprocesses the image.
      */
-    void preprocessImage();
+    virtual void preprocessImage();
 };
 
 } // namespace imageProcessing

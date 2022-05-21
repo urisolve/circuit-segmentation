@@ -13,12 +13,12 @@ ImageProcManager::ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
                                    std::shared_ptr<logging::Logger> logger,
                                    bool logMode,
                                    bool saveImages)
-    : mImageReceiver{imageReceiver}
-    , mImagePreprocessing{imagePreprocessing}
-    , mImageProcUtils{imageProcUtils}
-    , mLogger{logger}
-    , mLogMode{logMode}
-    , mSaveImages{saveImages}
+    : mImageReceiver{std::move(imageReceiver)}
+    , mImagePreprocessing{std::move(imagePreprocessing)}
+    , mImageProcUtils{std::move(imageProcUtils)}
+    , mLogger{std::move(logger)}
+    , mLogMode{std::move(logMode)}
+    , mSaveImages{std::move(saveImages)}
 {
     // Log mode
     setLogMode(mLogMode);
@@ -70,32 +70,7 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
     return true;
 }
 
-bool ImageProcManager::receiveOriginalImage(const std::string& filePath)
-{
-    // Set image file path
-    mImageReceiver->setImageFilePath(filePath);
-
-    // Receive image from image receiver
-    if (!mImageReceiver->receiveImage()) {
-        return false;
-    }
-
-    // Get image received
-    mImageOriginal = mImageReceiver->getImageReceived();
-
-    return true;
-}
-
-void ImageProcManager::preprocessImage()
-{
-    // Copy original image
-    mImageProcessed = mImageOriginal.clone();
-
-    // Preprocess the image
-    mImagePreprocessing->preprocessImage(mImageProcessed);
-}
-
-void ImageProcManager::setLogMode(bool logMode)
+void ImageProcManager::setLogMode(const bool& logMode)
 {
     mLogMode = logMode;
 
@@ -119,7 +94,7 @@ bool ImageProcManager::getLogMode() const
     return mLogMode;
 }
 
-void ImageProcManager::setSaveImages(bool saveImages)
+void ImageProcManager::setSaveImages(const bool& saveImages)
 {
     mSaveImages = saveImages;
 
@@ -129,4 +104,29 @@ void ImageProcManager::setSaveImages(bool saveImages)
 bool ImageProcManager::getSaveImages() const
 {
     return mSaveImages;
+}
+
+bool ImageProcManager::receiveOriginalImage(const std::string& filePath)
+{
+    // Set image file path
+    mImageReceiver->setImageFilePath(filePath);
+
+    // Receive image from image receiver
+    if (!mImageReceiver->receiveImage()) {
+        return false;
+    }
+
+    // Get image received
+    mImageOriginal = mImageReceiver->getImageReceived();
+
+    return true;
+}
+
+void ImageProcManager::preprocessImage()
+{
+    // Copy original image
+    mImageProcessed = mImageOriginal.clone();
+
+    // Preprocess the image
+    mImagePreprocessing->preprocessImage(mImageProcessed);
 }

@@ -18,7 +18,7 @@ class CmdLineParser
 {
 public:
     /**
-     * @brief Constructor of a new object.
+     * @brief Constructor.
      */
     CmdLineParser();
 
@@ -131,7 +131,7 @@ public:
      */
     void setAppUsageInfo(const std::string& exeName,
                          const std::string& optionsUsageInfo,
-                         const std::map<std::string, std::string> options);
+                         const std::map<std::string, std::string>& options);
 
     /**
      * @brief Gets the executable name of the application.

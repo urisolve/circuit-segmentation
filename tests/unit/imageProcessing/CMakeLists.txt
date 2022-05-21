@@ -36,7 +36,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE gmock
     PRIVATE pthread
     PRIVATE CircuitSegmentation::ImageProcessing
-    PRIVATE CircuitSegmentation::MockLogger
+    PRIVATE CircuitSegmentation::Logger
 )
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/src

@@ -8,7 +8,7 @@
 using namespace circuitSegmentation::imageProcessing;
 
 ImageReceiver::ImageReceiver(std::shared_ptr<logging::Logger> logger)
-    : mLogger{logger}
+    : mLogger{std::move(logger)}
 {
 }
 
@@ -34,7 +34,7 @@ bool ImageReceiver::receiveImage()
 
 void ImageReceiver::setImageFilePath(const std::string& filePath)
 {
-    mImageFilePath = std::move(filePath);
+    mImageFilePath = filePath;
 }
 
 [[nodiscard]] std::string ImageReceiver::getImageFilePath() const

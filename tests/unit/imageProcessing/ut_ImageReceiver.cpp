@@ -3,7 +3,7 @@
  */
 
 #include "imageProcessing/ImageReceiver.h"
-#include "logging/MockLogger.h"
+#include "logging/Logger.h"
 #include <gtest/gtest.h>
 #include <memory>
 #include <opencv2/core.hpp>
@@ -25,8 +25,8 @@ protected:
      */
     void SetUp() override
     {
-        mMockLogger = std::make_shared<testing::NiceMock<circuitSegmentation::logging::MockLogger>>(std::cout);
-        mImageReceiver = std::make_unique<circuitSegmentation::imageProcessing::ImageReceiver>(mMockLogger);
+        mLogger = std::make_shared<circuitSegmentation::logging::Logger>(std::cout);
+        mImageReceiver = std::make_unique<circuitSegmentation::imageProcessing::ImageReceiver>(mLogger);
     }
 
     /**
@@ -37,7 +37,7 @@ protected:
     /** Image receiver. */
     std::unique_ptr<circuitSegmentation::imageProcessing::ImageReceiver> mImageReceiver;
     /** Logger. */
-    std::shared_ptr<testing::NiceMock<circuitSegmentation::logging::MockLogger>> mMockLogger;
+    std::shared_ptr<circuitSegmentation::logging::Logger> mLogger;
 };
 
 /**

@@ -19,11 +19,16 @@ class ImageReceiver
 {
 public:
     /**
-     * @brief Constructor of a new object.
+     * @brief Constructor.
      *
      * @param logger Logger.
      */
     ImageReceiver(std::shared_ptr<logging::Logger> logger);
+
+    /**
+     * @brief Destructor.
+     */
+    virtual ~ImageReceiver() = default;
 
     /**
      * @brief Receives the image for processing.
@@ -31,28 +36,28 @@ public:
      * @return Returns true if image is okay, otherwise false when the image cannot be read because of missing file,
      * improper permissions, unsupported or invalid format.
      */
-    bool receiveImage();
+    virtual bool receiveImage();
 
     /**
      * @brief Gets the image received for processing.
      *
      * @return Image received.
      */
-    [[nodiscard]] cv::Mat getImageReceived() const;
+    [[nodiscard]] virtual cv::Mat getImageReceived() const;
 
     /**
      * @brief Sets the image file path for processing.
      *
      * @param filePath File path of the image.
      */
-    void setImageFilePath(const std::string& filePath);
+    virtual void setImageFilePath(const std::string& filePath);
 
     /**
      * @brief Gets the image file path for processing.
      *
      * @return Image file path.
      */
-    [[nodiscard]] std::string getImageFilePath() const;
+    [[nodiscard]] virtual std::string getImageFilePath() const;
 
 private:
     /** Image file path. */

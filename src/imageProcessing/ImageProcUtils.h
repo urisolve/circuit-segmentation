@@ -17,12 +17,12 @@ class ImageProcUtils
 {
 public:
     /**
-     * @brief Constructor of a new object.
+     * @brief Constructor.
      */
     ImageProcUtils() = default;
 
     /**
-     * @brief Destructor of the object.
+     * @brief Destructor.
      */
     virtual ~ImageProcUtils() = default;
 
