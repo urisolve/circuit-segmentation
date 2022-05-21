@@ -3,19 +3,18 @@
  */
 
 #include "ImageProcManager.h"
-#include <opencv2/core/utils/logger.hpp>
 
 using namespace circuitSegmentation::imageProcessing;
 
 ImageProcManager::ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
                                    std::shared_ptr<ImagePreprocessing> imagePreprocessing,
-                                   std::shared_ptr<ImageProcUtils> imageProcUtils,
+                                   std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                                    std::shared_ptr<logging::Logger> logger,
                                    bool logMode,
                                    bool saveImages)
     : mImageReceiver{std::move(imageReceiver)}
     , mImagePreprocessing{std::move(imagePreprocessing)}
-    , mImageProcUtils{std::move(imageProcUtils)}
+    , mOpenCvWrapper{std::move(openCvWrapper)}
     , mLogger{std::move(logger)}
     , mLogMode{std::move(logMode)}
     , mSaveImages{std::move(saveImages)}
@@ -29,11 +28,11 @@ ImageProcManager::ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
 
 ImageProcManager ImageProcManager::create(std::shared_ptr<logging::Logger> logger, bool logMode, bool saveImages)
 {
-    std::shared_ptr<ImageProcUtils> imageProcUtils{std::make_shared<ImageProcUtils>()};
+    std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper{std::make_shared<computerVision::OpenCvWrapper>()};
 
-    return ImageProcManager(std::make_shared<ImageReceiver>(logger),
-                            std::make_shared<ImagePreprocessing>(imageProcUtils, logger),
-                            imageProcUtils,
+    return ImageProcManager(std::make_shared<ImageReceiver>(openCvWrapper, logger),
+                            std::make_shared<ImagePreprocessing>(openCvWrapper, logger),
+                            openCvWrapper,
                             logger,
                             logMode,
                             saveImages);
@@ -48,9 +47,9 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Save image
     if (mSaveImages) {
-        mImageProcUtils->writeImage("image_original.png", mImageOriginal);
+        mOpenCvWrapper->writeImage("image_original.png", mImageOriginal);
         // TODO: Remove or comment.
-        mImageProcUtils->showImage("Original image", mImageOriginal, 0);
+        mOpenCvWrapper->showImage("Original image", mImageOriginal, 0);
     }
 
     // Preprocessing
@@ -58,9 +57,9 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Save image
     if (mSaveImages) {
-        mImageProcUtils->writeImage("image_preprocessed.png", mImageProcessed);
+        mOpenCvWrapper->writeImage("image_preprocessed.png", mImageProcessed);
         // TODO: Remove or comment.
-        mImageProcUtils->showImage("Preprocessed image", mImageProcessed, 0);
+        mOpenCvWrapper->showImage("Preprocessed image", mImageProcessed, 0);
     }
 
     // TODO: Segmentation.
@@ -78,14 +77,12 @@ void ImageProcManager::setLogMode(const bool& logMode)
         // Enable verbose logs
         mLogger->setLogLevel(logging::Logger::LogLevel::VERBOSE);
 
-        // Set OpenCV log level to Warning
-        cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_WARNING);
+        mOpenCvWrapper->setLogMode(false);
     } else {
         // Disable logs
         mLogger->setLogLevel(logging::Logger::LogLevel::NONE);
 
-        // Set OpenCV log level to Silent
-        cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_SILENT);
+        mOpenCvWrapper->setLogMode(true);
     }
 }
 
@@ -125,7 +122,7 @@ bool ImageProcManager::receiveOriginalImage(const std::string& filePath)
 void ImageProcManager::preprocessImage()
 {
     // Copy original image
-    mImageProcessed = mImageOriginal.clone();
+    mImageProcessed = mOpenCvWrapper->cloneImage(mImageOriginal);
 
     // Preprocess the image
     mImagePreprocessing->preprocessImage(mImageProcessed);

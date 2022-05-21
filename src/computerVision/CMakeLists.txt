@@ -1,16 +1,14 @@
 # ----------------------------------------------------------------------------
 # Project setup
-project(Application)
+project(ComputerVision)
 
 # ----------------------------------------------------------------------------
 # Source files
 set(Headers
-    Application.h
-    CommandLineParser.h
+    OpenCvWrapper.h
 )
 set(Sources
-    Application.cpp
-    CommandLineParser.cpp
+    OpenCvWrapper.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -22,13 +20,6 @@ add_library(CircuitSegmentation::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
 # Build
-
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..
-)
-
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE CircuitSegmentation::ImageProcessing
-    PRIVATE CircuitSegmentation::Logger
-    PRIVATE CircuitSegmentation::Utils
+    PRIVATE ${OpenCV_LIBS}
 )

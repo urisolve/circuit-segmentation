@@ -3,14 +3,14 @@
  */
 
 #include "imageProcessing/ImagePreprocessing.h"
-#include "imageProcessing/MockImageProcUtils.h"
 #include "logging/Logger.h"
+#include "mocks/computerVision/MockOpenCvWrapper.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
-#include <opencv2/core.hpp>
 
 using namespace testing;
+using namespace circuitSegmentation;
 
 /**
  * @brief Test class of ImagePreprocessing.
@@ -23,11 +23,10 @@ protected:
      */
     void SetUp() override
     {
-        mMockImageProcUtils = std::make_shared<NaggyMock<circuitSegmentation::imageProcessing::MockImageProcUtils>>();
-        mLogger = std::make_shared<circuitSegmentation::logging::Logger>(std::cout);
+        mMockOpenCvWrapper = std::make_shared<NaggyMock<computerVision::MockOpenCvWrapper>>();
+        mLogger = std::make_shared<logging::Logger>(std::cout);
 
-        mImagePreprocessing = std::make_unique<circuitSegmentation::imageProcessing::ImagePreprocessing>(
-            mMockImageProcUtils, mLogger, false);
+        mImagePreprocessing = std::make_unique<imageProcessing::ImagePreprocessing>(mMockOpenCvWrapper, mLogger, false);
     }
 
     /**
@@ -36,18 +35,14 @@ protected:
     void TearDown() override {}
 
     /** Image preprocessing. */
-    std::unique_ptr<circuitSegmentation::imageProcessing::ImagePreprocessing> mImagePreprocessing;
-    /** Image processing utils. */
-    std::shared_ptr<NaggyMock<circuitSegmentation::imageProcessing::MockImageProcUtils>> mMockImageProcUtils;
+    std::unique_ptr<imageProcessing::ImagePreprocessing> mImagePreprocessing;
+    /** OpenCV wrapper. */
+    std::shared_ptr<NaggyMock<computerVision::MockOpenCvWrapper>> mMockOpenCvWrapper;
     /** Logger. */
     std::shared_ptr<circuitSegmentation::logging::Logger> mLogger;
 
     /** Image to be used in tests. */
-    cv::Mat mTestImage{300, 300, CV_8UC3, cv::Scalar(128, 128, 128)};
-    /** Image file to be used in tests. */
-    const std::string cTestImageFile{"test_image.png"};
-    /** Window name to be used in tests. */
-    const std::string cTestImageWindow{"Test image"};
+    computerVision::ImageMat mTestImage{};
 };
 
 /**
@@ -59,10 +54,10 @@ TEST_F(ImagePreprocessingTest, preprocessImageSave)
     mImagePreprocessing->setSaveImages(true);
 
     // Setup behavior
-    ON_CALL(*mMockImageProcUtils, writeImage(_, _)).WillByDefault(Return(true));
+    ON_CALL(*mMockOpenCvWrapper, writeImage(_, _)).WillByDefault(Return(true));
 
     // Setup expectations
-    EXPECT_CALL(*mMockImageProcUtils, writeImage(_, _)).Times(4);
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage(_, _)).Times(4);
 
     // Preprocess image
     mImagePreprocessing->preprocessImage(mTestImage);
@@ -77,7 +72,7 @@ TEST_F(ImagePreprocessingTest, preprocessImageNotSave)
     mImagePreprocessing->setSaveImages(false);
 
     // Setup expectations
-    EXPECT_CALL(*mMockImageProcUtils, writeImage(_, _)).Times(0);
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage(_, _)).Times(0);
 
     // Preprocess image
     mImagePreprocessing->preprocessImage(mTestImage);
@@ -88,18 +83,17 @@ TEST_F(ImagePreprocessingTest, preprocessImageNotSave)
  */
 TEST_F(ImagePreprocessingTest, resizesImageSquare)
 {
-    // Large image
-    cv::Mat image{circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim + 100,
-                  circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim + 100,
-                  CV_8UC3,
-                  cv::Scalar(128, 128, 128)};
+    // Setup behavior
+    ON_CALL(*mMockOpenCvWrapper, getImageWidth(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
+    ON_CALL(*mMockOpenCvWrapper, getImageHeight(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
+
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, resizeImage(_, _, _)).Times(1);
 
     // Resize image
-    mImagePreprocessing->resizeImage(image);
-
-    // Expect the image is resized
-    EXPECT_GE(circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim, image.size().width);
-    EXPECT_GE(circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim, image.size().height);
+    mImagePreprocessing->resizeImage(mTestImage);
 }
 
 /**
@@ -107,18 +101,17 @@ TEST_F(ImagePreprocessingTest, resizesImageSquare)
  */
 TEST_F(ImagePreprocessingTest, resizesImageWidth)
 {
-    // Large image
-    cv::Mat image{circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim - 100,
-                  circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim + 100,
-                  CV_8UC3,
-                  cv::Scalar(128, 128, 128)};
+    // Setup behavior
+    ON_CALL(*mMockOpenCvWrapper, getImageWidth(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
+    ON_CALL(*mMockOpenCvWrapper, getImageHeight(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
+
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, resizeImage(_, _, _)).Times(1);
 
     // Resize image
-    mImagePreprocessing->resizeImage(image);
-
-    // Expect the image is resized
-    EXPECT_GE(circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim, image.size().width);
-    EXPECT_GE(circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim, image.size().height);
+    mImagePreprocessing->resizeImage(mTestImage);
 }
 
 /**
@@ -126,18 +119,17 @@ TEST_F(ImagePreprocessingTest, resizesImageWidth)
  */
 TEST_F(ImagePreprocessingTest, resizesImageHeight)
 {
-    // Large image
-    cv::Mat image{circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim + 100,
-                  circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim - 100,
-                  CV_8UC3,
-                  cv::Scalar(128, 128, 128)};
+    // Setup behavior
+    ON_CALL(*mMockOpenCvWrapper, getImageWidth(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
+    ON_CALL(*mMockOpenCvWrapper, getImageHeight(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
+
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, resizeImage(_, _, _)).Times(1);
 
     // Resize image
-    mImagePreprocessing->resizeImage(image);
-
-    // Expect the image is resized
-    EXPECT_GE(circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim, image.size().width);
-    EXPECT_GE(circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim, image.size().height);
+    mImagePreprocessing->resizeImage(mTestImage);
 }
 
 /**
@@ -145,54 +137,57 @@ TEST_F(ImagePreprocessingTest, resizesImageHeight)
  */
 TEST_F(ImagePreprocessingTest, doesNotResizeImage)
 {
-    // Small image
-    cv::Mat image{circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim - 100,
-                  circuitSegmentation::imageProcessing::ImagePreprocessing::cResizeDim - 100,
-                  CV_8UC3,
-                  cv::Scalar(128, 128, 128)};
+    // Setup behavior
+    ON_CALL(*mMockOpenCvWrapper, getImageWidth(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
+    ON_CALL(*mMockOpenCvWrapper, getImageHeight(_))
+        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
 
-    // Expected values
-    const auto expectWidth = image.size().width;
-    const auto expectHeight = image.size().height;
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, resizeImage(_, _, _)).Times(0);
 
     // Resize image
-    mImagePreprocessing->resizeImage(image);
-
-    // Expect the image is not resized
-    EXPECT_EQ(expectWidth, image.size().width);
-    EXPECT_EQ(expectHeight, image.size().height);
+    mImagePreprocessing->resizeImage(mTestImage);
 }
 
 /**
- * @brief Tests that the convertImageToGray() method does not throw.
+ * @brief Tests that the image is converted to grayscale.
  */
-TEST_F(ImagePreprocessingTest, convertImageToGrayDoesNotThrow)
+TEST_F(ImagePreprocessingTest, convertsImageToGray)
 {
-    EXPECT_NO_THROW(mImagePreprocessing->convertImageToGray(mTestImage));
-}
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, convertImageToGray(_, _)).Times(1);
 
-/**
- * @brief Tests that the blurImage() method does not throw.
- */
-TEST_F(ImagePreprocessingTest, blurImageDoesNotThrow)
-{
-    EXPECT_NO_THROW(mImagePreprocessing->blurImage(mTestImage));
-}
-
-/**
- * @brief Tests that the edgesImage() method does not throw.
- */
-TEST_F(ImagePreprocessingTest, edgesImageDoesNotThrow)
-{
-    // Image should be filtered before the edge detection
+    // Convert image to grayscale
     mImagePreprocessing->convertImageToGray(mTestImage);
-    mImagePreprocessing->blurImage(mTestImage);
-
-    EXPECT_NO_THROW(mImagePreprocessing->edgesImage(mTestImage));
 }
 
 /**
- * @brief Tests the setter of the flag to save images.
+ * @brief Tests that the image is blurred.
+ */
+TEST_F(ImagePreprocessingTest, blursImage)
+{
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, gaussianBlurImage(_, _, _)).Times(1);
+
+    // Blur image
+    mImagePreprocessing->blurImage(mTestImage);
+}
+
+/**
+ * @brief Tests that the edges of image are detected.
+ */
+TEST_F(ImagePreprocessingTest, detectsImageEdges)
+{
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, cannyEdgeImage(_, _, _, _, _)).Times(1);
+
+    // Detect edges
+    mImagePreprocessing->edgesImage(mTestImage);
+}
+
+/**
+ * @brief Tests that the flag to save images is defined correctly.
  */
 TEST_F(ImagePreprocessingTest, setsSaveImages)
 {
@@ -213,6 +208,5 @@ TEST_F(ImagePreprocessingTest, setsSaveImages)
 // int main(int argc, char* argv[])
 // {
 //     testing::InitGoogleTest(&argc, argv);
-
 //     return RUN_ALL_TESTS();
 // }

@@ -1,16 +1,15 @@
 # ----------------------------------------------------------------------------
 # Project setup
-project(UtLogger)
+project(UtOpenCvWrapper)
 
 # ----------------------------------------------------------------------------
 # Test
-include(GoogleTest)
 enable_testing()
 
 # ----------------------------------------------------------------------------
 # Source files
 set(Sources
-    ut_Logger.cpp
+    ut_OpenCvWrapper.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -34,10 +33,14 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/src
 )
 
+target_compile_definitions(${PROJECT_NAME}
+    PUBLIC TESTS_DATA_PATH="${CMAKE_SOURCE_DIR}/tests/data/"
+)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE gtest
     PRIVATE gtest_main
     PRIVATE gmock
     PRIVATE pthread
-    PRIVATE CircuitSegmentation::Logger
+    PRIVATE CircuitSegmentation::ComputerVision
 )

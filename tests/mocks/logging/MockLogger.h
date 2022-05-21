@@ -16,21 +16,21 @@ namespace logging {
 class MockLogger : public Logger
 {
 public:
-    /** Mocks method "virtual void setLogLevel(LogLevel level)". */
+    /** Mocks method setLogLevel. */
     MOCK_METHOD(void, setLogLevel, (LogLevel level), (override));
-    /** Mocks method "virtual LogLevel getLogLevel() const". */
+    /** Mocks method getLogLevel. */
     MOCK_METHOD(LogLevel, getLogLevel, (), (const, override));
-    /** Mocks method "virtual void logFatal(const std::string& msg)". */
+    /** Mocks method logFatal. */
     MOCK_METHOD(void, logFatal, (const std::string& msg), (override));
-    /** Mocks method "virtual void logError(const std::string& msg)". */
+    /** Mocks method logError. */
     MOCK_METHOD(void, logError, (const std::string& msg), (override));
-    /** Mocks method "virtual void logWarning(const std::string& msg)". */
+    /** Mocks method logWarning. */
     MOCK_METHOD(void, logWarning, (const std::string& msg), (override));
-    /** Mocks method "virtual void logInfo(const std::string& msg)". */
+    /** Mocks method logInfo. */
     MOCK_METHOD(void, logInfo, (const std::string& msg), (override));
-    /** Mocks method "virtual void logDebug(const std::string& msg)". */
+    /** Mocks method logDebug. */
     MOCK_METHOD(void, logDebug, (const std::string& msg), (override));
-    /** Mocks method "virtual void logVerbose(const std::string& msg)". */
+    /** Mocks method logVerbose. */
     MOCK_METHOD(void, logVerbose, (const std::string& msg), (override));
 };
 

@@ -16,6 +16,18 @@ namespace utils #DDDEEE {
     }
 }
 
+' OpenCV
+namespace cv #DDDEEE {
+}
+note bottom of cv: OpenCV library.
+
+' Computer vision
+namespace computerVision #DDDEEE {
+    class OpenCvWrapper {
+    }
+    OpenCvWrapper -> cv
+}
+
 ' Image processing
 namespace imageProcessing #DDDEEE {
     class ImageProcManager {
@@ -23,20 +35,19 @@ namespace imageProcessing #DDDEEE {
     ImageProcManager ..> ImageReceiver
     ImageProcManager ..> ImagePreprocessing
     ImageProcManager ..> ImageSegmentation
-    ImageProcManager ..> ImageProcUtils
+    ImageProcManager ..> computerVision::OpenCvWrapper
 
     class ImageReceiver {
     }
+    ImageReceiver ..> computerVision::OpenCvWrapper
 
     class ImagePreprocessing {
     }
-    ImagePreprocessing ..> ImageProcUtils
+    ImagePreprocessing ..> computerVision::OpenCvWrapper
 
     class ImageSegmentation {
     }
-
-    class ImageProcUtils {
-    }
+    ImageSegmentation ..> computerVision::OpenCvWrapper
 }
 
 ' Application

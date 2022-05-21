@@ -28,13 +28,15 @@ gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
 # Build
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE ${CMAKE_SOURCE_DIR}/src
+)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE gtest
     PRIVATE gtest_main
     PRIVATE gmock
     PRIVATE pthread
     PRIVATE CircuitSegmentation::Application
-)
-target_include_directories(${PROJECT_NAME}
-    PRIVATE ${CMAKE_SOURCE_DIR}/src
 )

@@ -14,8 +14,7 @@
 # ./<script>.sh build
 
 # Check script usage
-if [ "$#" -ne 1 ]
-then
+if [ "$#" -ne 1 ]; then
     echo "Usage:"
     echo "$0 <build_folder>"
     echo
@@ -24,18 +23,31 @@ fi
 
 # Build folder
 build_folder=$1
+# Code coverage folder
+coverage_folder=coverage
 
 # Run test command
 echo "Running ctest..."
 cd $build_folder
 ctest
 
+# Folder for results
+if [ -d "$coverage_folder" ]; then
+    # Delete previous results
+    echo "Deleting previous results..."
+    rm -rf $coverage_folder/*
+else
+    # Create folder
+    echo "Creating folder for results..."
+    mkdir -p $coverage_folder
+fi
+
 # Generate report
 echo "Generating report..."
-mkdir -p coverage
-gcovr --html-details coverage/coverage.html --exclude-directories='tests.*' --exclude='.*/src/main.cpp' --exclude='.*/src/application/Application.cpp' -r ..
+gcovr --html-details $coverage_folder/coverage.html --exclude-directories 'tests/*' \
+    -e '.*/src/main.cpp' -e '.*/src/application/Application.cpp' -r ..
 
-# Print a tabular report on the console
-gcovr --exclude-directories='tests.*' --exclude='.*/src/main.cpp' --exclude='.*/src/application/Application.cpp' -r ..
+# Print a tabular report to the output
+gcovr -s --exclude-directories 'tests/*' -e '.*/src/main.cpp' -e '.*/src/application/Application.cpp' -r ..
 
 echo "Coverage generation end"

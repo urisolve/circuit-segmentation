@@ -6,8 +6,7 @@
 # ./<script>.sh <doxyfile>
 
 # Check script usage
-if [ "$#" -ne 1 ]
-then
+if [ "$#" -ne 1 ]; then
     echo "Usage:"
     echo "$0 <doxyfile>"
     echo
@@ -20,4 +19,5 @@ doxyfile=$1
 echo "Generating doxygen documentation..."
 doxygen $doxyfile
 
-echo "Doxygen documentation end"
+echo
+echo "Doxygen documentation generated"

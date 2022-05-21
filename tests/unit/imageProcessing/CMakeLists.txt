@@ -10,7 +10,6 @@ enable_testing()
 # Source files
 set(Sources
     ut_ImagePreprocessing.cpp
-    ut_ImageProcUtils.cpp
     ut_ImageReceiver.cpp
 )
 
@@ -30,6 +29,12 @@ gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
 # Build
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE ${CMAKE_SOURCE_DIR}/src
+    PRIVATE ${CMAKE_SOURCE_DIR}/tests
+)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE gtest
     PRIVATE gtest_main
@@ -37,11 +42,4 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE pthread
     PRIVATE CircuitSegmentation::ImageProcessing
     PRIVATE CircuitSegmentation::Logger
-)
-target_include_directories(${PROJECT_NAME}
-    PRIVATE ${CMAKE_SOURCE_DIR}/src
-    PRIVATE ${CMAKE_SOURCE_DIR}/tests/mocks
-)
-target_compile_definitions(${PROJECT_NAME}
-    PUBLIC TESTS_DATA_PATH="${CMAKE_SOURCE_DIR}/tests/data/"
 )
