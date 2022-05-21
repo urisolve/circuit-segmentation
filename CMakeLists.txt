@@ -43,6 +43,7 @@ endif()
 # ----------------------------------------------------------------------------
 # Test
 if (BUILD_TESTS)
+    # find_package(GTest REQUIRED)
     include(CTest)
     enable_testing()
 endif()

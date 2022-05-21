@@ -10,9 +10,9 @@ using namespace circuitSegmentation::imageProcessing;
 ImagePreprocessing::ImagePreprocessing(std::shared_ptr<ImageProcUtils> imageProcUtils,
                                        std::shared_ptr<logging::Logger> logger,
                                        bool saveImages)
-    : mImageProcUtils{imageProcUtils}
-    , mLogger{logger}
-    , mSaveImages{saveImages}
+    : mImageProcUtils{std::move(imageProcUtils)}
+    , mLogger{std::move(logger)}
+    , mSaveImages{std::move(saveImages)}
 {
 }
 
@@ -141,7 +141,7 @@ void ImagePreprocessing::edgesImage(cv::Mat& image)
     mLogger->logInfo("Canny edge detector applied to the image");
 }
 
-void ImagePreprocessing::setSaveImages(bool saveImages)
+void ImagePreprocessing::setSaveImages(const bool& saveImages)
 {
     mSaveImages = saveImages;
 }

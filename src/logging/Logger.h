@@ -42,7 +42,7 @@ public:
     static constexpr auto cLogLevelDefault{LogLevel::VERBOSE};
 
     /**
-     * @brief Constructor of a new object.
+     * @brief Constructor.
      *
      * @param ostream Output stream.
      * @param level Log level.
@@ -50,60 +50,65 @@ public:
     Logger(std::ostream& ostream, LogLevel level = cLogLevelDefault);
 
     /**
+     * @brief Destructor.
+     */
+    virtual ~Logger() = default;
+
+    /**
      * @brief Sets the log level.
      *
      * @param level Log level.
      */
-    void setLogLevel(LogLevel level);
+    virtual void setLogLevel(LogLevel level);
 
     /**
      * @brief Gets the log level.
      *
      * @return Log level.
      */
-    [[nodiscard]] LogLevel getLogLevel() const;
+    [[nodiscard]] virtual LogLevel getLogLevel() const;
 
     /**
      * @brief Logs fatal messages.
      *
      * @param msg Message to log.
      */
-    void logFatal(const std::string& msg);
+    virtual void logFatal(const std::string& msg);
 
     /**
      * @brief Logs error messages.
      *
      * @param msg Message to log.
      */
-    void logError(const std::string& msg);
+    virtual void logError(const std::string& msg);
 
     /**
      * @brief Logs warning messages.
      *
      * @param msg Message to log.
      */
-    void logWarning(const std::string& msg);
+    virtual void logWarning(const std::string& msg);
 
     /**
      * @brief Logs information messages.
      *
      * @param msg Message to log.
      */
-    void logInfo(const std::string& msg);
+    virtual void logInfo(const std::string& msg);
 
     /**
      * @brief Logs debug messages.
      *
      * @param msg Message to log.
      */
-    void logDebug(const std::string& msg);
+    virtual void logDebug(const std::string& msg);
 
     /**
      * @brief Logs verbose messages.
      *
      * @param msg Message to log.
      */
-    void logVerbose(const std::string& msg);
+    virtual void logVerbose(const std::string& msg);
 
 private:
     /** Output stream. */
@@ -118,7 +123,7 @@ private:
      * @param level Log level of the message.
      * @param msg Message to log.
      */
-    void log(const std::string& level, const std::string& msg);
+    virtual void log(const std::string& level, const std::string& msg);
 
     /**
      * @brief Gets the current date and time.
@@ -127,7 +132,7 @@ private:
      *
      * @return String with the current date and time.
      */
-    const std::string getDateTime() const;
+    virtual const std::string getDateTime() const;
 };
 
 } // namespace logging

@@ -26,8 +26,8 @@ public:
     MOCK_METHOD(void, blurImage, (cv::Mat & image), (override));
     /** Mocks method "virtual void edgesImage(cv::Mat& image)". */
     MOCK_METHOD(void, edgesImage, (cv::Mat & image), (override));
-    /** Mocks method "virtual void setSaveImages(bool saveImages)". */
-    MOCK_METHOD(void, setSaveImages, (bool saveImages), (override));
+    /** Mocks method "virtual void setSaveImages(bool& saveImages)". */
+    MOCK_METHOD(void, setSaveImages, (bool& saveImages), (override));
     /** Mocks method "virtual bool getSaveImages() const". */
     MOCK_METHOD(bool, getSaveImages, (), (override, const));
 };

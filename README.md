@@ -97,7 +97,7 @@ $ cd <project-directory>
 $ ./scripts/doxygen-doc-gen.sh ./doxygen/Doxyfile
 ```
 
-The documentation is created in `doc` directory in the root of the project, and the index can be accessed in `doc/html/index.html`.
+The documentation is created in `build-doc` directory in the root of the project, and the index can be accessed in `build-doc/html/index.html`.
 
 ## Code formatting and analysis
 

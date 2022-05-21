@@ -22,7 +22,7 @@ public:
     static constexpr int cResizeDim{800};
 
     /**
-     * @brief Constructor of a new object.
+     * @brief Constructor.
      *
      * @param imageProcUtils Image processing utils.
      * @param logger Logger.
@@ -33,7 +33,7 @@ public:
                        bool saveImages = false);
 
     /**
-     * @brief Destructor of the object.
+     * @brief Destructor.
      */
     virtual ~ImagePreprocessing() = default;
 
@@ -77,7 +77,7 @@ public:
      *
      * @param saveImages Save images obtained during the processing.
      */
-    virtual void setSaveImages(bool saveImages);
+    virtual void setSaveImages(const bool& saveImages);
 
     /**
      * @brief Gets the flag to save images obtained during the processing.
