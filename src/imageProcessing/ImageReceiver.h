@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "computerVision/OpenCvWrapper.h"
 #include "logging/Logger.h"
 #include <memory>
-#include <opencv2/core.hpp>
 #include <string>
 
 namespace circuitSegmentation {
@@ -21,9 +21,11 @@ public:
     /**
      * @brief Constructor.
      *
+     * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      */
-    ImageReceiver(std::shared_ptr<logging::Logger> logger);
+    ImageReceiver(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
+                  std::shared_ptr<logging::Logger> logger);
 
     /**
      * @brief Destructor.
@@ -33,8 +35,8 @@ public:
     /**
      * @brief Receives the image for processing.
      *
-     * @return Returns true if image is okay, otherwise false when the image cannot be read because of missing file,
-     * improper permissions, unsupported or invalid format.
+     * @return True if image is okay, otherwise false when the image cannot be read because of missing file, improper
+     * permissions, unsupported or invalid format.
      */
     virtual bool receiveImage();
 
@@ -43,7 +45,7 @@ public:
      *
      * @return Image received.
      */
-    [[nodiscard]] virtual cv::Mat getImageReceived() const;
+    [[nodiscard]] virtual computerVision::ImageMat getImageReceived() const;
 
     /**
      * @brief Sets the image file path for processing.
@@ -63,8 +65,10 @@ private:
     /** Image file path. */
     std::string mImageFilePath{};
     /** Image for processing. */
-    cv::Mat mImage{};
+    computerVision::ImageMat mImage{};
 
+    /** OpenCV wrapper. */
+    std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;
     /** Logger. */
     std::shared_ptr<logging::Logger> mLogger;
 };

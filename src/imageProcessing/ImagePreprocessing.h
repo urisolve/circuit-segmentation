@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "ImageProcUtils.h"
+#include "computerVision/OpenCvWrapper.h"
 #include "logging/Logger.h"
 #include <memory>
-#include <opencv2/core.hpp>
 
 namespace circuitSegmentation {
 namespace imageProcessing {
@@ -24,11 +23,11 @@ public:
     /**
      * @brief Constructor.
      *
-     * @param imageProcUtils Image processing utils.
+     * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      * @param saveImages Save images obtained during the processing.
      */
-    ImagePreprocessing(std::shared_ptr<ImageProcUtils> imageProcUtils,
+    ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                        std::shared_ptr<logging::Logger> logger,
                        bool saveImages = false);
 
@@ -42,35 +41,35 @@ public:
      *
      * @param image Image for preprocessing.
      */
-    virtual void preprocessImage(cv::Mat& image);
+    virtual void preprocessImage(computerVision::ImageMat& image);
 
     /**
      * @brief Resizes the image.
      *
      * @param image Image to resize.
      */
-    virtual void resizeImage(cv::Mat& image);
+    virtual void resizeImage(computerVision::ImageMat& image);
 
     /**
      * @brief Converts the image to grayscale.
      *
      * @param image Image to convert.
      */
-    virtual void convertImageToGray(cv::Mat& image);
+    virtual void convertImageToGray(computerVision::ImageMat& image);
 
     /**
      * @brief Blurs the image.
      *
      * @param image Image to blur.
      */
-    virtual void blurImage(cv::Mat& image);
+    virtual void blurImage(computerVision::ImageMat& image);
 
     /**
      * @brief Detects edges the image.
      *
      * @param image Image to detect edges.
      */
-    virtual void edgesImage(cv::Mat& image);
+    virtual void edgesImage(computerVision::ImageMat& image);
 
     /**
      * @brief Sets the flag to save images obtained during the processing.
@@ -82,7 +81,7 @@ public:
     /**
      * @brief Gets the flag to save images obtained during the processing.
      *
-     * @return Returns the flag to save images obtained during the processing.
+     * @return The flag to save images obtained during the processing.
      */
     [[nodiscard]] virtual bool getSaveImages() const;
 
@@ -97,8 +96,8 @@ private:
     /** Aperture size for the Sobel operator, for the Canny Edge Detector. */
     const int cCannyEdgeApertureSize{3};
 
-    /** Image processing utils. */
-    std::shared_ptr<ImageProcUtils> mImageProcUtils;
+    /** OpenCV wrapper. */
+    std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;
 
     /** Logger. */
     std::shared_ptr<logging::Logger> mLogger;

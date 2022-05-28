@@ -6,8 +6,7 @@
 # ./<script>.sh <source_code_folder>
 
 # Check script usage
-if [ "$#" -ne 1 ]
-then
+if [ "$#" -ne 1 ]; then
     echo "Usage:"
     echo "$0 <source_code_folder>"
     echo

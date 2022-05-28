@@ -4,10 +4,13 @@
 
 #include "imageProcessing/ImageReceiver.h"
 #include "logging/Logger.h"
+#include "mocks/computerVision/MockOpenCvWrapper.h"
 #include <gtest/gtest.h>
 #include <memory>
-#include <opencv2/core.hpp>
 #include <string>
+
+using namespace testing;
+using namespace circuitSegmentation;
 
 /**
  * @brief Test class of ImageReceiver.
@@ -15,18 +18,15 @@
 class ImageReceiverTest : public ::testing::Test
 {
 protected:
-    /** Existent image file path to be used in tests. */
-    const std::string cExistentImageFilePath{std::string(TESTS_DATA_PATH) + "circuit-comp-1.png"};
-    /** Nonexistent image file path to be used in tests. */
-    const std::string cNonExistentImageFilePath{std::string(TESTS_DATA_PATH) + "nonexistent.png"};
-
     /**
      * @brief Test suite setup.
      */
     void SetUp() override
     {
-        mLogger = std::make_shared<circuitSegmentation::logging::Logger>(std::cout);
-        mImageReceiver = std::make_unique<circuitSegmentation::imageProcessing::ImageReceiver>(mLogger);
+        mMockOpenCvWrapper = std::make_shared<NaggyMock<computerVision::MockOpenCvWrapper>>();
+        mLogger = std::make_shared<logging::Logger>(std::cout);
+
+        mImageReceiver = std::make_unique<imageProcessing::ImageReceiver>(mMockOpenCvWrapper, mLogger);
     }
 
     /**
@@ -35,51 +35,51 @@ protected:
     void TearDown() override {}
 
     /** Image receiver. */
-    std::unique_ptr<circuitSegmentation::imageProcessing::ImageReceiver> mImageReceiver;
+    std::unique_ptr<imageProcessing::ImageReceiver> mImageReceiver;
+    /** OpenCV wrapper. */
+    std::shared_ptr<NaggyMock<computerVision::MockOpenCvWrapper>> mMockOpenCvWrapper;
     /** Logger. */
-    std::shared_ptr<circuitSegmentation::logging::Logger> mLogger;
+    std::shared_ptr<logging::Logger> mLogger;
 };
 
 /**
- * @brief Tests if image is received successfully.
- *
- * This test uses a correct image file path for image receiver.
+ * @brief Tests that when the image read is not empty, the image is received successfully.
  */
 TEST_F(ImageReceiverTest, receivesImageSuccessfully)
 {
-    const auto filePath{cExistentImageFilePath};
-    mImageReceiver->setImageFilePath(filePath);
+    // Setup behavior
+    ON_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).WillByDefault(Return(false));
 
-    // Verify if image was received successfully
-    const auto isImageOk = mImageReceiver->receiveImage();
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, readImage(_)).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).Times(1);
 
-    EXPECT_EQ(true, isImageOk);
+    // Receive image
+    EXPECT_EQ(true, mImageReceiver->receiveImage());
 }
 
 /**
- * @brief Tests if image is received unsuccessfully.
- *
- * This test uses a nonexistent image file path for image receiver.
+ * @brief Tests when the image read is empty, the image is received unsuccessfully.
  */
 TEST_F(ImageReceiverTest, receivesImageUnsuccessfully)
 {
-    const auto filePath{cNonExistentImageFilePath};
-    mImageReceiver->setImageFilePath(filePath);
+    // Setup behavior
+    ON_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).WillByDefault(Return(true));
 
-    // Verify if image was received unsuccessfully
-    const auto isImageOk = mImageReceiver->receiveImage();
-    const cv::Mat imageExpected = mImageReceiver->getImageReceived();
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, readImage(_)).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).Times(1);
 
-    EXPECT_EQ(false, isImageOk);
-    EXPECT_EQ(true, imageExpected.empty());
+    // Receive image
+    EXPECT_EQ(false, mImageReceiver->receiveImage());
 }
 
 /**
- * @brief Tests the image file path setted.
+ * @brief Tests that the the image file path is defined correctly.
  */
 TEST_F(ImageReceiverTest, setsImageFilePath)
 {
-    const auto filePath{cExistentImageFilePath};
+    const auto filePath{"image.png"};
     mImageReceiver->setImageFilePath(filePath);
 
     EXPECT_EQ(filePath, mImageReceiver->getImageFilePath());
@@ -96,6 +96,5 @@ TEST_F(ImageReceiverTest, setsImageFilePath)
 // int main(int argc, char* argv[])
 // {
 //     testing::InitGoogleTest(&argc, argv);
-
 //     return RUN_ALL_TESTS();
 // }

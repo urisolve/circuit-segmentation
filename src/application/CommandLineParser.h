@@ -26,7 +26,7 @@ public:
     /**
      * @brief Destructor.
      */
-    virtual ~CommandLineParser() = default;
+    virtual ~CommandLineParser() = default; // GCOVR_EXCL_LINE
 
     /**
      * @brief Parses the command line arguments.
@@ -39,21 +39,21 @@ public:
     /**
      * @brief Checks if help option was passed.
      *
-     * @return Returns true if the option was passed, otherwise false.
+     * @return True if the option was passed, otherwise false.
      */
     [[nodiscard]] virtual bool hasHelp() const;
 
     /**
      * @brief Checks if version option was passed.
      *
-     * @return Returns true if the option was passed, otherwise false.
+     * @return True if the option was passed, otherwise false.
      */
     [[nodiscard]] virtual bool hasVersion() const;
 
     /**
      * @brief Checks if verbose option was passed.
      *
-     * @return Returns true if the option was passed, otherwise false.
+     * @return True if the option was passed, otherwise false.
      */
     [[nodiscard]] virtual bool hasVerboseLog() const;
 
@@ -67,7 +67,7 @@ public:
     /**
      * @brief Checks if save images option was passed.
      *
-     * @return Returns true if the option was passed, otherwise false.
+     * @return True if the option was passed, otherwise false.
      */
     [[nodiscard]] virtual bool hasSaveImages() const;
 

@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include "computerVision/OpenCvWrapper.h"
 #include "ImagePreprocessing.h"
-#include "ImageProcUtils.h"
 #include "ImageReceiver.h"
 #include "logging/Logger.h"
 #include <memory>
-#include <opencv2/core.hpp>
 #include <string>
 
 namespace circuitSegmentation {
@@ -26,14 +25,14 @@ public:
      *
      * @param imageReceiver Image receiver.
      * @param imagePreprocessing Image preprocessing.
-     * @param imageProcUtils Image processing utils.
+     * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      * @param logMode Log mode: verbose = true, silent = false.
      * @param saveImages Save images obtained during the processing.
      */
     ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
                      std::shared_ptr<ImagePreprocessing> imagePreprocessing,
-                     std::shared_ptr<ImageProcUtils> imageProcUtils,
+                     std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                      std::shared_ptr<logging::Logger> logger,
                      bool logMode = false,
                      bool saveImages = false);
@@ -64,7 +63,7 @@ public:
      *
      * @param imageFilePath Image file path for processing.
      *
-     * @return Returns true if the processing terminated successfully, otherwise false.
+     * @return True if the processing terminated successfully, otherwise false.
      */
     virtual bool processImage(const std::string imageFilePath);
 
@@ -78,7 +77,7 @@ public:
     /**
      * @brief Gets the log mode setted.
      *
-     * @return Returns the log mode: verbose = true, silent = false.
+     * @return The log mode: verbose = true, silent = false.
      */
     [[nodiscard]] virtual bool getLogMode() const;
 
@@ -92,7 +91,7 @@ public:
     /**
      * @brief Gets the flag to save images obtained during the processing.
      *
-     * @return Returns the flag to save images obtained during the processing.
+     * @return The flag to save images obtained during the processing.
      */
     [[nodiscard]] virtual bool getSaveImages() const;
 
@@ -100,16 +99,16 @@ private:
     /** Image receiver. */
     std::shared_ptr<ImageReceiver> mImageReceiver;
     /** Original image for processing. */
-    cv::Mat mImageOriginal{};
+    computerVision::ImageMat mImageOriginal{};
 
     /** Image preprocessing. */
     std::shared_ptr<ImagePreprocessing> mImagePreprocessing;
 
-    /** Image processing utils. */
-    std::shared_ptr<ImageProcUtils> mImageProcUtils;
+    /** OpenCV wrapper. */
+    std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;
 
     /** Processed image. */
-    cv::Mat mImageProcessed{};
+    computerVision::ImageMat mImageProcessed{};
 
     /** Logger. */
     std::shared_ptr<logging::Logger> mLogger;
@@ -124,7 +123,7 @@ private:
      *
      * @param filePath Image file path.
      *
-     * @return Returns true if image is okay, otherwise false.
+     * @return True if image is okay, otherwise false.
      */
     virtual bool receiveOriginalImage(const std::string& filePath);
 

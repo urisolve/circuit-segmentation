@@ -3,20 +3,19 @@
  */
 
 #include "ImagePreprocessing.h"
-#include <opencv2/imgproc.hpp>
 
 using namespace circuitSegmentation::imageProcessing;
 
-ImagePreprocessing::ImagePreprocessing(std::shared_ptr<ImageProcUtils> imageProcUtils,
+ImagePreprocessing::ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                                        std::shared_ptr<logging::Logger> logger,
                                        bool saveImages)
-    : mImageProcUtils{std::move(imageProcUtils)}
+    : mOpenCvWrapper{std::move(openCvWrapper)}
     , mLogger{std::move(logger)}
     , mSaveImages{std::move(saveImages)}
 {
 }
 
-void ImagePreprocessing::preprocessImage(cv::Mat& image)
+void ImagePreprocessing::preprocessImage(computerVision::ImageMat& image)
 {
     mLogger->logInfo("Starting image preprocessing");
 
@@ -25,9 +24,9 @@ void ImagePreprocessing::preprocessImage(cv::Mat& image)
 
     // Save image
     if (mSaveImages) {
-        mImageProcUtils->writeImage("image_resize.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_1_resize.png", image);
         // TODO: Remove or comment.
-        mImageProcUtils->showImage("Resized image", image, 0);
+        mOpenCvWrapper->showImage("Resized image", image, 0);
     }
 
     // Convert to grayscale
@@ -35,9 +34,9 @@ void ImagePreprocessing::preprocessImage(cv::Mat& image)
 
     // Save image
     if (mSaveImages) {
-        mImageProcUtils->writeImage("image_grayscale.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_2_grayscale.png", image);
         // TODO: Remove or comment.
-        mImageProcUtils->showImage("Converted image to grayscale", image, 0);
+        mOpenCvWrapper->showImage("Converted image to grayscale", image, 0);
     }
 
     // Blur image
@@ -45,9 +44,9 @@ void ImagePreprocessing::preprocessImage(cv::Mat& image)
 
     // Save image
     if (mSaveImages) {
-        mImageProcUtils->writeImage("image_blur.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_3_blur.png", image);
         // TODO: Remove or comment.
-        mImageProcUtils->showImage("Blurred image", image, 0);
+        mOpenCvWrapper->showImage("Blurred image", image, 0);
     }
 
     // Detect edges
@@ -55,13 +54,13 @@ void ImagePreprocessing::preprocessImage(cv::Mat& image)
 
     // Save image
     if (mSaveImages) {
-        mImageProcUtils->writeImage("image_edge_detection.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_4_edge_detect.png", image);
         // TODO: Remove or comment.
-        mImageProcUtils->showImage("Edge detection image", image, 0);
+        mOpenCvWrapper->showImage("Edge detection image", image, 0);
     }
 }
 
-void ImagePreprocessing::resizeImage(cv::Mat& image)
+void ImagePreprocessing::resizeImage(computerVision::ImageMat& image)
 {
     /*
      * Resize image
@@ -70,9 +69,9 @@ void ImagePreprocessing::resizeImage(cv::Mat& image)
      */
 
     // Image width
-    const auto widthImg = image.size().width;
+    const auto widthImg = mOpenCvWrapper->getImageWidth(image);
     // Image height
-    const auto heightImg = image.size().height;
+    const auto heightImg = mOpenCvWrapper->getImageHeight(image);
 
     mLogger->logInfo("Initial image size: width = " + std::to_string(widthImg)
                      + ", height = " + std::to_string(heightImg));
@@ -93,50 +92,42 @@ void ImagePreprocessing::resizeImage(cv::Mat& image)
 
     // Resize
     if (doResize) {
-        cv::resize(image, image, cv::Size(), resizeScale, resizeScale, cv::InterpolationFlags::INTER_LINEAR);
+        mOpenCvWrapper->resizeImage(image, image, resizeScale);
 
         mLogger->logInfo("Resize scale = " + std::to_string(resizeScale));
-        mLogger->logInfo("Image resized: width = " + std::to_string(image.size().width)
-                         + ", height = " + std::to_string(image.size().height));
+        mLogger->logInfo("Image resized: width = " + std::to_string(mOpenCvWrapper->getImageWidth(image))
+                         + ", height = " + std::to_string(mOpenCvWrapper->getImageHeight(image)));
     }
 }
 
-void ImagePreprocessing::convertImageToGray(cv::Mat& image)
+void ImagePreprocessing::convertImageToGray(computerVision::ImageMat& image)
 {
     /*
      * Convert to grayscale
      * - Reduce the complexity of the calculations
      * - In this application, the color information is not relevant
      */
-    cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+    mOpenCvWrapper->convertImageToGray(image, image);
 
     mLogger->logInfo("Image converted to grayscale");
 }
 
-void ImagePreprocessing::blurImage(cv::Mat& image)
+void ImagePreprocessing::blurImage(computerVision::ImageMat& image)
 {
     /*
      * Gaussian blurring
      * - Reduce noise
      * - Improve edge detection
      */
-    cv::GaussianBlur(image, image, cv::Size(cFilterKernelSize, cFilterKernelSize), 0);
+    mOpenCvWrapper->gaussianBlurImage(image, image, cFilterKernelSize);
 
     mLogger->logInfo("Gaussian blurring applied to the image");
 }
 
-void ImagePreprocessing::edgesImage(cv::Mat& image)
+void ImagePreprocessing::edgesImage(computerVision::ImageMat& image)
 {
-    /*
-     * Detect edges using the Canny Edge Detector
-     * - The Canny Edge Detector algorithm follows a 3-stage process:
-     *      - Calculation of the intensity gradient of the image
-     *      - Suppression of false edges
-     *      - Hysteresis thresholding
-     * - Before applying the Canny Edge Detector, the image should be filtered (using Gaussian blurring, for example)
-     * - Canny recommended a ratio of high:low threshold between 2:1 and 3:1
-     */
-    cv::Canny(image, image, cCannyEdgeThresh1, cCannyEdgeThresh2, cCannyEdgeApertureSize);
+    // Detect edges using the Canny Edge Detector
+    mOpenCvWrapper->cannyEdgeImage(image, image, cCannyEdgeThresh1, cCannyEdgeThresh2, cCannyEdgeApertureSize);
 
     mLogger->logInfo("Canny edge detector applied to the image");
 }

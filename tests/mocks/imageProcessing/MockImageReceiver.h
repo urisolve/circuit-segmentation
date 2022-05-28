@@ -16,13 +16,13 @@ namespace imageProcessing {
 class MockImageReceiver : public ImageReceiver
 {
 public:
-    /** Mocks method "virtual bool receiveImage()". */
+    /** Mocks method receiveImage. */
     MOCK_METHOD(bool, receiveImage, (), (override));
-    /** Mocks method "virtual cv::Mat getImageReceived() const". */
-    MOCK_METHOD(cv::Mat, getImageReceived, (), (const, override));
-    /** Mocks method "virtual void setImageFilePath(const std::string& filePath)". */
+    /** Mocks method getImageReceived. */
+    MOCK_METHOD(computerVision::ImageMat, getImageReceived, (), (const, override));
+    /** Mocks method setImageFilePath. */
     MOCK_METHOD(void, setImageFilePath, (const std::string& filePath), (override));
-    /** Mocks method "virtual std::string getImageFilePath() const". */
+    /** Mocks method getImageFilePath. */
     MOCK_METHOD(std::string, getImageFilePath, (), (const, override));
 };
 

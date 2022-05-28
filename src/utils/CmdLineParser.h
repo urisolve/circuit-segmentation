@@ -44,7 +44,7 @@ public:
      *
      * @param option Command line option to check if it was passed.
      *
-     * @return Returns true if the option was passed, otherwise false.
+     * @return True if the option was passed, otherwise false.
      */
     bool hasOption(const std::string& option) const;
 
@@ -56,7 +56,7 @@ public:
      *
      * @param option Command line option to check if it was passed.
      *
-     * @return Command line option value if the option was passed, otherwise returns an empty string.
+     * @return Command line option value if the option was passed, otherwise an empty string.
      */
     std::string getOption(const std::string& option) const;
 
