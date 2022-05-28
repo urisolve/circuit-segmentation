@@ -65,6 +65,13 @@ public:
     virtual void blurImage(computerVision::ImageMat& image);
 
     /**
+     * @brief Applies a threshold to the image.
+     *
+     * @param image Image to apply a threshold.
+     */
+    virtual void thresholdImage(computerVision::ImageMat& image);
+
+    /**
      * @brief Detects edges the image.
      *
      * @param image Image to detect edges.
@@ -88,6 +95,19 @@ public:
 private:
     /** Size of the kernel for filter (must be odd and positive). */
     const unsigned int cFilterKernelSize{3};
+
+    /** Maximum value for thresholding. */
+    const double cThresholdMaxValue{255};
+    /** Adaptive thresholding algorithm. */
+    const computerVision::OpenCvWrapper::AdaptiveThresholdAlgorithm cThresholdMethod{
+        computerVision::OpenCvWrapper::AdaptiveThresholdAlgorithm::ADAPTIVE_THRESH_GAUSSIAN};
+    /** Threshold operation type. */
+    const computerVision::OpenCvWrapper::ThresholdOperations cThresholdOp{
+        computerVision::OpenCvWrapper::ThresholdOperations::THRESH_BINARY_INV};
+    /** Block size for thresholding. */
+    const int cThresholdBlockSize{21};
+    /** Constant to subtract from the algorithm for thresholding. */
+    const double cThresholdSubConst{4};
 
     /** Threshold1 value for the Canny Edge Detector. */
     const double cCannyEdgeThresh1{50};

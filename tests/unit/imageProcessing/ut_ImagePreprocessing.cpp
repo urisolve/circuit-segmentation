@@ -57,7 +57,7 @@ TEST_F(ImagePreprocessingTest, preprocessImageSave)
     ON_CALL(*mMockOpenCvWrapper, writeImage(_, _)).WillByDefault(Return(true));
 
     // Setup expectations
-    EXPECT_CALL(*mMockOpenCvWrapper, writeImage(_, _)).Times(4);
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage(_, _)).Times(3);
 
     // Preprocess image
     mImagePreprocessing->preprocessImage(mTestImage);
@@ -172,6 +172,18 @@ TEST_F(ImagePreprocessingTest, blursImage)
 
     // Blur image
     mImagePreprocessing->blurImage(mTestImage);
+}
+
+/**
+ * @brief Tests that the threshold operation is applied to the image.
+ */
+TEST_F(ImagePreprocessingTest, thresholdingImage)
+{
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, adaptiveThresholdImage(_, _, _, _, _, _, _)).Times(1);
+
+    // Thresholding image
+    mImagePreprocessing->thresholdImage(mTestImage);
 }
 
 /**

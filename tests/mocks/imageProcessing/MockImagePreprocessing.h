@@ -24,6 +24,8 @@ public:
     MOCK_METHOD(void, convertImageToGray, (computerVision::ImageMat & image), (override));
     /** Mocks method blurImage. */
     MOCK_METHOD(void, blurImage, (computerVision::ImageMat & image), (override));
+    /** Mocks method thresholdImage. */
+    MOCK_METHOD(void, thresholdImage, (computerVision::ImageMat & image), (override));
     /** Mocks method edgesImage. */
     MOCK_METHOD(void, edgesImage, (computerVision::ImageMat & image), (override));
     /** Mocks method setSaveImages. */
