@@ -20,6 +20,42 @@ class OpenCvWrapper
 {
 public:
     /**
+     * @brief Enumeration of the adaptive threshold algorithms.
+     *
+     * @note The values are mapped to AdaptiveThresholdTypes of the OpenCV library.
+     */
+    enum class AdaptiveThresholdAlgorithm : unsigned char {
+        /** Mapped to ADAPTIVE_THRESH_MEAN_C of the OpenCV library. */
+        ADAPTIVE_THRESH_MEAN = 0,
+        /** Mapped to ADAPTIVE_THRESH_GAUSSIAN_C of the OpenCV library. */
+        ADAPTIVE_THRESH_GAUSSIAN = 1
+    };
+
+    /**
+     * @brief Enumeration of the threshold operations.
+     *
+     * @note The values are mapped to ThresholdTypes of the OpenCV library.
+     */
+    enum class ThresholdOperations : unsigned char {
+        /** Mapped to THRESH_BINARY of the OpenCV library. */
+        THRESH_BINARY = 0,
+        /** Mapped to THRESH_BINARY_INV of the OpenCV library. */
+        THRESH_BINARY_INV = 1,
+        /** Mapped to THRESH_TRUNC of the OpenCV library. */
+        THRESH_TRUNC = 2,
+        /** Mapped to THRESH_TOZERO of the OpenCV library. */
+        THRESH_TOZERO = 3,
+        /** Mapped to THRESH_TOZERO_INV of the OpenCV library. */
+        THRESH_TOZERO_INV = 4,
+        /** Mapped to THRESH_MASK of the OpenCV library. */
+        THRESH_MASK = 7,
+        /** Mapped to THRESH_OTSU of the OpenCV library. */
+        THRESH_OTSU = 8,
+        /** Mapped to THRESH_TRIANGLE of the OpenCV library. */
+        THRESH_TRIANGLE = 16
+    };
+
+    /**
      * @brief Constructor.
      */
     OpenCvWrapper() = default;
@@ -134,6 +170,29 @@ public:
      * @param kernelSize Gaussian kernel size. The value must be positive and odd.
      */
     virtual void gaussianBlurImage(ImageMat& srcImg, ImageMat& dstImg, const unsigned int& kernelSize);
+
+    /**
+     * @brief Applies an adaptive threshold to an image.
+     *
+     * Before applying the adaptive threshold, the image should be filtered (using Gaussian blurring, for example).
+     *
+     * @param srcImg 8-bit input image.
+     * @param dstImg 8-bit output image.
+     * @param maxValue Non-zero value assigned to the pixels for which the condition is satisfied.
+     * @param adaptiveMethod Adaptive thresholding algorithm to use.
+     * @param thresholdOp Threshold operation type to use.
+     * @param blockSize Size of a pixel neighborhood that is used to calculate a threshold value for the pixel: 3, 5, 7,
+     * and so on.
+     * @param subConst Constant subtracted from the mean or weighted mean. Normally, it is positive but may be zero or
+     * negative as well.
+     */
+    virtual void adaptiveThresholdImage(ImageMat& srcImg,
+                                        ImageMat& dstImg,
+                                        const double& maxValue,
+                                        const AdaptiveThresholdAlgorithm& adaptiveMethod,
+                                        const ThresholdOperations& thresholdOp,
+                                        const int& blockSize,
+                                        const double& subConst);
 
     /**
      * @brief Finds edges in an image using the Canny algorithm.

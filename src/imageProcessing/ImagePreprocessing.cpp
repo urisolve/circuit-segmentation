@@ -19,22 +19,24 @@ void ImagePreprocessing::preprocessImage(computerVision::ImageMat& image)
 {
     mLogger->logInfo("Starting image preprocessing");
 
+    /*
     // Resize image
     resizeImage(image);
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_1_resize.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_resize.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Resized image", image, 0);
     }
+    */
 
     // Convert to grayscale
     convertImageToGray(image);
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_2_grayscale.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_grayscale.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Converted image to grayscale", image, 0);
     }
@@ -44,20 +46,32 @@ void ImagePreprocessing::preprocessImage(computerVision::ImageMat& image)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_3_blur.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_blur.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Blurred image", image, 0);
     }
 
+    // Apply threshold
+    thresholdImage(image);
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_threshold.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Thresholding image", image, 0);
+    }
+
+    /*
     // Detect edges
     edgesImage(image);
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_4_edge_detect.png", image);
+        mOpenCvWrapper->writeImage("image_preproc_edge_detect.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Edge detection image", image, 0);
     }
+    */
 }
 
 void ImagePreprocessing::resizeImage(computerVision::ImageMat& image)
@@ -122,6 +136,23 @@ void ImagePreprocessing::blurImage(computerVision::ImageMat& image)
     mOpenCvWrapper->gaussianBlurImage(image, image, cFilterKernelSize);
 
     mLogger->logInfo("Gaussian blurring applied to the image");
+}
+
+void ImagePreprocessing::thresholdImage(computerVision::ImageMat& image)
+{
+    /*
+     * Adaptive threshold
+     * - Consider small neighbors of pixels and then find an optimal threshold value, T, for each neighbor
+     * - Tend to produce good results, but is more computationally expensive than Otsu’s method or simple thresholding
+     * - Very useful in cases where:
+     *      - We have non-uniform illumination conditions
+     *      - There may be dramatic ranges of pixel intensities and the optimal value of T may change for different
+     * parts of the image
+     */
+    mOpenCvWrapper->adaptiveThresholdImage(
+        image, image, cThresholdMaxValue, cThresholdMethod, cThresholdOp, cThresholdBlockSize, cThresholdSubConst);
+
+    mLogger->logInfo("Adaptive threshold applied to the image");
 }
 
 void ImagePreprocessing::edgesImage(computerVision::ImageMat& image)

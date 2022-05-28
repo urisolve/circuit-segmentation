@@ -99,6 +99,19 @@ void OpenCvWrapper::gaussianBlurImage(ImageMat& srcImg, ImageMat& dstImg, const 
     cv::GaussianBlur(srcImg, dstImg, cv::Size(kernelSize, kernelSize), 0);
 }
 
+void OpenCvWrapper::adaptiveThresholdImage(ImageMat& srcImg,
+                                           ImageMat& dstImg,
+                                           const double& maxValue,
+                                           const AdaptiveThresholdAlgorithm& adaptiveMethod,
+                                           const ThresholdOperations& thresholdOp,
+                                           const int& blockSize,
+                                           const double& subConst)
+{
+    // Adaptive threshold
+    cv::adaptiveThreshold(
+        srcImg, dstImg, maxValue, static_cast<int>(adaptiveMethod), static_cast<int>(thresholdOp), blockSize, subConst);
+}
+
 void OpenCvWrapper::cannyEdgeImage(
     ImageMat& srcImg, ImageMat& dstImg, const double& threshold1, const double& threshold2, const int& apertureSize)
 {

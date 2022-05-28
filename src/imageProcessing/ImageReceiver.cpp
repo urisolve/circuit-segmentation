@@ -23,7 +23,7 @@ bool ImageReceiver::receiveImage()
         mLogger->logWarning("Image cannot be open/read with path: " + mImageFilePath);
         return false;
     }
-    mLogger->logInfo("Image okay with path: " + mImageFilePath);
+    mLogger->logInfo("Image file path: " + mImageFilePath);
 
     return true;
 }

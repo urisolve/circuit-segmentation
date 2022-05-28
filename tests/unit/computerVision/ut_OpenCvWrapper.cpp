@@ -208,6 +208,30 @@ TEST_F(OpenCvWrapperTest, gaussianBlurImageNoThrow)
 }
 
 /**
+ * @brief Tests that the method for adaptive thresholding the image does not throw an exception.
+ */
+TEST_F(OpenCvWrapperTest, adaptiveThresholdImageNoThrow)
+{
+    // Image to be processed
+    ImageMat image{};
+
+    // Image should be filtered before the adaptive thresholding
+    mOpenCvWrapper->convertImageToGray(mTestImage, image);
+    mOpenCvWrapper->gaussianBlurImage(image, image, 5);
+
+    // Adaptive threshold parameters
+    const double maxValue{255};
+    const OpenCvWrapper::AdaptiveThresholdAlgorithm adaptiveMethod{
+        OpenCvWrapper::AdaptiveThresholdAlgorithm::ADAPTIVE_THRESH_GAUSSIAN};
+    const OpenCvWrapper::ThresholdOperations thresholdOp{OpenCvWrapper::ThresholdOperations::THRESH_BINARY};
+    const int blockSize{21};
+    const double subConst{10};
+
+    EXPECT_NO_THROW(mOpenCvWrapper->adaptiveThresholdImage(
+        image, image, maxValue, adaptiveMethod, thresholdOp, blockSize, subConst));
+}
+
+/**
  * @brief Tests that the method for Canny edge detector does not throw an exception.
  */
 TEST_F(OpenCvWrapperTest, cannyEdgeImageNoThrow)

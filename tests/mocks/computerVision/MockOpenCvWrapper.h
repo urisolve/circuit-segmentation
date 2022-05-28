@@ -43,6 +43,17 @@ public:
                 gaussianBlurImage,
                 (ImageMat & srcImg, ImageMat& dstImg, const unsigned int& kernelSize),
                 (override));
+    /** Mocks method adaptiveThresholdImage. */
+    MOCK_METHOD(void,
+                adaptiveThresholdImage,
+                (ImageMat & srcImg,
+                 ImageMat& dstImg,
+                 const double& maxValue,
+                 const AdaptiveThresholdAlgorithm& adaptiveMethod,
+                 const ThresholdOperations& thresholdOp,
+                 const int& blockSize,
+                 const double& subConst),
+                (override));
     /** Mocks method cannyEdgeImage. */
     MOCK_METHOD(void,
                 cannyEdgeImage,
