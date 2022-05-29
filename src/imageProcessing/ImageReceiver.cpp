@@ -4,7 +4,8 @@
 
 #include "ImageReceiver.h"
 
-using namespace circuitSegmentation::imageProcessing;
+namespace circuitSegmentation {
+namespace imageProcessing {
 
 ImageReceiver::ImageReceiver(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                              std::shared_ptr<logging::Logger> logger)
@@ -42,3 +43,6 @@ void ImageReceiver::setImageFilePath(const std::string& filePath)
 {
     return mImageFilePath;
 }
+
+} // namespace imageProcessing
+} // namespace circuitSegmentation

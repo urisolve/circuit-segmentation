@@ -8,7 +8,7 @@
 /**
  * @brief Test class of CmdLineParser.
  */
-class CmdLineParserTest : public ::testing::Test
+class CmdLineParserTest : public testing::Test
 {
 protected:
     /**
@@ -21,6 +21,7 @@ protected:
      */
     void TearDown() override {}
 
+protected:
     /** Command line parser. */
     circuitSegmentation::utils::CmdLineParser mCmdLineParser{};
 };
@@ -56,7 +57,7 @@ TEST_F(CmdLineParserTest, hasCommandOption)
     // Verify if option is present
     const bool hasOptionArgs = mCmdLineParser.hasOption(std::string(argv[1]));
 
-    EXPECT_EQ(true, hasOptionArgs);
+    EXPECT_TRUE(hasOptionArgs);
 }
 
 /**
@@ -72,7 +73,7 @@ TEST_F(CmdLineParserTest, doesNotHaveCommandOption)
     // Verify if option is not present
     const bool hasOptionArgs = mCmdLineParser.hasOption("-v");
 
-    EXPECT_EQ(false, hasOptionArgs);
+    EXPECT_FALSE(hasOptionArgs);
 }
 
 /**

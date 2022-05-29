@@ -6,7 +6,8 @@
 #include "Application.h"
 #include <iostream>
 
-using namespace circuitSegmentation::application;
+namespace circuitSegmentation {
+namespace application {
 
 void CommandLineParser::parse(const int argc, char const* argv[])
 {
@@ -87,3 +88,6 @@ bool CommandLineParser::hasSaveImages() const
 
     return false;
 }
+
+} // namespace application
+} // namespace circuitSegmentation

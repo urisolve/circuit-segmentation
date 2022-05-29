@@ -8,7 +8,7 @@
 /**
  * @brief Test class of CommandLineParser.
  */
-class CommandLineParserTest : public ::testing::Test
+class CommandLineParserTest : public testing::Test
 {
 protected:
     /**
@@ -21,6 +21,7 @@ protected:
      */
     void TearDown() override {}
 
+protected:
     /** Command line parser. */
     circuitSegmentation::application::CommandLineParser mCommandLineParser{};
 };
@@ -38,7 +39,7 @@ TEST_F(CommandLineParserTest, hasHelpShortOption)
     // Verify if option is present
     const bool hasHelpOption = mCommandLineParser.hasHelp();
 
-    EXPECT_EQ(true, hasHelpOption);
+    EXPECT_TRUE(hasHelpOption);
 }
 
 /**
@@ -54,7 +55,7 @@ TEST_F(CommandLineParserTest, hasHelpLongOption)
     // Verify if option is present
     const bool hasHelpOption = mCommandLineParser.hasHelp();
 
-    EXPECT_EQ(true, hasHelpOption);
+    EXPECT_TRUE(hasHelpOption);
 }
 
 /**
@@ -70,7 +71,7 @@ TEST_F(CommandLineParserTest, doesNotHaveHelpOption)
     // Verify if option is not present
     const bool hasHelpOption = mCommandLineParser.hasHelp();
 
-    EXPECT_EQ(false, hasHelpOption);
+    EXPECT_FALSE(hasHelpOption);
 }
 
 /**
@@ -86,7 +87,7 @@ TEST_F(CommandLineParserTest, hasVersionShortOption)
     // Verify if option is present
     const bool hasVersionOption = mCommandLineParser.hasVersion();
 
-    EXPECT_EQ(true, hasVersionOption);
+    EXPECT_TRUE(hasVersionOption);
 }
 
 /**
@@ -102,7 +103,7 @@ TEST_F(CommandLineParserTest, hasVersionLongOption)
     // Verify if option is present
     const bool hasVersionOption = mCommandLineParser.hasVersion();
 
-    EXPECT_EQ(true, hasVersionOption);
+    EXPECT_TRUE(hasVersionOption);
 }
 
 /**
@@ -118,7 +119,7 @@ TEST_F(CommandLineParserTest, doesNotHaveVersionOption)
     // Verify if option is not present
     const bool hasVersionOption = mCommandLineParser.hasVersion();
 
-    EXPECT_EQ(false, hasVersionOption);
+    EXPECT_FALSE(hasVersionOption);
 }
 
 /**
@@ -134,7 +135,7 @@ TEST_F(CommandLineParserTest, hasVerboseShortOption)
     // Verify if option is present
     const bool hasVerboseOption = mCommandLineParser.hasVerboseLog();
 
-    EXPECT_EQ(true, hasVerboseOption);
+    EXPECT_TRUE(hasVerboseOption);
 }
 
 /**
@@ -150,7 +151,7 @@ TEST_F(CommandLineParserTest, hasVerboseLongOption)
     // Verify if option is present
     const bool hasVerboseOption = mCommandLineParser.hasVerboseLog();
 
-    EXPECT_EQ(true, hasVerboseOption);
+    EXPECT_TRUE(hasVerboseOption);
 }
 
 /**
@@ -166,7 +167,7 @@ TEST_F(CommandLineParserTest, doesNotHaveVerboseOption)
     // Verify if option is not present
     const bool hasVerboseOption = mCommandLineParser.hasVerboseLog();
 
-    EXPECT_EQ(false, hasVerboseOption);
+    EXPECT_FALSE(hasVerboseOption);
 }
 
 /**
@@ -230,7 +231,7 @@ TEST_F(CommandLineParserTest, hasSaveImagesShortOption)
     // Verify if option is present
     const bool hasSaveImagesOption = mCommandLineParser.hasSaveImages();
 
-    EXPECT_EQ(true, hasSaveImagesOption);
+    EXPECT_TRUE(hasSaveImagesOption);
 }
 
 /**
@@ -246,7 +247,7 @@ TEST_F(CommandLineParserTest, hasSaveImagesLongOption)
     // Verify if option is present
     const bool hasSaveImagesOption = mCommandLineParser.hasSaveImages();
 
-    EXPECT_EQ(true, hasSaveImagesOption);
+    EXPECT_TRUE(hasSaveImagesOption);
 }
 
 /**
@@ -262,7 +263,7 @@ TEST_F(CommandLineParserTest, doesNotHaveSaveImagesOption)
     // Verify if option is not present
     const bool hasSaveImagesOption = mCommandLineParser.hasSaveImages();
 
-    EXPECT_EQ(false, hasSaveImagesOption);
+    EXPECT_FALSE(hasSaveImagesOption);
 }
 
 // /**
