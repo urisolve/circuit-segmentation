@@ -4,16 +4,19 @@
 
 #include "ImageProcManager.h"
 
-using namespace circuitSegmentation::imageProcessing;
+namespace circuitSegmentation {
+namespace imageProcessing {
 
 ImageProcManager::ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
                                    std::shared_ptr<ImagePreprocessing> imagePreprocessing,
+                                   std::shared_ptr<ImageSegmentation> imageSegmentation,
                                    std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                                    std::shared_ptr<logging::Logger> logger,
                                    bool logMode,
                                    bool saveImages)
     : mImageReceiver{std::move(imageReceiver)}
     , mImagePreprocessing{std::move(imagePreprocessing)}
+    , mImageSegmentation{std::move(imageSegmentation)}
     , mOpenCvWrapper{std::move(openCvWrapper)}
     , mLogger{std::move(logger)}
     , mLogMode{std::move(logMode)}
@@ -32,6 +35,7 @@ ImageProcManager ImageProcManager::create(std::shared_ptr<logging::Logger> logge
 
     return ImageProcManager(std::make_shared<ImageReceiver>(openCvWrapper, logger),
                             std::make_shared<ImagePreprocessing>(openCvWrapper, logger),
+                            std::make_shared<ImageSegmentation>(openCvWrapper, logger),
                             openCvWrapper,
                             logger,
                             logMode,
@@ -40,31 +44,29 @@ ImageProcManager ImageProcManager::create(std::shared_ptr<logging::Logger> logge
 
 bool ImageProcManager::processImage(const std::string imageFilePath)
 {
-    // Receive original image
-    if (!receiveOriginalImage(imageFilePath)) {
+    // Receive image
+    if (!receiveImage(imageFilePath)) {
         return false;
     }
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_original.png", mImageOriginal);
+        mOpenCvWrapper->writeImage("image_initial.png", mImageInitial);
         // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Original image", mImageOriginal, 0);
+        mOpenCvWrapper->showImage("Initial image", mImageInitial, 0);
     }
 
     // Preprocessing
     preprocessImage();
 
-    // Save image
-    if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preprocessed.png", mImageProcessed);
-        // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Preprocessed image", mImageProcessed, 0);
+    // Segmentation.
+    if (!segmentImage()) {
+        return false;
     }
 
-    // TODO: Segmentation.
-
     // TODO: Segmentation map.
+
+    // TODO: Images of components with ID.
 
     return true;
 }
@@ -96,6 +98,7 @@ void ImageProcManager::setSaveImages(const bool& saveImages)
     mSaveImages = saveImages;
 
     mImagePreprocessing->setSaveImages(mSaveImages);
+    mImageSegmentation->setSaveImages(mSaveImages);
 }
 
 bool ImageProcManager::getSaveImages() const
@@ -103,7 +106,7 @@ bool ImageProcManager::getSaveImages() const
     return mSaveImages;
 }
 
-bool ImageProcManager::receiveOriginalImage(const std::string& filePath)
+bool ImageProcManager::receiveImage(const std::string& filePath)
 {
     // Set image file path
     mImageReceiver->setImageFilePath(filePath);
@@ -114,16 +117,25 @@ bool ImageProcManager::receiveOriginalImage(const std::string& filePath)
     }
 
     // Get image received
-    mImageOriginal = mImageReceiver->getImageReceived();
+    mImageInitial = mImageReceiver->getImageReceived();
 
     return true;
 }
 
 void ImageProcManager::preprocessImage()
 {
-    // Copy original image
-    mImageProcessed = mOpenCvWrapper->cloneImage(mImageOriginal);
+    // Copy initial image
+    mImageProcessed = mOpenCvWrapper->cloneImage(mImageInitial);
 
     // Preprocess the image
     mImagePreprocessing->preprocessImage(mImageProcessed);
 }
+
+bool ImageProcManager::segmentImage()
+{
+    // Segment the image
+    return mImageSegmentation->segmentImage(mImageInitial, mImageProcessed);
+}
+
+} // namespace imageProcessing
+} // namespace circuitSegmentation

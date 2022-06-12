@@ -27,9 +27,9 @@ public:
      * @param logger Logger.
      * @param saveImages Save images obtained during the processing.
      */
-    ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                       std::shared_ptr<logging::Logger> logger,
-                       bool saveImages = false);
+    explicit ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
+                                std::shared_ptr<logging::Logger> logger,
+                                bool saveImages = false);
 
     /**
      * @brief Destructor.
@@ -43,6 +43,23 @@ public:
      */
     virtual void preprocessImage(computerVision::ImageMat& image);
 
+    /**
+     * @brief Sets the flag to save images obtained during the processing.
+     *
+     * @param saveImages Save images obtained during the processing.
+     */
+    virtual void setSaveImages(const bool& saveImages);
+
+    /**
+     * @brief Gets the flag to save images obtained during the processing.
+     *
+     * @return The flag to save images obtained during the processing.
+     */
+    [[nodiscard]] virtual bool getSaveImages() const;
+
+#ifndef BUILD_TESTS
+private:
+#endif
     /**
      * @brief Resizes the image.
      *
@@ -72,29 +89,22 @@ public:
     virtual void thresholdImage(computerVision::ImageMat& image);
 
     /**
+     * @brief Applies a morphological opening to the image.
+     *
+     * @param image Image to apply a morphological opening.
+     */
+    virtual void morphologicalOpenImage(computerVision::ImageMat& image);
+
+    /**
      * @brief Detects edges the image.
      *
      * @param image Image to detect edges.
      */
     virtual void edgesImage(computerVision::ImageMat& image);
 
-    /**
-     * @brief Sets the flag to save images obtained during the processing.
-     *
-     * @param saveImages Save images obtained during the processing.
-     */
-    virtual void setSaveImages(const bool& saveImages);
-
-    /**
-     * @brief Gets the flag to save images obtained during the processing.
-     *
-     * @return The flag to save images obtained during the processing.
-     */
-    [[nodiscard]] virtual bool getSaveImages() const;
-
 private:
     /** Size of the kernel for filter (must be odd and positive). */
-    const unsigned int cFilterKernelSize{3};
+    const unsigned int cFilterKernelSize{9};
 
     /** Maximum value for thresholding. */
     const double cThresholdMaxValue{255};
@@ -108,6 +118,11 @@ private:
     const int cThresholdBlockSize{21};
     /** Constant to subtract from the algorithm for thresholding. */
     const double cThresholdSubConst{4};
+
+    /** Size of the kernel for morphological opening. */
+    const unsigned int cMorphOpenKernelSize{3};
+    /** Iterations for morphological opening. */
+    const unsigned int cMorphOpenIter{1};
 
     /** Threshold1 value for the Canny Edge Detector. */
     const double cCannyEdgeThresh1{50};

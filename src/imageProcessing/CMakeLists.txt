@@ -8,11 +8,13 @@ set(Headers
     ImagePreprocessing.h
     ImageProcManager.h
     ImageReceiver.h
+    ImageSegmentation.h
 )
 set(Sources
     ImagePreprocessing.cpp
     ImageProcManager.cpp
     ImageReceiver.cpp
+    ImageSegmentation.cpp
 )
 
 # ----------------------------------------------------------------------------

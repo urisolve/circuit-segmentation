@@ -6,7 +6,8 @@
 #include <algorithm>
 #include <iostream>
 
-using namespace circuitSegmentation::utils;
+namespace circuitSegmentation {
+namespace utils {
 
 CmdLineParser::CmdLineParser()
     : mCmdLineArgs{}
@@ -111,3 +112,6 @@ void CmdLineParser::showHelp() const
         std::cout << "\t" << it.first << "\t\t" << it.second << std::endl;
     }
 }
+
+} // namespace utils
+} // namespace circuitSegmentation

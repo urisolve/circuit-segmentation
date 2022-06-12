@@ -8,7 +8,8 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
-using namespace circuitSegmentation::computerVision;
+namespace circuitSegmentation {
+namespace computerVision {
 
 void OpenCvWrapper::setLogMode(const bool& silent)
 {
@@ -30,6 +31,8 @@ bool OpenCvWrapper::getLogMode() const
     }
 }
 
+// GCOVR_EXCL_START
+// Rationale: It is not worth to test this logic.
 void OpenCvWrapper::showImage(const std::string& windowName, ImageMat& image, int delay)
 {
     // Open image
@@ -37,6 +40,7 @@ void OpenCvWrapper::showImage(const std::string& windowName, ImageMat& image, in
     // Wait for a pressed key
     cv::waitKey(std::move(delay));
 }
+// GCOVR_EXCL_STOP
 
 bool OpenCvWrapper::writeImage(const std::string& fileName, ImageMat& image)
 {
@@ -118,3 +122,78 @@ void OpenCvWrapper::cannyEdgeImage(
     // Detect edges using the Canny Edge Detector
     cv::Canny(srcImg, dstImg, threshold1, threshold2, apertureSize);
 }
+
+ImageMat OpenCvWrapper::getStructuringElement(const MorphShapes& shape, const unsigned int& size)
+{
+    return cv::getStructuringElement(static_cast<int>(shape), cv::Size(size, size), cv::Point(-1, -1));
+}
+
+void OpenCvWrapper::morphologyEx(
+    ImageMat& srcImg, ImageMat& dstImg, const MorphTypes& op, const ImageMat& kernel, const unsigned int& iterations)
+{
+    cv::morphologyEx(srcImg, dstImg, static_cast<int>(op), kernel, cv::Point(-1, -1), iterations);
+}
+
+void OpenCvWrapper::findContours(ImageMat& image,
+                                 Contours& contours,
+                                 ContoursHierarchy& hierarchy,
+                                 const RetrievalModes& mode,
+                                 const ContourApproximationModes& method)
+{
+    cv::findContours(image, contours, hierarchy, static_cast<int>(mode), static_cast<int>(method));
+}
+
+void OpenCvWrapper::drawContours(ImageMat& image,
+                                 const Contours& contours,
+                                 const int& contourIdx,
+                                 const Scalar& color,
+                                 const int& thickness,
+                                 const LineTypes& lineType,
+                                 const ContoursHierarchy& hierarchy)
+{
+    cv::drawContours(image, contours, contourIdx, color, thickness, lineType, hierarchy);
+}
+
+double OpenCvWrapper::contourArea(InputOutputArray& contour)
+{
+    return cv::contourArea(contour);
+}
+
+Rectangle OpenCvWrapper::boundingRect(InputOutputArray& array)
+{
+    return cv::boundingRect(array);
+}
+
+void OpenCvWrapper::rectangle(
+    ImageMat& image, const Rectangle& rectangle, const Scalar& color, const int& thickness, const LineTypes& lineType)
+{
+    cv::rectangle(image, rectangle, color, thickness, lineType);
+}
+
+int OpenCvWrapper::getRectWidth(Rectangle& rectangle) const
+{
+    return rectangle.width;
+}
+
+int OpenCvWrapper::getRectHeight(Rectangle& rectangle) const
+{
+    return rectangle.height;
+}
+
+int OpenCvWrapper::getRectCoordX(Rectangle& rectangle) const
+{
+    return rectangle.x;
+}
+
+int OpenCvWrapper::getRectCoordY(Rectangle& rectangle) const
+{
+    return rectangle.y;
+}
+
+Rectangle OpenCvWrapper::createRect(const int& x, const int& y, const int& width, const int& height) const
+{
+    return Rectangle{x, y, width, height};
+}
+
+} // namespace computerVision
+} // namespace circuitSegmentation

@@ -7,6 +7,7 @@
 #include "computerVision/OpenCvWrapper.h"
 #include "ImagePreprocessing.h"
 #include "ImageReceiver.h"
+#include "ImageSegmentation.h"
 #include "logging/Logger.h"
 #include <memory>
 #include <string>
@@ -25,6 +26,7 @@ public:
      *
      * @param imageReceiver Image receiver.
      * @param imagePreprocessing Image preprocessing.
+     * @param imageSegmentation Image segmentation.
      * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      * @param logMode Log mode: verbose = true, silent = false.
@@ -32,6 +34,7 @@ public:
      */
     ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
                      std::shared_ptr<ImagePreprocessing> imagePreprocessing,
+                     std::shared_ptr<ImageSegmentation> imageSegmentation,
                      std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                      std::shared_ptr<logging::Logger> logger,
                      bool logMode = false,
@@ -96,41 +99,52 @@ public:
     [[nodiscard]] virtual bool getSaveImages() const;
 
 private:
-    /** Image receiver. */
-    std::shared_ptr<ImageReceiver> mImageReceiver;
-    /** Original image for processing. */
-    computerVision::ImageMat mImageOriginal{};
-
-    /** Image preprocessing. */
-    std::shared_ptr<ImagePreprocessing> mImagePreprocessing;
-
-    /** OpenCV wrapper. */
-    std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;
-
-    /** Processed image. */
-    computerVision::ImageMat mImageProcessed{};
-
-    /** Logger. */
-    std::shared_ptr<logging::Logger> mLogger;
-
-    /** Log mode: verbose = true, silent = false. */
-    bool mLogMode{false};
-    /** Flag to save images obtained during the processing in the working directory. */
-    bool mSaveImages{false};
-
     /**
-     * @brief Receives the original image for processing.
+     * @brief Receives the image for processing.
      *
      * @param filePath Image file path.
      *
      * @return True if image is okay, otherwise false.
      */
-    virtual bool receiveOriginalImage(const std::string& filePath);
+    virtual bool receiveImage(const std::string& filePath);
 
     /**
      * @brief Preprocesses the image.
      */
     virtual void preprocessImage();
+
+    /**
+     * @brief Segments the image.
+     *
+     * @return True if image segmentation occurred successfully, otherwise false.
+     */
+    virtual bool segmentImage();
+
+private:
+    /** Image receiver. */
+    std::shared_ptr<ImageReceiver> mImageReceiver;
+    /** Initial Image for processing. */
+    computerVision::ImageMat mImageInitial{};
+
+    /** Image preprocessing. */
+    std::shared_ptr<ImagePreprocessing> mImagePreprocessing;
+
+    /** Image segmentation. */
+    std::shared_ptr<ImageSegmentation> mImageSegmentation;
+
+    /** OpenCV wrapper. */
+    std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;
+
+    /** Logger. */
+    std::shared_ptr<logging::Logger> mLogger;
+
+    /** Processed image. */
+    computerVision::ImageMat mImageProcessed{};
+
+    /** Log mode: verbose = true, silent = false. */
+    bool mLogMode{false};
+    /** Flag to save images obtained during the processing in the working directory. */
+    bool mSaveImages{false};
 };
 
 } // namespace imageProcessing

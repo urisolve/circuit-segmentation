@@ -63,6 +63,63 @@ public:
                  const double& threshold2,
                  const int& apertureSize),
                 (override));
+    /** Mocks method getStructuringElement. */
+    MOCK_METHOD(ImageMat, getStructuringElement, (const MorphShapes& shape, const unsigned int& size), (override));
+    /** Mocks method morphologyEx. */
+    MOCK_METHOD(void,
+                morphologyEx,
+                (ImageMat & srcImg,
+                 ImageMat& dstImg,
+                 const MorphTypes& op,
+                 const ImageMat& kernel,
+                 const unsigned int& iterations),
+                (override));
+    /** Mocks method findContours. */
+    MOCK_METHOD(void,
+                findContours,
+                (ImageMat & image,
+                 Contours& contours,
+                 ContoursHierarchy& hierarchy,
+                 const RetrievalModes& mode,
+                 const ContourApproximationModes& method),
+                (override));
+    /** Mocks method drawContours. */
+    MOCK_METHOD(void,
+                drawContours,
+                (ImageMat & image,
+                 const Contours& contours,
+                 const int& contourIdx,
+                 const Scalar& color,
+                 const int& thickness,
+                 const LineTypes& lineType,
+                 const ContoursHierarchy& hierarchy),
+                (override));
+    /** Mocks method contourArea. */
+    MOCK_METHOD(double, contourArea, (InputOutputArray & contour), (override));
+    /** Mocks method boundingRect. */
+    MOCK_METHOD(Rectangle, boundingRect, (InputOutputArray & array), (override));
+    /** Mocks method rectangle. */
+    MOCK_METHOD(void,
+                rectangle,
+                (ImageMat & image,
+                 const Rectangle& rectangle,
+                 const Scalar& color,
+                 const int& thickness,
+                 const LineTypes& lineType),
+                (override));
+    /** Mocks method getRectWidth. */
+    MOCK_METHOD(int, getRectWidth, (Rectangle & rectangle), (const, override));
+    /** Mocks method getRectHeight. */
+    MOCK_METHOD(int, getRectHeight, (Rectangle & rectangle), (const, override));
+    /** Mocks method getRectCoordX. */
+    MOCK_METHOD(int, getRectCoordX, (Rectangle & rectangle), (const, override));
+    /** Mocks method getRectCoordY. */
+    MOCK_METHOD(int, getRectCoordY, (Rectangle & rectangle), (const, override));
+    /** Mocks method createRect. */
+    MOCK_METHOD(Rectangle,
+                createRect,
+                (const int& x, const int& y, const int& width, const int& height),
+                (const, override));
 };
 
 } // namespace computerVision

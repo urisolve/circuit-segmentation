@@ -4,7 +4,8 @@
 
 #include "ImagePreprocessing.h"
 
-using namespace circuitSegmentation::imageProcessing;
+namespace circuitSegmentation {
+namespace imageProcessing {
 
 ImagePreprocessing::ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
                                        std::shared_ptr<logging::Logger> logger,
@@ -19,59 +20,27 @@ void ImagePreprocessing::preprocessImage(computerVision::ImageMat& image)
 {
     mLogger->logInfo("Starting image preprocessing");
 
-    /*
-    // Resize image
-    resizeImage(image);
-
-    // Save image
-    if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_resize.png", image);
-        // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Resized image", image, 0);
-    }
-    */
-
     // Convert to grayscale
     convertImageToGray(image);
-
-    // Save image
-    if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_grayscale.png", image);
-        // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Converted image to grayscale", image, 0);
-    }
 
     // Blur image
     blurImage(image);
 
-    // Save image
-    if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_blur.png", image);
-        // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Blurred image", image, 0);
-    }
-
     // Apply threshold
     thresholdImage(image);
 
-    // Save image
-    if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_threshold.png", image);
-        // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Thresholding image", image, 0);
-    }
+    // Apply morphological opening
+    morphologicalOpenImage(image);
+}
 
-    /*
-    // Detect edges
-    edgesImage(image);
+void ImagePreprocessing::setSaveImages(const bool& saveImages)
+{
+    mSaveImages = saveImages;
+}
 
-    // Save image
-    if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_edge_detect.png", image);
-        // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Edge detection image", image, 0);
-    }
-    */
+bool ImagePreprocessing::getSaveImages() const
+{
+    return mSaveImages;
 }
 
 void ImagePreprocessing::resizeImage(computerVision::ImageMat& image)
@@ -124,6 +93,13 @@ void ImagePreprocessing::convertImageToGray(computerVision::ImageMat& image)
     mOpenCvWrapper->convertImageToGray(image, image);
 
     mLogger->logInfo("Image converted to grayscale");
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_grayscale.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Converted image to grayscale", image, 0);
+    }
 }
 
 void ImagePreprocessing::blurImage(computerVision::ImageMat& image)
@@ -136,6 +112,13 @@ void ImagePreprocessing::blurImage(computerVision::ImageMat& image)
     mOpenCvWrapper->gaussianBlurImage(image, image, cFilterKernelSize);
 
     mLogger->logInfo("Gaussian blurring applied to the image");
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_blur.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Blurred image", image, 0);
+    }
 }
 
 void ImagePreprocessing::thresholdImage(computerVision::ImageMat& image)
@@ -153,6 +136,39 @@ void ImagePreprocessing::thresholdImage(computerVision::ImageMat& image)
         image, image, cThresholdMaxValue, cThresholdMethod, cThresholdOp, cThresholdBlockSize, cThresholdSubConst);
 
     mLogger->logInfo("Adaptive threshold applied to the image");
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_threshold.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Thresholding image", image, 0);
+    }
+}
+
+void ImagePreprocessing::morphologicalOpenImage(computerVision::ImageMat& image)
+{
+    /*
+     * Morphological opening
+     * - Performs an opening operation that allows us to remove small blobs from an image
+     * - First an erosion is applied to remove the small blobs, then a dilation is applied to regrow the size of the
+     * original object
+     */
+    const auto kernelMorph = mOpenCvWrapper->getStructuringElement(
+        circuitSegmentation::computerVision::OpenCvWrapper::MorphShapes::MORPH_RECT, cMorphOpenKernelSize);
+    mOpenCvWrapper->morphologyEx(image,
+                                 image,
+                                 circuitSegmentation::computerVision::OpenCvWrapper::MorphTypes::MORPH_OPEN,
+                                 kernelMorph,
+                                 cMorphOpenIter);
+
+    mLogger->logInfo("Morphological opening applied to the image");
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_morph_open.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Morphological opening image", image, 0);
+    }
 }
 
 void ImagePreprocessing::edgesImage(computerVision::ImageMat& image)
@@ -163,12 +179,5 @@ void ImagePreprocessing::edgesImage(computerVision::ImageMat& image)
     mLogger->logInfo("Canny edge detector applied to the image");
 }
 
-void ImagePreprocessing::setSaveImages(const bool& saveImages)
-{
-    mSaveImages = saveImages;
-}
-
-bool ImagePreprocessing::getSaveImages() const
-{
-    return mSaveImages;
-}
+} // namespace imageProcessing
+} // namespace circuitSegmentation

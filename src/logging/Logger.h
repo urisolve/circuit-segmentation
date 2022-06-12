@@ -47,7 +47,7 @@ public:
      * @param ostream Output stream.
      * @param level Log level.
      */
-    Logger(std::ostream& ostream, LogLevel level = cLogLevelDefault);
+    explicit Logger(std::ostream& ostream, LogLevel level = cLogLevelDefault);
 
     /**
      * @brief Destructor.
@@ -111,12 +111,6 @@ public:
     virtual void logVerbose(const std::string& msg);
 
 private:
-    /** Output stream. */
-    std::ostream& mOstream;
-
-    /** Log level. */
-    LogLevel mLogLevel{cLogLevelDefault};
-
     /**
      * @brief Logs the message.
      *
@@ -133,6 +127,13 @@ private:
      * @return String with the current date and time.
      */
     virtual const std::string getDateTime() const;
+
+private:
+    /** Output stream. */
+    std::ostream& mOstream;
+
+    /** Log level. */
+    LogLevel mLogLevel{cLogLevelDefault};
 };
 
 } // namespace logging

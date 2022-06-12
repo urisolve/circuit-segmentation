@@ -9,7 +9,8 @@
 #include <iostream>
 #include <memory>
 
-using namespace circuitSegmentation::application;
+namespace circuitSegmentation {
+namespace application {
 
 int Application::exec(int& argc, char const* argv[])
 {
@@ -49,9 +50,7 @@ int Application::exec(int& argc, char const* argv[])
     logger->logInfo("Starting " + std::string(cAppName) + ": version " + std::string(cAppVersion));
 
     // Image processing manager
-    auto imageProcManager{imageProcessing::ImageProcManager::create(logger)};
-    imageProcManager.setLogMode(hasVerboseLogs);
-    imageProcManager.setSaveImages(hasSaveImages);
+    auto imageProcManager{imageProcessing::ImageProcManager::create(logger, hasVerboseLogs, hasSaveImages)};
 
     // Initialize processing
     imageProcManager.processImage(imagePath);
@@ -60,3 +59,6 @@ int Application::exec(int& argc, char const* argv[])
 
     return 0;
 }
+
+} // namespace application
+} // namespace circuitSegmentation

@@ -15,7 +15,7 @@ using namespace circuitSegmentation;
 /**
  * @brief Test class of ImageReceiver.
  */
-class ImageReceiverTest : public ::testing::Test
+class ImageReceiverTest : public testing::Test
 {
 protected:
     /**
@@ -23,7 +23,7 @@ protected:
      */
     void SetUp() override
     {
-        mMockOpenCvWrapper = std::make_shared<NaggyMock<computerVision::MockOpenCvWrapper>>();
+        mMockOpenCvWrapper = std::make_shared<NiceMock<computerVision::MockOpenCvWrapper>>();
         mLogger = std::make_shared<logging::Logger>(std::cout);
 
         mImageReceiver = std::make_unique<imageProcessing::ImageReceiver>(mMockOpenCvWrapper, mLogger);
@@ -34,10 +34,11 @@ protected:
      */
     void TearDown() override {}
 
+protected:
     /** Image receiver. */
     std::unique_ptr<imageProcessing::ImageReceiver> mImageReceiver;
     /** OpenCV wrapper. */
-    std::shared_ptr<NaggyMock<computerVision::MockOpenCvWrapper>> mMockOpenCvWrapper;
+    std::shared_ptr<NiceMock<computerVision::MockOpenCvWrapper>> mMockOpenCvWrapper;
     /** Logger. */
     std::shared_ptr<logging::Logger> mLogger;
 };
@@ -48,14 +49,14 @@ protected:
 TEST_F(ImageReceiverTest, receivesImageSuccessfully)
 {
     // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).WillByDefault(Return(false));
+    ON_CALL(*mMockOpenCvWrapper, isImageEmpty).WillByDefault(Return(false));
 
     // Setup expectations
-    EXPECT_CALL(*mMockOpenCvWrapper, readImage(_)).Times(1);
-    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, readImage).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty).Times(1);
 
     // Receive image
-    EXPECT_EQ(true, mImageReceiver->receiveImage());
+    EXPECT_TRUE(mImageReceiver->receiveImage());
 }
 
 /**
@@ -64,14 +65,14 @@ TEST_F(ImageReceiverTest, receivesImageSuccessfully)
 TEST_F(ImageReceiverTest, receivesImageUnsuccessfully)
 {
     // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).WillByDefault(Return(true));
+    ON_CALL(*mMockOpenCvWrapper, isImageEmpty).WillByDefault(Return(true));
 
     // Setup expectations
-    EXPECT_CALL(*mMockOpenCvWrapper, readImage(_)).Times(1);
-    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty(_)).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, readImage).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty).Times(1);
 
     // Receive image
-    EXPECT_EQ(false, mImageReceiver->receiveImage());
+    EXPECT_FALSE(mImageReceiver->receiveImage());
 }
 
 /**

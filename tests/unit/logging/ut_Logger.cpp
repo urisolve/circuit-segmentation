@@ -16,7 +16,7 @@ using namespace circuitSegmentation::logging;
 /**
  * @brief Test class of Logger.
  */
-class LoggerTest : public ::testing::Test
+class LoggerTest : public testing::Test
 {
 protected:
     /**
@@ -46,6 +46,7 @@ protected:
         return ss.str();
     }
 
+protected:
     /** Logger. */
     std::shared_ptr<Logger> mLogger;
     /** Logger stream */
@@ -92,7 +93,7 @@ TEST_F(LoggerTest, noFatalLog)
     const std::string msg{"A fatal message"};
     mLogger->logFatal(msg);
 
-    EXPECT_EQ(true, mStream.str().empty());
+    EXPECT_TRUE(mStream.str().empty());
 }
 
 /**
@@ -122,7 +123,7 @@ TEST_F(LoggerTest, noErrorLog)
     const std::string msg{"An error message"};
     mLogger->logError(msg);
 
-    EXPECT_EQ(true, mStream.str().empty());
+    EXPECT_TRUE(mStream.str().empty());
 }
 
 /**
@@ -152,7 +153,7 @@ TEST_F(LoggerTest, noWarningLog)
     const std::string msg{"A warning message"};
     mLogger->logWarning(msg);
 
-    EXPECT_EQ(true, mStream.str().empty());
+    EXPECT_TRUE(mStream.str().empty());
 }
 
 /**
@@ -182,7 +183,7 @@ TEST_F(LoggerTest, noInfoLog)
     const std::string msg{"An information message"};
     mLogger->logInfo(msg);
 
-    EXPECT_EQ(true, mStream.str().empty());
+    EXPECT_TRUE(mStream.str().empty());
 }
 
 /**
@@ -212,7 +213,7 @@ TEST_F(LoggerTest, noDebugLog)
     const std::string msg{"A debug message"};
     mLogger->logDebug(msg);
 
-    EXPECT_EQ(true, mStream.str().empty());
+    EXPECT_TRUE(mStream.str().empty());
 }
 
 /**
@@ -242,7 +243,7 @@ TEST_F(LoggerTest, noVerboseLog)
     const std::string msg{"A verbose message"};
     mLogger->logVerbose(msg);
 
-    EXPECT_EQ(true, mStream.str().empty());
+    EXPECT_TRUE(mStream.str().empty());
 }
 
 // /**

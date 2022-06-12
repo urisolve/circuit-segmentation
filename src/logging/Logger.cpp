@@ -9,7 +9,8 @@
 #include <sstream>
 #include <string>
 
-using namespace circuitSegmentation::logging;
+namespace circuitSegmentation {
+namespace logging {
 
 Logger::Logger(std::ostream& ostream, LogLevel level)
     : mOstream{ostream}
@@ -89,3 +90,6 @@ const std::string Logger::getDateTime() const
 
     return ss.str();
 }
+
+} // namespace logging
+} // namespace circuitSegmentation
