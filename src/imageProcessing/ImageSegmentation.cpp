@@ -3,18 +3,21 @@
  */
 
 #include "ImageSegmentation.h"
+#include <algorithm>
 
 namespace circuitSegmentation {
 namespace imageProcessing {
 
 using namespace circuitSegmentation::computerVision;
 
-ImageSegmentation::ImageSegmentation(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                                     std::shared_ptr<logging::Logger> logger,
-                                     bool saveImages)
-    : mOpenCvWrapper{std::move(openCvWrapper)}
-    , mLogger{std::move(logger)}
+ImageSegmentation::ImageSegmentation(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                                     const std::shared_ptr<logging::Logger>& logger,
+                                     const bool saveImages)
+    : mOpenCvWrapper{openCvWrapper}
+    , mLogger{logger}
     , mSaveImages{std::move(saveImages)}
+    , mComponents{}
+    , mNodes{}
 {
 }
 
@@ -26,41 +29,39 @@ bool ImageSegmentation::segmentImage(computerVision::ImageMat imageInitial, comp
     mImagePreprocessed = std::move(imagePreprocessed);
 
     /*
-    Steps:
-    - Find components
-        - Morphological closing is applied which results in dilating components
-        - Morphological opening removes the rest of the circuit leaving only the dilated components
-        - Save bounding boxes of the components identified
-    - Find terminal points of the components
-        - Generate a binary image with only bounding boxes
-        - Identify terminal points as intersection points between the circuit and bounding boxes generated (binary
-    images)
-        - See truth table of the article
-    - Detection of components
-        - Discard bounding boxes of components that do not have terminals
-        - Generate images (ROI) with the components
-    - Separation of components and circuits
-        - Bounding boxes as black pixels, so the components are removed
-    - Identification of horizontal and vertical lines
-        - Hough transform is applied to identify horizontal and vertical lines
-        - See slopes considered for horizontal and vertical lines in the article
-    - Detection of nodes
-        - Nodes are intersection points of horizontal and vertical lines
-        - Dilate image
-        - See algorithm used for intersection in the article
-    - Mapping nodes to the terminals
-        - Each terminal is connected to a node, and hence the connections can be made by choosing the minimum distance
-    between a particular terminal and all the nodes in the circuit
-        - See pseudo code in the article
-    */
+     * Steps:
+     * - Detection of components
+     *     - Morphological closing is applied which results in dilating components
+     *     - Morphological opening removes the rest of the circuit leaving only the dilated components
+     *     - Save bounding boxes of the components identified
+     * - Detection of nodes
+     *     - Separation of components found and circuit (bounding boxes as black pixels), so the components are removed
+     *     - Contour finding algorithm is applied to identify each node (wire = contour)
+     * - Circuit connections
+     *     - For each component:
+     *         - Increase 2 pixels to the dimensions of bounding box to allow intersection points with nodes
+     *         - For each node:
+     *             - Check if component bounding box contains node points
+     *             - If it contains, there is connection between the component and the node (add node to that component)
+     * - Update list of detected components
+     *     - Discard components that are not connected to circuit nodes
+     */
 
-    // Find components
-    if (!findComponents()) {
+    // Detect components
+    if (!detectComponents()) {
         return false;
     }
 
-    // Find terminal points of the components
-    if (!findTerminalPoints()) {
+    // Detect nodes
+    if (!detectNodes()) {
+        return false;
+    }
+
+    // Detect circuit connections
+    detectCircuitConnections();
+
+    // Update list of detected components
+    if (!updateDetectedComponents()) {
         return false;
     }
 
@@ -77,236 +78,288 @@ bool ImageSegmentation::getSaveImages() const
     return mSaveImages;
 }
 
-bool ImageSegmentation::findComponents()
+bool ImageSegmentation::detectComponents()
 {
-    mLogger->logInfo("Finding components");
+    mLogger->logInfo("Detecting components");
 
-    // Morphological closing
+    // Morphological closing for dilation of components
     auto kernelMorph{
         mOpenCvWrapper->getStructuringElement(OpenCvWrapper::MorphShapes::MORPH_RECT, cMorphCloseKernelSize)};
-    mOpenCvWrapper->morphologyEx(
-        mImagePreprocessed, mImageSegmented, OpenCvWrapper::MorphTypes::MORPH_CLOSE, kernelMorph, cMorphCloseIter);
+    mOpenCvWrapper->morphologyEx(mImagePreprocessed,
+                                 mImageSegmentationProc,
+                                 OpenCvWrapper::MorphTypes::MORPH_CLOSE,
+                                 kernelMorph,
+                                 cMorphCloseIter);
 
-    mLogger->logInfo("Morphological closing applied to the image, to find components");
+    mLogger->logInfo("Morphological closing applied to the image, to detect components");
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_segment_morph_close.png", mImageSegmented);
+        mOpenCvWrapper->writeImage("image_segment_morph_close.png", mImageSegmentationProc);
         // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Morphological closing to find components", mImageSegmented, 0);
+        mOpenCvWrapper->showImage("Morphological closing to detect components", mImageSegmentationProc, 0);
     }
 
-    // Morphological opening
+    // Morphological opening to remove the rest of the circuit leaving only the dilated components
     kernelMorph = mOpenCvWrapper->getStructuringElement(OpenCvWrapper::MorphShapes::MORPH_RECT, cMorphOpenKernelSize);
-    mOpenCvWrapper->morphologyEx(
-        mImageSegmented, mImageSegmented, OpenCvWrapper::MorphTypes::MORPH_OPEN, kernelMorph, cMorphOpenIter);
+    mOpenCvWrapper->morphologyEx(mImageSegmentationProc,
+                                 mImageSegmentationProc,
+                                 OpenCvWrapper::MorphTypes::MORPH_OPEN,
+                                 kernelMorph,
+                                 cMorphOpenIter);
 
-    mLogger->logInfo("Morphological opening applied to the image, to find components");
+    mLogger->logInfo("Morphological opening applied to the image, to detect components");
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_segment_morph_open.png", mImageSegmented);
+        mOpenCvWrapper->writeImage("image_segment_morph_open.png", mImageSegmentationProc);
         // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Morphological opening to find components", mImageSegmented, 0);
+        mOpenCvWrapper->showImage("Morphological opening to detect components", mImageSegmentationProc, 0);
     }
 
-    Contours contours{};
+    // At this point, the components are represented as blobs in the image, so we need to find those blobs
+
+    Contours componentsBlobs{};
     ContoursHierarchy hierarchy{};
 
-    // Find contours that represent the components (blobs) in the image
     mOpenCvWrapper->findContours(
-        mImageSegmented, contours, hierarchy, cBoundingBoxFindContourMode, cBoundingBoxFindContourMethod);
+        mImageSegmentationProc, componentsBlobs, hierarchy, cBoundingBoxFindContourMode, cBoundingBoxFindContourMethod);
 
-    mLogger->logDebug("Contours found in the image, to find components: " + std::to_string(contours.size()));
+    mLogger->logDebug("Contours found in the image, to detect components: " + std::to_string(componentsBlobs.size()));
 
-    const auto imgWidth{mOpenCvWrapper->getImageWidth(mImageInitial)};
-    const auto imgHeight{mOpenCvWrapper->getImageHeight(mImageInitial)};
-    mRectComponentsFound.clear();
+    // Generate bounding boxes for blobs
+    boundingBoxComponents(componentsBlobs);
 
-    // Bounding boxes for all contours
-    for (const auto contour : contours) {
-        // Check contour area
-        if (mOpenCvWrapper->contourArea(contour) < cBoundingBoxMinArea) {
+    mLogger->logInfo("Components found in the image: " + std::to_string(mComponents.size()));
+
+    // If there are no components detected, it makes no sense to continue
+    if (mComponents.empty()) {
+        return false;
+    }
+
+    // Save image
+    if (mSaveImages) {
+        mImageSegmentationProc = mOpenCvWrapper->cloneImage(mImageInitial);
+        for (const auto& component : mComponents) {
+            mOpenCvWrapper->rectangle(mImageSegmentationProc,
+                                      component.getBoundingBox(),
+                                      cBoundingBoxColor,
+                                      cBoundingBoxThickness,
+                                      OpenCvWrapper::LineTypes::LINE_8);
+        }
+
+        mOpenCvWrapper->writeImage("image_segment_detect_components.png", mImageSegmentationProc);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Detecting components", mImageSegmentationProc, 0);
+    }
+
+    return true;
+}
+
+void ImageSegmentation::boundingBoxComponents(const computerVision::Contours& blobs)
+{
+    const auto imgWidth{mOpenCvWrapper->getImageWidth(mImagePreprocessed)};
+    const auto imgHeight{mOpenCvWrapper->getImageHeight(mImagePreprocessed)};
+
+    mComponents.clear();
+
+    for (const auto& blob : blobs) {
+        // Check blob area
+        if (mOpenCvWrapper->contourArea(blob) < cBoundingBoxMinArea) {
             continue;
         }
 
         // Bounding rectangle
-        auto rect{mOpenCvWrapper->boundingRect(contour)};
+        auto rect{mOpenCvWrapper->boundingRect(blob)};
 
         // Increase dimensions because bounding boxes may not completely enclose the component
+        rect = increaseBoundingBox(rect, cBoundingBoxWidthIncrease, cBoundingBoxHeightIncrease, imgWidth, imgHeight);
 
-        auto x{mOpenCvWrapper->getRectCoordX(rect) - cBoundingBoxWidthIncrease / 2};
-        x = x < 0 ? 0 : x; // Cannot be negative
-        auto y{mOpenCvWrapper->getRectCoordY(rect) - cBoundingBoxHeightIncrease / 2};
-        y = y < 0 ? 0 : y; // Cannot be negative
+        // Add component
+        circuit::Component component{};
+        component.setBoundingBox(rect);
+        mComponents.push_back(component);
+    }
+}
 
-        auto width{mOpenCvWrapper->getRectWidth(rect) + cBoundingBoxWidthIncrease};
-        if ((x + width) > imgWidth) {
-            width = imgWidth - x;
-        }
-        auto height{mOpenCvWrapper->getRectHeight(rect) + cBoundingBoxHeightIncrease};
-        if ((y + height) > imgHeight) {
-            height = imgHeight - y;
-        }
+computerVision::Rectangle ImageSegmentation::increaseBoundingBox(const computerVision::Rectangle& box,
+                                                                 const int& widthIncr,
+                                                                 const int& heightIncr,
+                                                                 const int& widthMax,
+                                                                 const int& heightMax)
+{
+    // Axis
+    auto x{box.x - widthIncr / 2};  // Truncated
+    x = x < 0 ? 0 : x;              // Cannot be negative
+    auto y{box.y - heightIncr / 2}; // Truncated
+    y = y < 0 ? 0 : y;              // Cannot be negative
 
-        const auto rectComponent{mOpenCvWrapper->createRect(x, y, width, height)};
-
-        mRectComponentsFound.push_back(rectComponent);
+    // Dimensions
+    auto width{box.width + widthIncr};
+    if ((x + width) > widthMax) {
+        width = widthMax - x;
+    }
+    auto height{box.height + heightIncr};
+    if ((y + height) > heightMax) {
+        height = heightMax - y;
     }
 
-    mLogger->logInfo("Components found in the image: " + std::to_string(mRectComponentsFound.size()));
+    return Rectangle{x, y, width, height};
+}
 
-    // Check if there are components found
-    if (mRectComponentsFound.empty()) {
-        return false;
+bool ImageSegmentation::detectNodes()
+{
+    mLogger->logInfo("Detecting nodes of the circuit");
+
+    // Set bounding boxes as black pixels, so the components are removed
+    mImageSegmentationProc = mOpenCvWrapper->cloneImage(mImagePreprocessed);
+    for (const auto& component : mComponents) {
+        mOpenCvWrapper->rectangle(
+            mImageSegmentationProc, component.getBoundingBox(), {0, 0, 0}, -1, OpenCvWrapper::LineTypes::LINE_8);
     }
-
-    mLogger->logInfo("Saved bounding boxes with found components");
 
     // Save image
     if (mSaveImages) {
-        mImageSegmented = mOpenCvWrapper->cloneImage(mImageInitial);
-        for (const auto rect : mRectComponentsFound) {
-            mOpenCvWrapper->rectangle(
-                mImageSegmented, rect, cBoundingBoxColor, cBoundingBoxThickness, OpenCvWrapper::LineTypes::LINE_8);
-        }
-
-        mOpenCvWrapper->writeImage("image_segment_find_components.png", mImageSegmented);
+        mOpenCvWrapper->writeImage("image_segment_remove_components.png", mImageSegmentationProc);
         // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Finding components", mImageSegmented, 0);
+        mOpenCvWrapper->showImage("Remove components", mImageSegmentationProc, 0);
+    }
+
+    // At this point, the nodes are represented as wires in the image, so we need to find those wires
+
+    Contours wires{};
+    ContoursHierarchy hierarchy{};
+
+    mOpenCvWrapper->findContours(
+        mImageSegmentationProc, wires, hierarchy, cNodesFindContourMode, cNodesFindContourMethod);
+
+    mLogger->logDebug("Contours found in the image, to detect nodes: " + std::to_string(wires.size()));
+
+    // Wire for each node
+
+    mNodes.clear();
+
+    for (const auto& wire : wires) {
+        // Check wire area
+        if (mOpenCvWrapper->contourArea(wire) >= cNodesMinArea) {
+            // Add node
+            circuit::Node node{};
+            node.setWire(wire);
+            mNodes.push_back(node);
+        }
+    }
+
+    mLogger->logInfo("Nodes found in the circuit: " + std::to_string(mNodes.size()));
+
+    // If there are no nodes detected, it makes no sense to continue
+    if (mNodes.empty()) {
+        return false;
+    }
+
+    // Save image
+    if (mSaveImages) {
+        mImageSegmentationProc = mOpenCvWrapper->cloneImage(mImageInitial);
+        Contours wires{};
+        for (const auto& node : mNodes) {
+            wires.push_back(node.getWire());
+        }
+        mOpenCvWrapper->drawContours(
+            mImageSegmentationProc, wires, -1, cNodesColor, cNodesThickness, OpenCvWrapper::LineTypes::LINE_8, {});
+
+        mOpenCvWrapper->writeImage("image_segment_detect_nodes.png", mImageSegmentationProc);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Detecting nodes", mImageSegmentationProc, 0);
     }
 
     return true;
 }
 
-bool ImageSegmentation::findTerminalPoints()
+void ImageSegmentation::detectCircuitConnections()
 {
-    mLogger->logInfo("Finding terminal points of components");
+    mLogger->logInfo("Detecting circuit connections");
 
-    // See https://stackoverflow.com/questions/38457744/opencv-c-collision-for-retangle-and-line
+    const auto imgWidth{mOpenCvWrapper->getImageWidth(mImagePreprocessed)};
+    const auto imgHeight{mOpenCvWrapper->getImageHeight(mImagePreprocessed)};
+    constexpr int widthIncr{2};  // 2 pixels to allow centering
+    constexpr int heightIncr{2}; // 2 pixels to allow centering
 
-    return true;
+    for (auto& component : mComponents) {
+        // Increase dimensions of bounding box to allow intersection points with nodes
+        const auto box = increaseBoundingBox(component.getBoundingBox(), widthIncr, heightIncr, imgWidth, imgHeight);
+
+        std::vector<circuit::Node> nodesConnected{};
+
+        mLogger->logDebug("Checking component with top-left corner (" + std::to_string(component.getBoundingBox().x)
+                          + ", " + std::to_string(component.getBoundingBox().y) + ")");
+
+        for (const auto& node : mNodes) {
+            const auto wire{node.getWire()};
+            auto intersect{false};
+
+            for (const auto& point : wire) {
+                // Intersection
+                intersect = mOpenCvWrapper->contains(box, point);
+                if (intersect) {
+                    mLogger->logDebug("Component connected to a node wire at point (" + std::to_string(point.x) + ", "
+                                      + std::to_string(point.y) + ")");
+
+                    // There is at least one intersection point, so no need to check other points
+                    break;
+                }
+            }
+
+            if (intersect) {
+                // Add node
+                nodesConnected.push_back(node);
+            }
+        }
+
+        // Set nodes to the component
+        component.setNodes(nodesConnected);
+    }
 }
 
-// // TODO: Remove.
-// #include <iostream>
-// #include <opencv2/core.hpp>
-// #include <opencv2/imgproc.hpp>
-// #include <vector>
+bool ImageSegmentation::updateDetectedComponents()
+{
+    mLogger->logInfo("Updating list of detected components");
 
-// void ImageSegmentation::debug(computerVision::ImageMat& image)
-// {
-//     cv::Mat testImage{image.clone()};
-//     cv::Mat kernel{cv::getStructuringElement(cv::MorphShapes::MORPH_RECT, cv::Size(3, 3), cv::Point(-1, -1))};
+    // Verify that the component is not connected to a node
+    const auto isComponentNotConnected = [](circuit::Component component) {
+        const auto nodes{component.getNodes()};
+        return nodes.empty();
+    };
 
-//     int op{0};
-//     int value{0};
-//     int loop{1};
-//     int restart{1};
-//     cv::MorphTypes morphOp{};
-//     std::vector<std::vector<cv::Point>> testContours;
-//     std::vector<cv::Vec4i> contHierarchy;
+    // Erase components from the vector that are not connected to a node
+    mComponents.erase(std::remove_if(mComponents.begin(), mComponents.end(), isComponentNotConnected),
+                      mComponents.end());
 
-//     while (loop) {
-//         std::cout << "--------" << std::endl;
-//         std::cout << "Operations" << std::endl;
-//         std::cout << "0: Erosion" << std::endl;
-//         std::cout << "1: Dilation" << std::endl;
-//         std::cout << "2: Opening" << std::endl;
-//         std::cout << "3: Closing" << std::endl;
-//         std::cout << "4: Find and draw contours" << std::endl;
-//         std::cout << "Select operation: ";
-//         std::cin >> op;
-//         std::cout << std::endl;
+    mLogger->logInfo("Detected components in the image: " + std::to_string(mComponents.size()));
 
-//         if (op != 4) {
-//             std::cout << "Kernel size: ";
-//             std::cin >> value;
-//             std::cout << std::endl;
-//             kernel = cv::getStructuringElement(cv::MorphShapes::MORPH_RECT, cv::Size(value, value), cv::Point(-1,
-//             -1));
-//         }
+    // Return if there are still components in the vector
+    return !mComponents.empty();
+}
 
-//         switch (op) {
-//         case 0:
-//             morphOp = cv::MorphTypes::MORPH_ERODE;
-//             break;
-//         case 1:
-//             morphOp = cv::MorphTypes::MORPH_DILATE;
-//             break;
-//         case 2:
-//             morphOp = cv::MorphTypes::MORPH_OPEN;
-//             break;
-//         case 3:
-//             morphOp = cv::MorphTypes::MORPH_CLOSE;
-//             break;
-//         default:
-//             morphOp = cv::MorphTypes::MORPH_ERODE;
-//         }
+const std::vector<circuit::Component>& ImageSegmentation::getDetectedComponents() const
+{
+    return mComponents;
+}
 
-//         if (op != 4) {
-//             std::cout << "Iterations: ";
-//             std::cin >> value;
-//             std::cout << std::endl;
-//         } else {
-//             std::cout << "Contour retrieval mode (0 = RETR_EXTERNAL, 1 = RETR_LIST, 2 = RETR_CCOMP, 3 = RETR_TREE, 4
-//             = "
-//                          "RETR_FLOODFILL): ";
-//             std::cin >> value;
-//             std::cout << std::endl;
-//         }
+#ifdef BUILD_TESTS
+void ImageSegmentation::setDetectedComponents(const std::vector<circuit::Component>& components)
+{
+    mComponents = components;
+}
 
-//         std::cout << "Restart with the initial image: ";
-//         std::cin >> restart;
-//         std::cout << std::endl;
+const std::vector<circuit::Node>& ImageSegmentation::getDetectedNodes() const
+{
+    return mNodes;
+}
 
-//         if (restart) {
-//             testImage = image.clone();
-//             if (op != 4) {
-//                 cv::morphologyEx(image, testImage, morphOp, kernel, cv::Point(-1, -1), value);
-//             } else {
-//                 cv::findContours(
-//                     image, testContours, contHierarchy, static_cast<cv::RetrievalModes>(value),
-//                     cv::CHAIN_APPROX_SIMPLE);
-//                 std::cout << "Number of contours found: " << testContours.size() << std::endl;
-//                 int idx = 0;
-//                 for (; idx >= 0; idx = contHierarchy[idx][0]) {
-//                     cv::Scalar color(rand() & 255, rand() & 255, rand() & 255);
-//                     cv::drawContours(testImage, testContours, idx, color, cv::FILLED, cv::LINE_8, contHierarchy);
-//                 }
-//                 // cv::drawContours(
-//                 //     testImage, testContours, -1, cv::Scalar(255, 255, 255), cv::FILLED, cv::LINE_8,
-//                 contHierarchy);
-//             }
-//         } else {
-//             if (op != 4) {
-//                 cv::morphologyEx(testImage, testImage, morphOp, kernel, cv::Point(-1, -1), value);
-//             } else {
-//                 cv::findContours(testImage,
-//                                  testContours,
-//                                  contHierarchy,
-//                                  static_cast<cv::RetrievalModes>(value),
-//                                  cv::CHAIN_APPROX_SIMPLE);
-//                 std::cout << "Number of contours found: " << testContours.size() << std::endl;
-//                 int idx = 0;
-//                 for (; idx >= 0; idx = contHierarchy[idx][0]) {
-//                     cv::Scalar color(rand() & 255, rand() & 255, rand() & 255);
-//                     cv::drawContours(testImage, testContours, idx, color, cv::FILLED, cv::LINE_8, contHierarchy);
-//                 }
-//                 // cv::drawContours(
-//                 //     testImage, testContours, -1, cv::Scalar(255, 255, 255), cv::FILLED, cv::LINE_8,
-//                 contHierarchy);
-//             }
-//         }
-
-//         mOpenCvWrapper->writeImage("image_segment_test.png", testImage);
-//         mOpenCvWrapper->showImage("Test", testImage, 0);
-
-//         std::cout << "Continue looping (0 to stop): ";
-//         std::cin >> loop;
-//         std::cout << std::endl;
-//     }
-// }
+void ImageSegmentation::setDetectedNodes(const std::vector<circuit::Node>& nodes)
+{
+    mNodes = nodes;
+}
+#endif
 
 } // namespace imageProcessing
 } // namespace circuitSegmentation

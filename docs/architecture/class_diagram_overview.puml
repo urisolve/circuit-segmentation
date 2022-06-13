@@ -10,8 +10,8 @@ namespace logging #DDDEEE {
 }
 note top of logging: Used by many classes.
 
-' Utils
-namespace utils #DDDEEE {
+' Command line parser
+namespace cmdLineParser #DDDEEE {
     class CmdLineParser {
     }
 }
@@ -26,6 +26,24 @@ namespace computerVision #DDDEEE {
     class OpenCvWrapper {
     }
     OpenCvWrapper -> cv
+}
+
+' Circuit
+namespace circuit #DDDEEE {
+    class Component {
+    }
+    Component --> computerVision::OpenCvWrapper
+    Component --> Node
+
+    class Node {
+    }
+    Node --> computerVision::OpenCvWrapper
+}
+
+' Common
+namespace common #DDDEEE {
+    class RandomNumberGen {
+    }
 }
 
 ' Image processing
@@ -48,6 +66,8 @@ namespace imageProcessing #DDDEEE {
     class ImageSegmentation {
     }
     ImageSegmentation ..> computerVision::OpenCvWrapper
+    ImageSegmentation --> circuit::Component
+    ImageSegmentation --> circuit::Node
 }
 
 ' Application
@@ -59,7 +79,7 @@ namespace application #DDDEEE {
 
     class CommandLineParser {
     }
-    CommandLineParser ..> utils::CmdLineParser
+    CommandLineParser ..> cmdLineParser::CmdLineParser
 }
 
 @enduml

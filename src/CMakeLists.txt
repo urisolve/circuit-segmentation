@@ -19,12 +19,12 @@ add_executable(${PROJECT_NAME}
 
 # Subdirectories
 add_subdirectory(application)
+add_subdirectory(circuit)
+add_subdirectory(cmdLineParser)
+add_subdirectory(common)
 add_subdirectory(computerVision)
 add_subdirectory(imageProcessing)
 add_subdirectory(logging)
-add_subdirectory(utils)
-
-include_directories(${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::Application

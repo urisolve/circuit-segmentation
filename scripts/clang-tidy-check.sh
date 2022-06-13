@@ -1,23 +1,25 @@
 #!/usr/bin/bash
 
 # Analyses statically using clang-tidy.
-# 
+# This scripts uses CMake to set up a compile command database of the project, and must be run from the project root
+# directory.
+#
 # Usage:
-# ./<script>.sh <source_code_folder>
+# ./<script>.sh
 
-# Check script usage
-if [ "$#" -ne 1 ]; then
-    echo "Usage:"
-    echo "$0 <source_code_folder>"
-    echo
-    exit -1
-fi
-
-# Source code folder
-src_folder=$1
+# Build folder (created if not exist)
+build_folder=build-clang-tidy
+# Report file
+report_file=$build_folder/report.txt
 
 echo "Clang-tidy checking..."
-files=$(find $src_folder -type f -iname "*.h" -o -iname "*.cpp")
-clang-tidy $files
+
+# Cmake
+cmake -S . -B $build_folder -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+# Clang-tidy
+files=$(find src -type f -iname "*.h" -o -iname "*.cpp")
+clang-tidy $files -p $build_folder -header-filter=src/* > $report_file
 
 echo "Clang-tidy check end"

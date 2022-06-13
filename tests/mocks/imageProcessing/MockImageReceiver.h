@@ -16,6 +16,18 @@ namespace imageProcessing {
 class MockImageReceiver : public ImageReceiver
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param openCvWrapper OpenCV wrapper.
+     * @param logger Logger.
+     */
+    explicit MockImageReceiver(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                               const std::shared_ptr<logging::Logger>& logger)
+        : ImageReceiver(openCvWrapper, logger)
+    {
+    }
+
     /** Mocks method receiveImage. */
     MOCK_METHOD(bool, receiveImage, (), (override));
     /** Mocks method getImageReceived. */

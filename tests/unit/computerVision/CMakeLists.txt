@@ -23,7 +23,6 @@ add_executable(${PROJECT_NAME}
 # add_test(${PROJECT_NAME}
 #     ${PROJECT_NAME}
 # )
-include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
@@ -38,9 +37,6 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE gtest
-    PRIVATE gtest_main
-    PRIVATE gmock
-    PRIVATE pthread
+    PRIVATE GTest::gtest_main
     PRIVATE CircuitSegmentation::ComputerVision
 )

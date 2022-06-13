@@ -12,8 +12,12 @@ namespace computerVision {
 
 /** Alias for image matrix. */
 using ImageMat = cv::Mat;
+/** Alias for point. */
+using Point = cv::Point;
+/** Alias for contour. */
+using Contour = std::vector<Point>;
 /** Alias for contours. */
-using Contours = std::vector<std::vector<cv::Point>>;
+using Contours = std::vector<Contour>;
 /** Alias for hierarchy for finding contours. */
 using ContoursHierarchy = std::vector<cv::Vec4i>;
 /** Alias for scalar. */
@@ -22,8 +26,6 @@ using Scalar = cv::Scalar;
 using Rectangle = cv::Rect;
 /** Alias for input/output array. */
 using InputOutputArray = cv::InputOutputArray;
-/** Alias for point. */
-using Point = cv::Point;
 
 /**
  * @brief Wrapper of the OpenCV library.
@@ -417,52 +419,13 @@ public:
                            const LineTypes& lineType);
 
     /**
-     * @brief Gets the width of a rectangle.
+     * @brief Checks if the rectangle contains the point.
      *
      * @param rectangle Rectangle.
-     *
-     * @return Width of the rectangle.
+     * @param point Point.
+     * @return True if the rectangle contains the point, otherwise false.
      */
-    [[nodiscard]] virtual int getRectWidth(Rectangle& rectangle) const;
-
-    /**
-     * @brief Gets the height of a rectangle.
-     *
-     * @param rectangle Rectangle.
-     *
-     * @return Height of the rectangle.
-     */
-    [[nodiscard]] virtual int getRectHeight(Rectangle& rectangle) const;
-
-    /**
-     * @brief Gets the x coordinate of the top-left corner of a rectangle.
-     *
-     * @param rectangle Rectangle.
-     *
-     * @return Value of x coordinate of the top-left corner of the rectangle.
-     */
-    [[nodiscard]] virtual int getRectCoordX(Rectangle& rectangle) const;
-
-    /**
-     * @brief Gets the y coordinate of the top-left corner of a rectangle.
-     *
-     * @param rectangle Rectangle.
-     *
-     * @return Value of y coordinate of the top-left corner of the rectangle.
-     */
-    [[nodiscard]] virtual int getRectCoordY(Rectangle& rectangle) const;
-
-    /**
-     * @brief Creates a rectangle.
-     *
-     * @param x Value of x coordinate of the top-left corner of the rectangle.
-     * @param y Value of y coordinate of the top-left corner of the rectangle.
-     * @param width Wdith of the rectangle.
-     * @param height Height of the rectangle.
-     *
-     * @return Created rectangle.
-     */
-    [[nodiscard]] virtual Rectangle createRect(const int& x, const int& y, const int& width, const int& height) const;
+    virtual bool contains(const Rectangle& rectangle, const Point& point);
 };
 
 } // namespace computerVision

@@ -24,8 +24,8 @@ public:
      * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      */
-    explicit ImageReceiver(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                           std::shared_ptr<logging::Logger> logger);
+    explicit ImageReceiver(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                           const std::shared_ptr<logging::Logger>& logger);
 
     /**
      * @brief Destructor.

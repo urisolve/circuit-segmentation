@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace circuitSegmentation {
-namespace utils {
+namespace cmdLineParser {
 
 /**
  * @brief Parser of command line arguments.
@@ -178,5 +178,5 @@ private:
     std::map<std::string, std::string> mOptions{};
 };
 
-} // namespace utils
+} // namespace cmdLineParser
 } // namespace circuitSegmentation

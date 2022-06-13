@@ -2,7 +2,7 @@
  * @file
  */
 
-#include "utils/CmdLineParser.h"
+#include "cmdLineParser/CmdLineParser.h"
 #include <gtest/gtest.h>
 
 /**
@@ -23,7 +23,7 @@ protected:
 
 protected:
     /** Command line parser. */
-    circuitSegmentation::utils::CmdLineParser mCmdLineParser{};
+    circuitSegmentation::cmdLineParser::CmdLineParser mCmdLineParser{};
 };
 
 /**

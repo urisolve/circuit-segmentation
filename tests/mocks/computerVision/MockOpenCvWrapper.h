@@ -107,19 +107,8 @@ public:
                  const int& thickness,
                  const LineTypes& lineType),
                 (override));
-    /** Mocks method getRectWidth. */
-    MOCK_METHOD(int, getRectWidth, (Rectangle & rectangle), (const, override));
-    /** Mocks method getRectHeight. */
-    MOCK_METHOD(int, getRectHeight, (Rectangle & rectangle), (const, override));
-    /** Mocks method getRectCoordX. */
-    MOCK_METHOD(int, getRectCoordX, (Rectangle & rectangle), (const, override));
-    /** Mocks method getRectCoordY. */
-    MOCK_METHOD(int, getRectCoordY, (Rectangle & rectangle), (const, override));
-    /** Mocks method createRect. */
-    MOCK_METHOD(Rectangle,
-                createRect,
-                (const int& x, const int& y, const int& width, const int& height),
-                (const, override));
+    /** Mocks method contains. */
+    MOCK_METHOD(bool, contains, (const Rectangle& rectangle, const Point& point), (override));
 };
 
 } // namespace computerVision

@@ -16,8 +16,9 @@ This project aims to interpret and model electrical schematics using computer vi
 
 This project has the following structure:
 
+- circuit-examples/: contains some circuit examples to be used by the application
 - cmake/: contains useful CMake files
-- diagrams/: contains diagrams related with the software architecture
+- docs/: contains documentation related with the software architecture, and some circuit examples
 - doxygen/: contains the doxyfile used to build documentation
 - scripts/: contains useful scripts
 - src/: contains the source code of the project
@@ -26,13 +27,15 @@ This project has the following structure:
 - .clang-tidy: file with the code analysis checks
 - .gitignore: file that specifies intentionally untracked files that Git should ignore
 - CMakeLists.txt: root CMake file
+- LICENSE: license file
 - README.md: README file of this project
 
 ## Dependencies
 
 The following libraries are used in this project:
 
-- OpenCV 4.5.5
+- **OpenCV 4.5.5**: needs to be installed on the system
+- **GoogleTest**: fetched with CMake (if BUILD_TESTS is ON)
 
 ## Compilation
 
@@ -44,41 +47,36 @@ This project uses the CMake tool for build configuration. The CMake options for 
 | BUILD_TESTS | Build unit tests | ON |
 | BUILD_COVERAGE | Build with code coverage | OFF |
 
-The following commands can be used to compile this project (using MinGW-W64):
+The following commands can be used to compile this project (using generator for MinGW makefiles):
 ```sh
 $ cd <project-directory>
 $ mkdir build-debug
 $ cd build-debug
 $ cmake .. -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles"
-$ mingw32-make
+$ cmake --build .
 ```
 
 ## Tests
 
-To run the unit tests, use the commands below (using MinGW-W64):
+To run the unit tests, use the commands below (using generator for MinGW makefiles):
 ```sh
 $ cd <project-directory>
 $ mkdir build-debug
 $ cd build-debug
 $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -G "MinGW Makefiles"
-$ mingw32-make
-$ mingw32-make test
-```
-
-It can also be used CMake to run the unit tests (use `--verbose` to have more output information):
-```sh
+$ cmake --build .
 $ ctest
 ```
 
 ## Code coverage
 
-The project can be compiled for code coverage analysis, using the following commands (using MinGW-W64):
+The project can be compiled for code coverage analysis, using the following commands (using generator for MinGW makefiles):
 ```sh
 $ cd <project-directory>
 $ mkdir build-coverage
 $ cd build-coverage
 $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON -G "MinGW Makefiles"
-$ mingw32-make
+$ cmake --build .
 ```
 
 For generation of the report, use the correspondent script as follows:
@@ -97,7 +95,7 @@ $ cd <project-directory>
 $ ./scripts/doxygen-doc-gen.sh ./doxygen/Doxyfile
 ```
 
-The documentation is created in `build-doc` directory in the root of the project, and the index can be accessed in `build-doc/html/index.html`.
+The documentation is created and can be accessed in `build-doxygen/html/index.html`.
 
 ## Code formatting and analysis
 
@@ -111,6 +109,7 @@ $ ./scripts/clang-format-check.sh ./src
 For code static analysis, this project uses clang-tidy tool. The correspondent script can be used to analyze the code:
 ```sh
 $ cd <project-directory>
-$ # To analyze the src directory
-$ ./scripts/clang-tidy-check.sh ./src
+$ ./scripts/clang-tidy-check.sh
 ```
+
+A report file is created in `build-clang-tidy` directory.

@@ -32,13 +32,13 @@ public:
      * @param logMode Log mode: verbose = true, silent = false.
      * @param saveImages Save images obtained during the processing.
      */
-    ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
-                     std::shared_ptr<ImagePreprocessing> imagePreprocessing,
-                     std::shared_ptr<ImageSegmentation> imageSegmentation,
-                     std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                     std::shared_ptr<logging::Logger> logger,
-                     bool logMode = false,
-                     bool saveImages = false);
+    ImageProcManager(const std::shared_ptr<ImageReceiver>& imageReceiver,
+                     const std::shared_ptr<ImagePreprocessing>& imagePreprocessing,
+                     const std::shared_ptr<ImageSegmentation>& imageSegmentation,
+                     const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                     const std::shared_ptr<logging::Logger>& logger,
+                     const bool logMode = false,
+                     const bool saveImages = false);
 
     /**
      * @brief Destructor.
@@ -54,8 +54,9 @@ public:
      *
      * @return An instance of an image processing manager.
      */
-    static ImageProcManager
-        create(std::shared_ptr<logging::Logger> logger, bool logMode = false, bool saveImages = false);
+    static ImageProcManager create(const std::shared_ptr<logging::Logger>& logger,
+                                   const bool logMode = false,
+                                   const bool saveImages = false);
 
     /**
      * @brief Processes the image.

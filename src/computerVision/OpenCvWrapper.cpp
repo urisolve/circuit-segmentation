@@ -170,29 +170,9 @@ void OpenCvWrapper::rectangle(
     cv::rectangle(image, rectangle, color, thickness, lineType);
 }
 
-int OpenCvWrapper::getRectWidth(Rectangle& rectangle) const
+bool OpenCvWrapper::contains(const Rectangle& rectangle, const Point& point)
 {
-    return rectangle.width;
-}
-
-int OpenCvWrapper::getRectHeight(Rectangle& rectangle) const
-{
-    return rectangle.height;
-}
-
-int OpenCvWrapper::getRectCoordX(Rectangle& rectangle) const
-{
-    return rectangle.x;
-}
-
-int OpenCvWrapper::getRectCoordY(Rectangle& rectangle) const
-{
-    return rectangle.y;
-}
-
-Rectangle OpenCvWrapper::createRect(const int& x, const int& y, const int& width, const int& height) const
-{
-    return Rectangle{x, y, width, height};
+    return rectangle.contains(point);
 }
 
 } // namespace computerVision

@@ -1,17 +1,14 @@
 # ----------------------------------------------------------------------------
 # Project setup
+
 cmake_minimum_required(VERSION 3.22)
-project(CircuitSegmentation VERSION 1.0.0)
+
+project(CircuitSegmentation
+    VERSION 1.0.0
+    LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 20)
-
-# ----------------------------------------------------------------------------
-# Dependencies
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
-# OpenCV
-find_package(OpenCV REQUIRED)
 
 # ----------------------------------------------------------------------------
 # CMake options
@@ -26,6 +23,17 @@ option(BUILD_TESTS "Builds unit tests" ON)
 
 # Option to build with code coverage
 option(BUILD_COVERAGE "Builds with code coverage" OFF)
+
+# ----------------------------------------------------------------------------
+# Dependencies
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+# OpenCV
+find_package(OpenCV REQUIRED)
+
+# Fetch dependencies
+include(FetchDependencies)
 
 # ----------------------------------------------------------------------------
 # Compile definitions
@@ -43,8 +51,8 @@ endif()
 # ----------------------------------------------------------------------------
 # Test
 if (BUILD_TESTS)
-    # find_package(GTest REQUIRED)
     include(CTest)
+    include(GoogleTest)
     enable_testing()
 endif()
 
@@ -81,4 +89,11 @@ message(STATUS "- CMAKE_CXX_STANDARD = ${CMAKE_CXX_STANDARD}")
 message(STATUS "- CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
 message(STATUS "- BUILD_TESTS = ${BUILD_TESTS}")
 message(STATUS "- BUILD_COVERAGE = ${BUILD_COVERAGE}")
+message(STATUS)
+# OpenCV variables are set with find_package, the full list with descriptions is in the OpenCVConfig.cmake file
+message(STATUS "OpenCV configuration:")
+message(STATUS "- OpenCV_VERSION = ${OpenCV_VERSION}")
+message(STATUS "- OpenCV_DIR = ${OpenCV_DIR}")
+message(STATUS "- OpenCV_INCLUDE_DIRS = ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "- OpenCV_LIBS = ${OpenCV_LIBS}")
 message(STATUS)

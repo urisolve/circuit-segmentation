@@ -9,6 +9,7 @@ set(Headers
     ImageProcManager.h
     ImageReceiver.h
     ImageSegmentation.h
+    ImageUtils.h
 )
 set(Sources
     ImagePreprocessing.cpp
@@ -28,10 +29,12 @@ add_library(CircuitSegmentation::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Build
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..
+    PRIVATE ${CMAKE_SOURCE_DIR}/src
+    PUBLIC ${OpenCV_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::ComputerVision
     PRIVATE CircuitSegmentation::Logger
+    PRIVATE CircuitSegmentation::Circuit
 )

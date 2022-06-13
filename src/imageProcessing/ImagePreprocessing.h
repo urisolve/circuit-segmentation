@@ -27,9 +27,9 @@ public:
      * @param logger Logger.
      * @param saveImages Save images obtained during the processing.
      */
-    explicit ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                                std::shared_ptr<logging::Logger> logger,
-                                bool saveImages = false);
+    explicit ImagePreprocessing(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                                const std::shared_ptr<logging::Logger>& logger,
+                                const bool saveImages = false);
 
     /**
      * @brief Destructor.

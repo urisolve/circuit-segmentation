@@ -32,13 +32,13 @@ protected:
     const std::string cExistentImageFilePath{std::string(TESTS_DATA_PATH) + "circuit-1.png"};
     /** Nonexistent image file path to be used in tests. */
     const std::string cNonExistentImageFilePath{std::string(TESTS_DATA_PATH) + "nonexistent.png"};
-
-    /** OpenCV wrapper. */
-    std::unique_ptr<OpenCvWrapper> mOpenCvWrapper;
     /** Width of the image to be used in tests. */
     const int cTestImageWidth{300};
     /** Height of the image to be used in tests. */
     const int cTestImageHeight{300};
+
+    /** OpenCV wrapper. */
+    std::unique_ptr<OpenCvWrapper> mOpenCvWrapper;
     /** Image with 3 channels to be used in tests. */
     ImageMat mTestImage3chn{cTestImageHeight, cTestImageWidth, CV_8UC3, cv::Scalar(128, 128, 128)};
     /** Image with 1 channel to be used in tests. */
@@ -366,37 +366,50 @@ TEST_F(OpenCvWrapperTest, boundingAndDrawingRectNoThrow)
 }
 
 /**
- * @brief Tests if the rectangle dimensions (width and height) and coordinates (x and y) are correct.
+ * @brief Tests that the rectangle contains a point correctly.
  */
-TEST_F(OpenCvWrapperTest, checksRectangleDimensionsCoordinates)
+TEST_F(OpenCvWrapperTest, rectangleContainsPoints)
 {
-    constexpr unsigned int x{5};
-    constexpr unsigned int y{10};
-    constexpr unsigned int width{20};
-    constexpr unsigned int height{30};
-    Rectangle rect{x, y, width, height};
+    // Rectangle parameters
+    const auto x{0};
+    const auto y{0};
+    const auto width{100};
+    const auto height{100};
+    const Rectangle rect{x, y, width, height};
 
-    EXPECT_EQ(x, mOpenCvWrapper->getRectCoordX(rect));
-    EXPECT_EQ(y, mOpenCvWrapper->getRectCoordY(rect));
-    EXPECT_EQ(width, mOpenCvWrapper->getRectWidth(rect));
-    EXPECT_EQ(height, mOpenCvWrapper->getRectHeight(rect));
-}
+    // Points that rectangle should contain
+    // Vertices
+    const Point p1{0, 0};
+    const Point p2{99, 0};
+    const Point p3{0, 99};
+    const Point p4{99, 99};
+    // Border
+    const Point p5{50, 0};
+    const Point p6{0, 50};
+    // Internal
+    const Point p7{50, 50};
+    const Point p8{1, 1};
 
-/**
- * @brief Tests if the rectangle creation is done correctly.
- */
-TEST_F(OpenCvWrapperTest, createsRectangle)
-{
-    constexpr unsigned int x{5};
-    constexpr unsigned int y{10};
-    constexpr unsigned int width{20};
-    constexpr unsigned int height{30};
-    Rectangle rect{mOpenCvWrapper->createRect(x, y, width, height)};
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p1));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p2));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p3));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p4));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p5));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p6));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p7));
+    EXPECT_TRUE(mOpenCvWrapper->contains(rect, p8));
 
-    EXPECT_EQ(x, mOpenCvWrapper->getRectCoordX(rect));
-    EXPECT_EQ(y, mOpenCvWrapper->getRectCoordY(rect));
-    EXPECT_EQ(width, mOpenCvWrapper->getRectWidth(rect));
-    EXPECT_EQ(height, mOpenCvWrapper->getRectHeight(rect));
+    // Points that rectangle should not contain
+    // External
+    const Point p9{-1, 0};
+    const Point p10{100, 0};
+    const Point p11{0, 100};
+    const Point p12{100, 100};
+
+    EXPECT_FALSE(mOpenCvWrapper->contains(rect, p9));
+    EXPECT_FALSE(mOpenCvWrapper->contains(rect, p10));
+    EXPECT_FALSE(mOpenCvWrapper->contains(rect, p11));
+    EXPECT_FALSE(mOpenCvWrapper->contains(rect, p12));
 }
 
 // /**

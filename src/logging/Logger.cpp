@@ -83,7 +83,7 @@ const std::string Logger::getDateTime() const
     // Time converted to std::time_t
     auto nowConv = std::chrono::system_clock::to_time_t(now);
 
-    std::stringstream ss;
+    std::stringstream ss{};
     ss << "[";
     ss << std::put_time(std::localtime(&nowConv), "%Y-%m-%d %X");
     ss << "]";
