@@ -48,12 +48,9 @@ protected:
  */
 TEST_F(ImageReceiverTest, receivesImageSuccessfully)
 {
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, isImageEmpty).WillByDefault(Return(false));
-
-    // Setup expectations
+    // Setup expectations and behavior
     EXPECT_CALL(*mMockOpenCvWrapper, readImage).Times(1);
-    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty).Times(1).WillOnce(Return(false));
 
     // Receive image
     EXPECT_TRUE(mImageReceiver->receiveImage());
@@ -64,19 +61,16 @@ TEST_F(ImageReceiverTest, receivesImageSuccessfully)
  */
 TEST_F(ImageReceiverTest, receivesImageUnsuccessfully)
 {
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, isImageEmpty).WillByDefault(Return(true));
-
-    // Setup expectations
+    // Setup expectations and behavior
     EXPECT_CALL(*mMockOpenCvWrapper, readImage).Times(1);
-    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, isImageEmpty).Times(1).WillOnce(Return(true));
 
     // Receive image
     EXPECT_FALSE(mImageReceiver->receiveImage());
 }
 
 /**
- * @brief Tests that the the image file path is defined correctly.
+ * @brief Tests that the image file path is defined correctly.
  */
 TEST_F(ImageReceiverTest, setsImageFilePath)
 {

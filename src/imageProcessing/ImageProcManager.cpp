@@ -7,18 +7,18 @@
 namespace circuitSegmentation {
 namespace imageProcessing {
 
-ImageProcManager::ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
-                                   std::shared_ptr<ImagePreprocessing> imagePreprocessing,
-                                   std::shared_ptr<ImageSegmentation> imageSegmentation,
-                                   std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                                   std::shared_ptr<logging::Logger> logger,
-                                   bool logMode,
-                                   bool saveImages)
-    : mImageReceiver{std::move(imageReceiver)}
-    , mImagePreprocessing{std::move(imagePreprocessing)}
-    , mImageSegmentation{std::move(imageSegmentation)}
-    , mOpenCvWrapper{std::move(openCvWrapper)}
-    , mLogger{std::move(logger)}
+ImageProcManager::ImageProcManager(const std::shared_ptr<ImageReceiver>& imageReceiver,
+                                   const std::shared_ptr<ImagePreprocessing>& imagePreprocessing,
+                                   const std::shared_ptr<ImageSegmentation>& imageSegmentation,
+                                   const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                                   const std::shared_ptr<logging::Logger>& logger,
+                                   const bool logMode,
+                                   const bool saveImages)
+    : mImageReceiver{imageReceiver}
+    , mImagePreprocessing{imagePreprocessing}
+    , mImageSegmentation{imageSegmentation}
+    , mOpenCvWrapper{openCvWrapper}
+    , mLogger{logger}
     , mLogMode{std::move(logMode)}
     , mSaveImages{std::move(saveImages)}
 {
@@ -29,7 +29,8 @@ ImageProcManager::ImageProcManager(std::shared_ptr<ImageReceiver> imageReceiver,
     setSaveImages(mSaveImages);
 }
 
-ImageProcManager ImageProcManager::create(std::shared_ptr<logging::Logger> logger, bool logMode, bool saveImages)
+ImageProcManager
+    ImageProcManager::create(const std::shared_ptr<logging::Logger>& logger, const bool logMode, const bool saveImages)
 {
     std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper{std::make_shared<computerVision::OpenCvWrapper>()};
 
@@ -44,10 +45,14 @@ ImageProcManager ImageProcManager::create(std::shared_ptr<logging::Logger> logge
 
 bool ImageProcManager::processImage(const std::string imageFilePath)
 {
+    mLogger->logInfo("Starting image processing");
+
     // Receive image
     if (!receiveImage(imageFilePath)) {
+        mLogger->logInfo("Failed during image receiving");
         return false;
     }
+    mLogger->logInfo("Image received successfully");
 
     // Save image
     if (mSaveImages) {
@@ -58,15 +63,18 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Preprocessing
     preprocessImage();
+    mLogger->logInfo("Image preprocessing occurred successfully");
 
-    // Segmentation.
+    // Segmentation
     if (!segmentImage()) {
+        mLogger->logInfo("Failed during image segmentation");
         return false;
     }
+    mLogger->logInfo("Image segmentation occurred successfully");
 
     // TODO: Segmentation map.
 
-    // TODO: Images of components with ID.
+    // TODO: Images (ROI) of components with ID (ID in the file name or in the ROI?).
 
     return true;
 }

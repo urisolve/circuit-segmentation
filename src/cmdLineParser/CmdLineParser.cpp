@@ -7,7 +7,7 @@
 #include <iostream>
 
 namespace circuitSegmentation {
-namespace utils {
+namespace cmdLineParser {
 
 CmdLineParser::CmdLineParser()
     : mCmdLineArgs{}
@@ -113,5 +113,5 @@ void CmdLineParser::showHelp() const
     }
 }
 
-} // namespace utils
+} // namespace cmdLineParser
 } // namespace circuitSegmentation

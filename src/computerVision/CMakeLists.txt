@@ -20,6 +20,11 @@ add_library(CircuitSegmentation::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
 # Build
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC ${OpenCV_INCLUDE_DIRS}
+)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE ${OpenCV_LIBS}
 )

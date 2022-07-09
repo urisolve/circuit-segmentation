@@ -7,11 +7,11 @@
 namespace circuitSegmentation {
 namespace imageProcessing {
 
-ImagePreprocessing::ImagePreprocessing(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                                       std::shared_ptr<logging::Logger> logger,
-                                       bool saveImages)
-    : mOpenCvWrapper{std::move(openCvWrapper)}
-    , mLogger{std::move(logger)}
+ImagePreprocessing::ImagePreprocessing(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                                       const std::shared_ptr<logging::Logger>& logger,
+                                       const bool saveImages)
+    : mOpenCvWrapper{openCvWrapper}
+    , mLogger{logger}
     , mSaveImages{std::move(saveImages)}
 {
 }

@@ -24,11 +24,11 @@ add_library(CircuitSegmentation::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Build
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..
+    PRIVATE ${CMAKE_SOURCE_DIR}/src
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::ImageProcessing
+    PRIVATE CircuitSegmentation::CmdLineParser
     PRIVATE CircuitSegmentation::Logger
-    PRIVATE CircuitSegmentation::Utils
 )

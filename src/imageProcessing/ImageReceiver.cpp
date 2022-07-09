@@ -7,10 +7,10 @@
 namespace circuitSegmentation {
 namespace imageProcessing {
 
-ImageReceiver::ImageReceiver(std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper,
-                             std::shared_ptr<logging::Logger> logger)
-    : mOpenCvWrapper{std::move(openCvWrapper)}
-    , mLogger{std::move(logger)}
+ImageReceiver::ImageReceiver(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                             const std::shared_ptr<logging::Logger>& logger)
+    : mOpenCvWrapper{openCvWrapper}
+    , mLogger{logger}
 {
 }
 

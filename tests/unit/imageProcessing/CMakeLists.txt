@@ -11,6 +11,8 @@ enable_testing()
 set(Sources
     ut_ImagePreprocessing.cpp
     ut_ImageReceiver.cpp
+    ut_ImageSegmentation.cpp
+    ut_ImageUtils.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -24,7 +26,6 @@ add_executable(${PROJECT_NAME}
 # add_test(${PROJECT_NAME}
 #     ${PROJECT_NAME}
 # )
-include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
@@ -36,10 +37,8 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE gtest
-    PRIVATE gtest_main
-    PRIVATE gmock
-    PRIVATE pthread
+    PRIVATE GTest::gtest_main
+    PRIVATE GTest::gmock
     PRIVATE CircuitSegmentation::ImageProcessing
     PRIVATE CircuitSegmentation::Logger
 )

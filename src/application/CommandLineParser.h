@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "utils/CmdLineParser.h"
+#include "cmdLineParser/CmdLineParser.h"
 #include <string>
 
 namespace circuitSegmentation {
@@ -73,7 +73,7 @@ public:
 
 private:
     /** Parser of the command line arguments. */
-    utils::CmdLineParser mParser{};
+    circuitSegmentation::cmdLineParser::CmdLineParser mParser{};
 };
 
 } // namespace application

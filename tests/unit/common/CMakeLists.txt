@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------------------
 # Project setup
-project(UtUtils)
+project(UtCommon)
 
 # ----------------------------------------------------------------------------
 # Test
@@ -9,7 +9,7 @@ enable_testing()
 # ----------------------------------------------------------------------------
 # Source files
 set(Sources
-    ut_CmdLineParser.cpp
+    ut_RandomNumberGen.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -23,7 +23,6 @@ add_executable(${PROJECT_NAME}
 # add_test(${PROJECT_NAME}
 #     ${PROJECT_NAME}
 # )
-include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------
@@ -34,9 +33,5 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE gtest
-    PRIVATE gtest_main
-    PRIVATE gmock
-    PRIVATE pthread
-    PRIVATE CircuitSegmentation::Utils
+    PRIVATE GTest::gtest_main
 )

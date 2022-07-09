@@ -54,11 +54,8 @@ TEST_F(ImagePreprocessingTest, preprocessImageSave)
     // Set flag to save images
     mImagePreprocessing->setSaveImages(true);
 
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, writeImage).WillByDefault(Return(true));
-
-    // Setup expectations
-    EXPECT_CALL(*mMockOpenCvWrapper, writeImage).Times(4);
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage).Times(4).WillRepeatedly(Return(true));
 
     // Preprocess image
     mImagePreprocessing->preprocessImage(mTestImage);
@@ -95,13 +92,13 @@ TEST_F(ImagePreprocessingTest, setsSaveImages)
  */
 TEST_F(ImagePreprocessingTest, resizesImageSquare)
 {
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, getImageWidth)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
-    ON_CALL(*mMockOpenCvWrapper, getImageHeight)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
-
-    // Setup expectations
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth)
+        .Times(2)
+        .WillRepeatedly(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight)
+        .Times(2)
+        .WillRepeatedly(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
     EXPECT_CALL(*mMockOpenCvWrapper, resizeImage).Times(1);
 
     // Resize image
@@ -113,13 +110,13 @@ TEST_F(ImagePreprocessingTest, resizesImageSquare)
  */
 TEST_F(ImagePreprocessingTest, resizesImageWidth)
 {
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, getImageWidth)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
-    ON_CALL(*mMockOpenCvWrapper, getImageHeight)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
-
-    // Setup expectations
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth)
+        .Times(2)
+        .WillRepeatedly(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight)
+        .Times(2)
+        .WillRepeatedly(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
     EXPECT_CALL(*mMockOpenCvWrapper, resizeImage).Times(1);
 
     // Resize image
@@ -131,13 +128,13 @@ TEST_F(ImagePreprocessingTest, resizesImageWidth)
  */
 TEST_F(ImagePreprocessingTest, resizesImageHeight)
 {
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, getImageWidth)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
-    ON_CALL(*mMockOpenCvWrapper, getImageHeight)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
-
-    // Setup expectations
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth)
+        .Times(2)
+        .WillRepeatedly(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight)
+        .Times(2)
+        .WillRepeatedly(Return(imageProcessing::ImagePreprocessing::cResizeDim + 100));
     EXPECT_CALL(*mMockOpenCvWrapper, resizeImage).Times(1);
 
     // Resize image
@@ -149,13 +146,13 @@ TEST_F(ImagePreprocessingTest, resizesImageHeight)
  */
 TEST_F(ImagePreprocessingTest, doesNotResizeImage)
 {
-    // Setup behavior
-    ON_CALL(*mMockOpenCvWrapper, getImageWidth)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
-    ON_CALL(*mMockOpenCvWrapper, getImageHeight)
-        .WillByDefault(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
-
-    // Setup expectations
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth)
+        .Times(1)
+        .WillOnce(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight)
+        .Times(1)
+        .WillOnce(Return(imageProcessing::ImagePreprocessing::cResizeDim - 100));
     EXPECT_CALL(*mMockOpenCvWrapper, resizeImage).Times(0);
 
     // Resize image

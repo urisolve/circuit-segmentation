@@ -7,6 +7,7 @@ project(MockImageProcessing)
 set(Headers
     MockImagePreprocessing.h
     MockImageReceiver.h
+    MockImageSegmentation.h
 )
 
 # ----------------------------------------------------------------------------
@@ -24,6 +25,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE gmock
+    PRIVATE GTest::gmock
     PRIVATE CircuitSegmentation::ImageProcessing
 )

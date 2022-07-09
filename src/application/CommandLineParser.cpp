@@ -14,7 +14,7 @@ void CommandLineParser::parse(const int argc, char const* argv[])
     // Set parser information
     mParser.setAppName(Application::cAppName);
     mParser.setAppVersion(Application::cAppVersion);
-    const std::string appDescription = std::string(Application::cAppDescription) + "\n" + Application::cAppDate;
+    const std::string appDescription{std::string(Application::cAppDescription) + "\n" + Application::cAppDate};
     mParser.setAppDescription(appDescription);
 
     const std::map<std::string, std::string> options{

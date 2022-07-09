@@ -16,6 +16,17 @@ namespace logging {
 class MockLogger : public Logger
 {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param ostream Output stream.
+     * @param level Log level.
+     */
+    MockLogger(std::ostream& ostream, LogLevel level = cLogLevelDefault)
+        : Logger(ostream, level)
+    {
+    }
+
     /** Mocks method setLogLevel. */
     MOCK_METHOD(void, setLogLevel, (LogLevel level), (override));
     /** Mocks method getLogLevel. */
