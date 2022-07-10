@@ -22,9 +22,9 @@ class ImageSegmentation
 {
 public:
     /** Bounding boxes minimum area. */
-    static constexpr double cBoundingBoxMinArea{400};
-    /** Nodes minimum area. */
-    static constexpr double cNodesMinArea{100};
+    static constexpr double cBoundingBoxMinArea{200};
+    /** Nodes minimum length. */
+    static constexpr double cNodesMinLength{20};
 
     /**
      * @brief Constructor.
@@ -161,12 +161,12 @@ private:
     /** Size of the kernel for morphological closing. */
     const unsigned int cMorphCloseKernelSize{11};
     /** Iterations for morphological closing. */
-    const unsigned int cMorphCloseIter{3};
+    const unsigned int cMorphCloseIter{4};
 
     /** Size of the kernel for morphological opening. */
     const unsigned int cMorphOpenKernelSize{3};
     /** Iterations for morphological opening. */
-    const unsigned int cMorphOpenIter{3};
+    const unsigned int cMorphOpenIter{1};
 
     /** Mode of contour retrieval algorithm for bounding boxes. */
     const computerVision::OpenCvWrapper::RetrievalModes cBoundingBoxFindContourMode{

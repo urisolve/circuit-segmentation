@@ -96,6 +96,20 @@ private:
     virtual void morphologicalOpenImage(computerVision::ImageMat& image);
 
     /**
+     * @brief Applies a morphological dilation to the image.
+     *
+     * @param image Image to apply a morphological dilation.
+     */
+    virtual void morphologicalDilateImage(computerVision::ImageMat& image);
+
+    /**
+     * @brief Applies a thinning operation to the image.
+     *
+     * @param image Image to apply a thinning operation.
+     */
+    virtual void thinningImage(computerVision::ImageMat& image);
+
+    /**
      * @brief Detects edges the image.
      *
      * @param image Image to detect edges.
@@ -123,6 +137,11 @@ private:
     const unsigned int cMorphOpenKernelSize{3};
     /** Iterations for morphological opening. */
     const unsigned int cMorphOpenIter{1};
+
+    /** Size of the kernel for morphological dilation. */
+    const unsigned int cMorphDilateKernelSize{3};
+    /** Iterations for morphological dilation. */
+    const unsigned int cMorphDilateIter{1};
 
     /** Threshold1 value for the Canny Edge Detector. */
     const double cCannyEdgeThresh1{50};

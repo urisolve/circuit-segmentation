@@ -28,6 +28,7 @@ bool ImageSegmentation::segmentImage(computerVision::ImageMat imageInitial, comp
     mImageInitial = std::move(imageInitial);
     mImagePreprocessed = std::move(imagePreprocessed);
 
+    // TODO: Update segmentation process to fill closed shapes.
     /*
      * Steps:
      * - Detection of components
@@ -240,8 +241,8 @@ bool ImageSegmentation::detectNodes()
     mNodes.clear();
 
     for (const auto& wire : wires) {
-        // Check wire area
-        if (mOpenCvWrapper->contourArea(wire) >= cNodesMinArea) {
+        // Check wire length
+        if (mOpenCvWrapper->arcLength(wire, false) >= cNodesMinLength) {
             // Add node
             circuit::Node node{};
             node.setWire(wire);

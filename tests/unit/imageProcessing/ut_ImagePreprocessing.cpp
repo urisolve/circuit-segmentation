@@ -55,7 +55,7 @@ TEST_F(ImagePreprocessingTest, preprocessImageSave)
     mImagePreprocessing->setSaveImages(true);
 
     // Setup expectations and behavior
-    EXPECT_CALL(*mMockOpenCvWrapper, writeImage).Times(4).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage).WillRepeatedly(Return(true));
 
     // Preprocess image
     mImagePreprocessing->preprocessImage(mTestImage);
@@ -205,6 +205,30 @@ TEST_F(ImagePreprocessingTest, morphologicalOpenImage)
 
     // Morphological opening image
     mImagePreprocessing->morphologicalOpenImage(mTestImage);
+}
+
+/**
+ * @brief Tests that the morphological dilation operation is applied to the image.
+ */
+TEST_F(ImagePreprocessingTest, morphologicalDilateImage)
+{
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, morphologyEx).Times(1);
+
+    // Morphological opening image
+    mImagePreprocessing->morphologicalDilateImage(mTestImage);
+}
+
+/**
+ * @brief Tests that the thinning operation is applied to the image.
+ */
+TEST_F(ImagePreprocessingTest, thinningOperationImage)
+{
+    // Setup expectations
+    EXPECT_CALL(*mMockOpenCvWrapper, thinning).Times(1);
+
+    // Thinning image
+    mImagePreprocessing->thinningImage(mTestImage);
 }
 
 /**

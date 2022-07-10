@@ -46,6 +46,10 @@ public:
     MOCK_METHOD(void, thresholdImage, (computerVision::ImageMat & image), (override));
     /** Mocks method morphologicalOpenImage. */
     MOCK_METHOD(void, morphologicalOpenImage, (computerVision::ImageMat & image), (override));
+    /** Mocks method morphologicalDilateImage. */
+    MOCK_METHOD(void, morphologicalDilateImage, (computerVision::ImageMat & image), (override));
+    /** Mocks method thinningImage. */
+    MOCK_METHOD(void, thinningImage, (computerVision::ImageMat & image), (override));
     /** Mocks method edgesImage. */
     MOCK_METHOD(void, edgesImage, (computerVision::ImageMat & image), (override));
 };

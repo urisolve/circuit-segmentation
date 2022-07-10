@@ -158,6 +158,16 @@ public:
     };
 
     /**
+     * @brief Enumeration of thinning algorithms.
+     */
+    enum ThinningAlgorithms {
+        /** Thinning technique of Zhang-Suen. */
+        THINNING_ZHANGSUEN = 0,
+        /** Thinning technique of Guo-Hall. */
+        THINNING_GUOHALL = 1
+    };
+
+    /**
      * @brief Constructor.
      */
     OpenCvWrapper() = default; // GCOVR_EXCL_LINE
@@ -388,9 +398,20 @@ public:
      * @brief Calculates a contour area.
      *
      * @param contour Input vector of 2D points (contour vertices).
+     *
      * @return Contour area.
      */
     virtual double contourArea(InputOutputArray& contour);
+
+    /**
+     * @brief Calculates a contour perimeter or a curve length.
+     *
+     * @param curve Input vector of 2D points.
+     * @param closed Flag indicating whether the curve is closed or not.
+     *
+     * @return Contour perimeter or curve length.
+     */
+    virtual double arcLength(InputOutputArray& curve, const bool& closed);
 
     /**
      * @brief Calculates the up-right bounding rectangle of a point set or non-zero pixels of gray-scale image.
@@ -426,6 +447,28 @@ public:
      * @return True if the rectangle contains the point, otherwise false.
      */
     virtual bool contains(const Rectangle& rectangle, const Point& point);
+
+    /**
+     * @brief Applies a binary blob thinning operation, for skeletonization of the input image.
+     *
+     * @param srcImg Source 8-bit single-channel image.
+     * @param dstImg Destination image of the same size and the same type as source image.
+     * @param thinningAlg Thinning algorithm to be used.
+     *
+     * @see Thinning method implemented in OpenCV ximgproc module (opencv_contrib), in the following link:
+     * https://github.com/opencv/opencv_contrib/blob/4.x/modules/ximgproc/src/thinning.cpp
+     */
+    virtual void thinning(ImageMat& srcImg, ImageMat& dstImg, const ThinningAlgorithms& thinningAlg);
+
+private:
+    /**
+     * @brief Applies a thinning iteration to a binary image.
+     *
+     * @param img Binary image.
+     * @param iter Iteration.
+     * @param thinningAlg Thinning algorithm to be used.
+     */
+    void thinningIter(ImageMat& img, const int& iter, const ThinningAlgorithms& thinningAlg);
 };
 
 } // namespace computerVision

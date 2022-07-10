@@ -96,6 +96,8 @@ public:
                 (override));
     /** Mocks method contourArea. */
     MOCK_METHOD(double, contourArea, (InputOutputArray & contour), (override));
+    /** Mocks method arcLength. */
+    MOCK_METHOD(double, arcLength, (InputOutputArray & curve, const bool& closed), (override));
     /** Mocks method boundingRect. */
     MOCK_METHOD(Rectangle, boundingRect, (InputOutputArray & array), (override));
     /** Mocks method rectangle. */
@@ -109,6 +111,11 @@ public:
                 (override));
     /** Mocks method contains. */
     MOCK_METHOD(bool, contains, (const Rectangle& rectangle, const Point& point), (override));
+    /** Mocks method thinning. */
+    MOCK_METHOD(void,
+                thinning,
+                (ImageMat & srcImg, ImageMat& dstImg, const ThinningAlgorithms& thinningAlg),
+                (override));
 };
 
 } // namespace computerVision
