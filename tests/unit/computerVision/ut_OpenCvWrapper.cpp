@@ -330,6 +330,17 @@ TEST_F(OpenCvWrapperTest, calculatesContourArea)
 }
 
 /**
+ * @brief Tests that the arc length is calculated correctly.
+ */
+TEST_F(OpenCvWrapperTest, calculatesArcLength)
+{
+    std::vector<Point> contour{Point(0, 0), Point(10, 0), Point(10, 10), Point(0, 10)};
+    constexpr auto closed{true};
+
+    EXPECT_EQ(40, static_cast<int>(mOpenCvWrapper->arcLength(contour, closed)));
+}
+
+/**
  * @brief Tests that the methods for bounding rectangle and for drawing rectangle do not throw an exception.
  */
 TEST_F(OpenCvWrapperTest, boundingAndDrawingRectNoThrow)
@@ -410,6 +421,20 @@ TEST_F(OpenCvWrapperTest, rectangleContainsPoints)
     EXPECT_FALSE(mOpenCvWrapper->contains(rect, p10));
     EXPECT_FALSE(mOpenCvWrapper->contains(rect, p11));
     EXPECT_FALSE(mOpenCvWrapper->contains(rect, p12));
+}
+
+/**
+ * @brief Tests that the method for thinning operation does not throw an exception.
+ */
+TEST_F(OpenCvWrapperTest, thinningNoThrow)
+{
+    // Find contours parameters
+    ImageMat img{};
+    const OpenCvWrapper::ThinningAlgorithms thinningAlg1{OpenCvWrapper::ThinningAlgorithms::THINNING_ZHANGSUEN};
+    const OpenCvWrapper::ThinningAlgorithms thinningAlg2{OpenCvWrapper::ThinningAlgorithms::THINNING_GUOHALL};
+
+    EXPECT_NO_THROW(mOpenCvWrapper->thinning(mTestImage1chn, img, thinningAlg1));
+    EXPECT_NO_THROW(mOpenCvWrapper->thinning(mTestImage1chn, img, thinningAlg2));
 }
 
 // /**

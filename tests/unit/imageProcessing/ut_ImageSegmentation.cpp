@@ -114,16 +114,16 @@ protected:
      */
     void setupDetectNodes(const unsigned int nodesDetected)
     {
-        // Area is larger than the minimum to consider wire as a node, if there are nodes to detect
-        const auto contArea{nodesDetected > 0 ? imageProcessing::ImageSegmentation::cNodesMinArea
-                                              : (imageProcessing::ImageSegmentation::cNodesMinArea - 1)};
+        // Length is larger than the minimum to consider wire as a node, if there are nodes to detect
+        const auto contLength{nodesDetected > 0 ? imageProcessing::ImageSegmentation::cNodesMinLength
+                                                : (imageProcessing::ImageSegmentation::cNodesMinLength - 1)};
 
         // Setup expectations and behavior
         expectRemoveComponents();
         onFindContours(nodesDetected);
 
         EXPECT_CALL(*mMockOpenCvWrapper, findContours).Times(1);
-        EXPECT_CALL(*mMockOpenCvWrapper, contourArea).Times(nodesDetected).WillRepeatedly(Return(contArea));
+        EXPECT_CALL(*mMockOpenCvWrapper, arcLength).Times(nodesDetected).WillRepeatedly(Return(contLength));
     }
 
     /**
@@ -556,15 +556,15 @@ TEST_F(ImageSegmentationTest, detectsNoNodesWhenNoContours)
  */
 TEST_F(ImageSegmentationTest, detectsNoNodesWhenSmallArea)
 {
-    // Area is smaller than the minimum to consider wire as a node
-    constexpr auto contArea{imageProcessing::ImageSegmentation::cNodesMinArea - 1};
+    // Length is smaller than the minimum to consider wire as a node
+    constexpr auto contLength{imageProcessing::ImageSegmentation::cNodesMinLength - 1};
     constexpr auto nodesContours{2};
 
     // Setup expectations and behavior
     expectRemoveComponents();
     onFindContours(nodesContours);
     EXPECT_CALL(*mMockOpenCvWrapper, findContours).Times(1);
-    EXPECT_CALL(*mMockOpenCvWrapper, contourArea).Times(nodesContours).WillRepeatedly(Return(contArea));
+    EXPECT_CALL(*mMockOpenCvWrapper, arcLength).Times(nodesContours).WillRepeatedly(Return(contLength));
 
     // Detect nodes
     ASSERT_FALSE(mImageSegmentation->detectNodes());

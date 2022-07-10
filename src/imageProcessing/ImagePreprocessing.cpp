@@ -29,8 +29,11 @@ void ImagePreprocessing::preprocessImage(computerVision::ImageMat& image)
     // Apply threshold
     thresholdImage(image);
 
-    // Apply morphological opening
-    morphologicalOpenImage(image);
+    // Apply morphological dilation
+    morphologicalDilateImage(image);
+
+    // Apply thinning operation
+    thinningImage(image);
 }
 
 void ImagePreprocessing::setSaveImages(const bool& saveImages)
@@ -168,6 +171,53 @@ void ImagePreprocessing::morphologicalOpenImage(computerVision::ImageMat& image)
         mOpenCvWrapper->writeImage("image_preproc_morph_open.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Morphological opening image", image, 0);
+    }
+}
+
+void ImagePreprocessing::morphologicalDilateImage(computerVision::ImageMat& image)
+{
+    /*
+     * Morphological dilation
+     * - Opposite of an erosion
+     * - Grows the foreground pixels, increasing the size of foreground objects
+     * - Useful for joining broken parts of an image together
+     */
+    const auto kernelMorph = mOpenCvWrapper->getStructuringElement(
+        circuitSegmentation::computerVision::OpenCvWrapper::MorphShapes::MORPH_RECT, cMorphDilateKernelSize);
+    mOpenCvWrapper->morphologyEx(image,
+                                 image,
+                                 circuitSegmentation::computerVision::OpenCvWrapper::MorphTypes::MORPH_DILATE,
+                                 kernelMorph,
+                                 cMorphDilateIter);
+
+    mLogger->logInfo("Morphological dilation applied to the image");
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_morph_dilation.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Morphological dilation image", image, 0);
+    }
+}
+
+void ImagePreprocessing::thinningImage(computerVision::ImageMat& image)
+{
+    /*
+     * Thinning operation
+     * - Transformation of a digital image into a simplified, but topologically equivalent image
+     * - Allows to obtain the image skeleton, with each line thickness transformed into a pixel
+     * - This is useful to be independent of the contours thickness in the initial image
+     */
+    mOpenCvWrapper->thinning(
+        image, image, circuitSegmentation::computerVision::OpenCvWrapper::ThinningAlgorithms::THINNING_ZHANGSUEN);
+
+    mLogger->logInfo("Thinning operation applied to the image");
+
+    // Save image
+    if (mSaveImages) {
+        mOpenCvWrapper->writeImage("image_preproc_thinning.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Thinning image", image, 0);
     }
 }
 

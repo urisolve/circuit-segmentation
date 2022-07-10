@@ -49,7 +49,7 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Receive image
     if (!receiveImage(imageFilePath)) {
-        mLogger->logInfo("Failed during image receiving");
+        mLogger->logInfo("Failed during image reception");
         return false;
     }
     mLogger->logInfo("Image received successfully");
@@ -74,7 +74,7 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // TODO: Segmentation map.
 
-    // TODO: Images (ROI) of components with ID (ID in the file name or in the ROI?).
+    // TODO: Images (ROI) of components with ID (ID in the file name).
 
     return true;
 }
