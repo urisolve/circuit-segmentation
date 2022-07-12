@@ -28,21 +28,21 @@ public:
     }
 
     /** Mocks method setLogLevel. */
-    MOCK_METHOD(void, setLogLevel, (LogLevel level), (override));
+    MOCK_METHOD(void, setLogLevel, (LogLevel), (override));
     /** Mocks method getLogLevel. */
     MOCK_METHOD(LogLevel, getLogLevel, (), (const, override));
     /** Mocks method logFatal. */
-    MOCK_METHOD(void, logFatal, (const std::string& msg), (override));
+    MOCK_METHOD(void, logFatal, (const std::string&), (override));
     /** Mocks method logError. */
-    MOCK_METHOD(void, logError, (const std::string& msg), (override));
+    MOCK_METHOD(void, logError, (const std::string&), (override));
     /** Mocks method logWarning. */
-    MOCK_METHOD(void, logWarning, (const std::string& msg), (override));
+    MOCK_METHOD(void, logWarning, (const std::string&), (override));
     /** Mocks method logInfo. */
-    MOCK_METHOD(void, logInfo, (const std::string& msg), (override));
+    MOCK_METHOD(void, logInfo, (const std::string&), (override));
     /** Mocks method logDebug. */
-    MOCK_METHOD(void, logDebug, (const std::string& msg), (override));
+    MOCK_METHOD(void, logDebug, (const std::string&), (override));
     /** Mocks method logVerbose. */
-    MOCK_METHOD(void, logVerbose, (const std::string& msg), (override));
+    MOCK_METHOD(void, logVerbose, (const std::string&), (override));
 };
 
 } // namespace logging

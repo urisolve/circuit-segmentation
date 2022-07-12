@@ -44,10 +44,11 @@ fi
 
 # Generate report
 echo "Generating report..."
-gcovr --html-details $coverage_folder/coverage.html --exclude-directories 'tests/*' \
+gcovr --html-details $coverage_folder/coverage.html --exclude-directories 'tests/*' --exclude-directories 'external/*' \
     -e '.*/src/main.cpp' -e '.*/src/application/Application.cpp' -r ..
 
 # Print a tabular report to the output
-gcovr -s --exclude-directories 'tests/*' -e '.*/src/main.cpp' -e '.*/src/application/Application.cpp' -r ..
+gcovr -s --exclude-directories 'tests/*' --exclude-directories 'external/*' \
+    -e '.*/src/main.cpp' -e '.*/src/application/Application.cpp' -r ..
 
 echo "Coverage generation end"

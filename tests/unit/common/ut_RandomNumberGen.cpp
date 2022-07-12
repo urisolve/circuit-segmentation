@@ -33,7 +33,7 @@ protected:
     /** Maximum random number to be used in tests. */
     const int cMaxRandom{10};
 
-    /** Command line parser. */
+    /** Simple random number generator. */
     std::unique_ptr<common::RandomNumberGen<int>> mRandomNumberGen;
 };
 

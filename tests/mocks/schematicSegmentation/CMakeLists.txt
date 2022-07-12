@@ -1,11 +1,12 @@
 # ----------------------------------------------------------------------------
 # Project setup
-project(MockCommon)
+project(MockSchematicSegmentation)
 
 # ----------------------------------------------------------------------------
 # Source files
 set(Headers
-    MockRandomNumberGen.h
+    MockComponentSegmentation.h
+    MockConnectionSegmentation.h
 )
 
 # ----------------------------------------------------------------------------
@@ -24,5 +25,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE GTest::gmock
-    PRIVATE CircuitSegmentation::Common
+    PRIVATE CircuitSegmentation::SchematicSegmentation
 )

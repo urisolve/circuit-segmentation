@@ -2,12 +2,12 @@
  * @file
  */
 
-#include "Component.h"
+#include "Connection.h"
 
 namespace circuitSegmentation {
 namespace circuit {
 
-Component::Component()
+Connection::Connection()
     : mId{generateId()}
 {
 }

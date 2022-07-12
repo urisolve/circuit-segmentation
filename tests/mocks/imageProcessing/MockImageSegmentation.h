@@ -21,45 +21,26 @@ public:
      *
      * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
+     * @param componentSegmentation Component segmentation.
+     * @param connectionSegmentation Connection segmentation.
      * @param saveImages Save images obtained during the processing.
      */
-    explicit MockImageSegmentation(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
-                                   const std::shared_ptr<logging::Logger>& logger,
-                                   const bool saveImages = false)
-        : ImageSegmentation(openCvWrapper, logger, saveImages)
+    explicit MockImageSegmentation(
+        const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+        const std::shared_ptr<logging::Logger>& logger,
+        const std::shared_ptr<schematicSegmentation::ComponentSegmentation>& componentSegmentation,
+        const std::shared_ptr<schematicSegmentation::ConnectionSegmentation>& connectionSegmentation,
+        const bool saveImages = false)
+        : ImageSegmentation(openCvWrapper, logger, componentSegmentation, connectionSegmentation, saveImages)
     {
     }
 
     /** Mocks method segmentImage. */
-    MOCK_METHOD(bool,
-                segmentImage,
-                (computerVision::ImageMat imageInitial, computerVision::ImageMat imagePreprocessed),
-                (override));
+    MOCK_METHOD(bool, segmentImage, (computerVision::ImageMat, computerVision::ImageMat), (override));
     /** Mocks method setSaveImages. */
-    MOCK_METHOD(void, setSaveImages, (const bool& saveImages), (override));
+    MOCK_METHOD(void, setSaveImages, (const bool&), (override));
     /** Mocks method getSaveImages. */
     MOCK_METHOD(bool, getSaveImages, (), (const, override));
-    /** Mocks method detectComponents. */
-    MOCK_METHOD(bool, detectComponents, (), (override));
-    /** Mocks method boundingBoxComponents. */
-    MOCK_METHOD(void, boundingBoxComponents, (const computerVision::Contours& blobs), (override));
-    /** Mocks method increaseBoundingBox. */
-    MOCK_METHOD(computerVision::Rectangle,
-                increaseBoundingBox,
-                (const computerVision::Rectangle& box,
-                 const int& widthIncr,
-                 const int& heightIncr,
-                 const int& widthMax,
-                 const int& heightMax),
-                (override));
-    /** Mocks method detectNodes. */
-    MOCK_METHOD(bool, detectNodes, (), (override));
-    /** Mocks method detectCircuitConnections. */
-    MOCK_METHOD(void, detectCircuitConnections, (), (override));
-    /** Mocks method updateDetectedComponents. */
-    MOCK_METHOD(bool, updateDetectedComponents, (), (override));
-    /** Mocks method getDetectedComponents. */
-    MOCK_METHOD(std::vector<circuit::Component>, getDetectedComponents, (), (const, override));
 };
 
 } // namespace imageProcessing

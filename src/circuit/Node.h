@@ -4,47 +4,53 @@
 
 #pragma once
 
-#include "computerVision/OpenCvWrapper.h"
+#include "Id.h"
+#include "Label.h"
+#include "Position.h"
+#include <map>
+#include <string>
+#include <vector>
 
 namespace circuitSegmentation {
 namespace circuit {
 
-/** Alias for wire. */
-using Wire = computerVision::Contour;
-
 /**
  * @brief Circuit node.
+ *
+ * It represents connection points.
  */
-class Node
+struct Node
 {
-public:
+    /**
+     * @brief Enumeration of the node types allowed.
+     */
+    enum class NodeType : unsigned char {
+        /** Real (node holds more than 2 connections). */
+        REAL = 0,
+        /** Virtual. */
+        VIRTUAL = 1
+    };
+
     /**
      * @brief Constructor.
      */
     Node();
 
     /**
-     * @brief Destructor.
-     */
-    virtual ~Node() = default;
-
-    /**
-     * @brief Sets the wire of the node.
+     * @brief Sets the node type.
      *
-     * @param wire Wire of the node.
+     * @param type Type.
      */
-    virtual void setWire(const Wire wire);
+    void setType(const NodeType& type);
 
-    /**
-     * @brief Gets the wire of the node.
-     *
-     * @return Wire of the node.
-     */
-    [[nodiscard]] virtual Wire getWire() const;
-
-private:
-    /** Wire of the node. */
-    Wire mWire;
+    /** Unique ID. */
+    Id mId{};
+    /** Type. */
+    std::string mType{"virtual"};
+    /** Position. */
+    GlobalPosition mPosition{};
+    /** Connection IDs. */
+    std::vector<Id> mConnectionIds{};
 };
 
 } // namespace circuit

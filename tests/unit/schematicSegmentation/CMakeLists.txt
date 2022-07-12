@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------------------
 # Project setup
-project(UtCircuit)
+project(UtSchematicSegmentation)
 
 # ----------------------------------------------------------------------------
 # Test
@@ -9,8 +9,8 @@ enable_testing()
 # ----------------------------------------------------------------------------
 # Source files
 set(Sources
-    ut_Component.cpp
-    ut_Node.cpp
+    ut_ComponentSegmentation.cpp
+    ut_ConnectionSegmentation.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -31,9 +31,12 @@ gtest_discover_tests(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/src
+    PRIVATE ${CMAKE_SOURCE_DIR}/tests
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE GTest::gtest_main
-    PRIVATE CircuitSegmentation::Circuit
+    PRIVATE GTest::gmock
+    PRIVATE CircuitSegmentation::SchematicSegmentation
+    PRIVATE CircuitSegmentation::Logger
 )
