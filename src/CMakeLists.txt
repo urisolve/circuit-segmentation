@@ -25,6 +25,7 @@ add_subdirectory(common)
 add_subdirectory(computerVision)
 add_subdirectory(imageProcessing)
 add_subdirectory(logging)
+add_subdirectory(schematicSegmentation)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::Application

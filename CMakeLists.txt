@@ -29,17 +29,17 @@ option(BUILD_COVERAGE "Builds with code coverage" OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# OpenCV
-find_package(OpenCV REQUIRED)
-
 # Fetch dependencies
 include(FetchDependencies)
+
+# OpenCV
+find_package(OpenCV REQUIRED)
 
 # ----------------------------------------------------------------------------
 # Compile definitions
 
 # Set build debug definition
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(BUILD_DEBUG)
 endif()
 
@@ -60,17 +60,26 @@ endif()
 # Build
 
 # Set compile options for g++
-if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic-errors"
+        "${CMAKE_CXX_FLAGS} -Wall -Werror"
+    )
+endif()
+
+# Set compile options for MSVC
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} /WX"
     )
 endif()
 
 # Code coverage
 if(BUILD_COVERAGE)
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} --coverage -g -O0"
-    )
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS
+            "${CMAKE_CXX_FLAGS} --coverage -g -O0"
+        )
+    endif()
 endif()
 
 # Subdirectories
@@ -89,7 +98,6 @@ message(STATUS "- CMAKE_CXX_STANDARD = ${CMAKE_CXX_STANDARD}")
 message(STATUS "- CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
 message(STATUS "- BUILD_TESTS = ${BUILD_TESTS}")
 message(STATUS "- BUILD_COVERAGE = ${BUILD_COVERAGE}")
-message(STATUS)
 # OpenCV variables are set with find_package, the full list with descriptions is in the OpenCVConfig.cmake file
 message(STATUS "OpenCV configuration:")
 message(STATUS "- OpenCV_VERSION = ${OpenCV_VERSION}")

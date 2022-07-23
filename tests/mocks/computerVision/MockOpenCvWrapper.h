@@ -17,105 +17,72 @@ class MockOpenCvWrapper : public OpenCvWrapper
 {
 public:
     /** Mocks method setLogMode. */
-    MOCK_METHOD(void, setLogMode, (const bool& silent), (override));
+    MOCK_METHOD(void, setLogMode, (const bool&), (override));
     /** Mocks method getLogMode. */
     MOCK_METHOD(bool, getLogMode, (), (const, override));
     /** Mocks method showImage. */
-    MOCK_METHOD(void, showImage, (const std::string& windowName, ImageMat& image, int delay), (override));
+    MOCK_METHOD(void, showImage, (const std::string&, ImageMat&, int), (override));
     /** Mocks method writeImage. */
-    MOCK_METHOD(bool, writeImage, (const std::string& fileName, ImageMat& image), (override));
+    MOCK_METHOD(bool, writeImage, (const std::string&, ImageMat&), (override));
     /** Mocks method readImage. */
-    MOCK_METHOD(ImageMat, readImage, (const std::string& fileName), (override));
+    MOCK_METHOD(ImageMat, readImage, (const std::string&), (override));
     /** Mocks method cloneImage. */
-    MOCK_METHOD(ImageMat, cloneImage, (ImageMat & image), (override));
+    MOCK_METHOD(ImageMat, cloneImage, (ImageMat&), (override));
     /** Mocks method isImageEmpty. */
-    MOCK_METHOD(bool, isImageEmpty, (ImageMat & image), (override));
+    MOCK_METHOD(bool, isImageEmpty, (ImageMat&), (override));
     /** Mocks method resizeImage. */
-    MOCK_METHOD(void, resizeImage, (ImageMat & srcImg, ImageMat& dstImg, const double& scale), (override));
+    MOCK_METHOD(void, resizeImage, (ImageMat&, ImageMat&, const double&), (override));
     /** Mocks method getImageWidth. */
-    MOCK_METHOD(int, getImageWidth, (ImageMat & image), (const, override));
+    MOCK_METHOD(int, getImageWidth, (ImageMat&), (const, override));
     /** Mocks method getImageHeight. */
-    MOCK_METHOD(int, getImageHeight, (ImageMat & image), (const, override));
+    MOCK_METHOD(int, getImageHeight, (ImageMat&), (const, override));
     /** Mocks method convertImageToGray. */
-    MOCK_METHOD(void, convertImageToGray, (ImageMat & srcImg, ImageMat& dstImg), (override));
+    MOCK_METHOD(void, convertImageToGray, (ImageMat&, ImageMat&), (override));
     /** Mocks method gaussianBlurImage. */
-    MOCK_METHOD(void,
-                gaussianBlurImage,
-                (ImageMat & srcImg, ImageMat& dstImg, const unsigned int& kernelSize),
-                (override));
+    MOCK_METHOD(void, gaussianBlurImage, (ImageMat&, ImageMat&, const unsigned int&), (override));
     /** Mocks method adaptiveThresholdImage. */
     MOCK_METHOD(void,
                 adaptiveThresholdImage,
-                (ImageMat & srcImg,
-                 ImageMat& dstImg,
-                 const double& maxValue,
-                 const AdaptiveThresholdAlgorithm& adaptiveMethod,
-                 const ThresholdOperations& thresholdOp,
-                 const int& blockSize,
-                 const double& subConst),
+                (ImageMat&,
+                 ImageMat&,
+                 const double&,
+                 const AdaptiveThresholdAlgorithm&,
+                 const ThresholdOperations&,
+                 const int&,
+                 const double&),
                 (override));
     /** Mocks method cannyEdgeImage. */
-    MOCK_METHOD(void,
-                cannyEdgeImage,
-                (ImageMat & srcImg,
-                 ImageMat& dstImg,
-                 const double& threshold1,
-                 const double& threshold2,
-                 const int& apertureSize),
-                (override));
+    MOCK_METHOD(void, cannyEdgeImage, (ImageMat&, ImageMat&, const double&, const double&, const int&), (override));
     /** Mocks method getStructuringElement. */
-    MOCK_METHOD(ImageMat, getStructuringElement, (const MorphShapes& shape, const unsigned int& size), (override));
+    MOCK_METHOD(ImageMat, getStructuringElement, (const MorphShapes&, const unsigned int&), (override));
     /** Mocks method morphologyEx. */
     MOCK_METHOD(void,
                 morphologyEx,
-                (ImageMat & srcImg,
-                 ImageMat& dstImg,
-                 const MorphTypes& op,
-                 const ImageMat& kernel,
-                 const unsigned int& iterations),
+                (ImageMat&, ImageMat&, const MorphTypes&, const ImageMat&, const unsigned int&),
                 (override));
     /** Mocks method findContours. */
     MOCK_METHOD(void,
                 findContours,
-                (ImageMat & image,
-                 Contours& contours,
-                 ContoursHierarchy& hierarchy,
-                 const RetrievalModes& mode,
-                 const ContourApproximationModes& method),
+                (ImageMat&, Contours&, ContoursHierarchy&, const RetrievalModes&, const ContourApproximationModes&),
                 (override));
     /** Mocks method drawContours. */
-    MOCK_METHOD(void,
-                drawContours,
-                (ImageMat & image,
-                 const Contours& contours,
-                 const int& contourIdx,
-                 const Scalar& color,
-                 const int& thickness,
-                 const LineTypes& lineType,
-                 const ContoursHierarchy& hierarchy),
-                (override));
+    MOCK_METHOD(
+        void,
+        drawContours,
+        (ImageMat&, const Contours&, const int&, const Scalar&, const int&, const LineTypes&, const ContoursHierarchy&),
+        (override));
     /** Mocks method contourArea. */
-    MOCK_METHOD(double, contourArea, (InputOutputArray & contour), (override));
+    MOCK_METHOD(double, contourArea, (InputOutputArray&), (override));
     /** Mocks method arcLength. */
-    MOCK_METHOD(double, arcLength, (InputOutputArray & curve, const bool& closed), (override));
+    MOCK_METHOD(double, arcLength, (InputOutputArray&, const bool&), (override));
     /** Mocks method boundingRect. */
-    MOCK_METHOD(Rectangle, boundingRect, (InputOutputArray & array), (override));
+    MOCK_METHOD(Rectangle, boundingRect, (InputOutputArray&), (override));
     /** Mocks method rectangle. */
-    MOCK_METHOD(void,
-                rectangle,
-                (ImageMat & image,
-                 const Rectangle& rectangle,
-                 const Scalar& color,
-                 const int& thickness,
-                 const LineTypes& lineType),
-                (override));
+    MOCK_METHOD(void, rectangle, (ImageMat&, const Rectangle&, const Scalar&, const int&, const LineTypes&), (override));
     /** Mocks method contains. */
-    MOCK_METHOD(bool, contains, (const Rectangle& rectangle, const Point& point), (override));
+    MOCK_METHOD(bool, contains, (const Rectangle&, const Point&), (override));
     /** Mocks method thinning. */
-    MOCK_METHOD(void,
-                thinning,
-                (ImageMat & srcImg, ImageMat& dstImg, const ThinningAlgorithms& thinningAlg),
-                (override));
+    MOCK_METHOD(void, thinning, (ImageMat&, ImageMat&, const ThinningAlgorithms&), (override));
 };
 
 } // namespace computerVision

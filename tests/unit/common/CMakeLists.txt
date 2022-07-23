@@ -10,6 +10,7 @@ enable_testing()
 # Source files
 set(Sources
     ut_RandomNumberGen.cpp
+    ut_UuidGen.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -34,4 +35,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE GTest::gtest_main
+    PRIVATE CircuitSegmentation::Common
 )

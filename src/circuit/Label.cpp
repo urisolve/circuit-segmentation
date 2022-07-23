@@ -2,12 +2,12 @@
  * @file
  */
 
-#include "Component.h"
+#include "Label.h"
 
 namespace circuitSegmentation {
 namespace circuit {
 
-Component::Component()
+Label::Label()
     : mId{generateId()}
 {
 }

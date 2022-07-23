@@ -6,11 +6,20 @@ project(Circuit)
 # Source files
 set(Headers
     Component.h
+    Connection.h
+    Id.h
+    Label.h
     Node.h
+    Port.h
+    Position.h
+    Schematic.h
 )
 set(Sources
     Component.cpp
+    Connection.cpp
+    Label.cpp
     Node.cpp
+    Port.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -26,8 +35,10 @@ add_library(CircuitSegmentation::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/src
     PUBLIC ${OpenCV_INCLUDE_DIRS}
+    PUBLIC ${CMAKE_SOURCE_DIR}/external/stduuid
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::ComputerVision
+    PRIVATE CircuitSegmentation::Common
 )

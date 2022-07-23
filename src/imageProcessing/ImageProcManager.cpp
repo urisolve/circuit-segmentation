@@ -3,6 +3,8 @@
  */
 
 #include "ImageProcManager.h"
+#include "schematicSegmentation/ComponentSegmentation.h"
+#include "schematicSegmentation/ConnectionSegmentation.h"
 
 namespace circuitSegmentation {
 namespace imageProcessing {
@@ -33,14 +35,19 @@ ImageProcManager
     ImageProcManager::create(const std::shared_ptr<logging::Logger>& logger, const bool logMode, const bool saveImages)
 {
     std::shared_ptr<computerVision::OpenCvWrapper> openCvWrapper{std::make_shared<computerVision::OpenCvWrapper>()};
+    std::shared_ptr<schematicSegmentation::ComponentSegmentation> componentSegmentation{
+        std::make_shared<schematicSegmentation::ComponentSegmentation>(openCvWrapper, logger)};
+    std::shared_ptr<schematicSegmentation::ConnectionSegmentation> connectionSegmentation{
+        std::make_shared<schematicSegmentation::ConnectionSegmentation>(openCvWrapper, logger)};
 
-    return ImageProcManager(std::make_shared<ImageReceiver>(openCvWrapper, logger),
-                            std::make_shared<ImagePreprocessing>(openCvWrapper, logger),
-                            std::make_shared<ImageSegmentation>(openCvWrapper, logger),
-                            openCvWrapper,
-                            logger,
-                            logMode,
-                            saveImages);
+    return ImageProcManager(
+        std::make_shared<ImageReceiver>(openCvWrapper, logger),
+        std::make_shared<ImagePreprocessing>(openCvWrapper, logger),
+        std::make_shared<ImageSegmentation>(openCvWrapper, logger, componentSegmentation, connectionSegmentation),
+        openCvWrapper,
+        logger,
+        logMode,
+        saveImages);
 }
 
 bool ImageProcManager::processImage(const std::string imageFilePath)

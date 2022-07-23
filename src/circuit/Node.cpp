@@ -8,18 +8,23 @@ namespace circuitSegmentation {
 namespace circuit {
 
 Node::Node()
-    : mWire{}
+    : mId{generateId()}
 {
 }
 
-void Node::setWire(const Wire wire)
+void Node::setType(const Node::NodeType& type)
 {
-    mWire = std::move(wire);
-}
-
-Wire Node::getWire() const
-{
-    return mWire;
+    switch (type) {
+    case Node::NodeType::REAL:
+        mType = "real";
+        break;
+    case Node::NodeType::VIRTUAL:
+        mType = "virtual";
+        break;
+    default:
+        mType = "virtual";
+        break;
+    }
 }
 
 } // namespace circuit

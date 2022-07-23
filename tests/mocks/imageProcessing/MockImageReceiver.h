@@ -33,7 +33,7 @@ public:
     /** Mocks method getImageReceived. */
     MOCK_METHOD(computerVision::ImageMat, getImageReceived, (), (const, override));
     /** Mocks method setImageFilePath. */
-    MOCK_METHOD(void, setImageFilePath, (const std::string& filePath), (override));
+    MOCK_METHOD(void, setImageFilePath, (const std::string&), (override));
     /** Mocks method getImageFilePath. */
     MOCK_METHOD(std::string, getImageFilePath, (), (const, override));
 };
