@@ -9,7 +9,43 @@
 #include <utility>
 
 namespace circuitSegmentation {
-namespace imageProcessing {
+namespace schematicSegmentation {
+
+/**
+ * @brief Increases size of bounding box and centers it.
+ *
+ * @param box Bounding box.
+ * @param widthIncr Increment for width.
+ * @param heightIncr Increment for height.
+ * @param widthMax Maximum width (x coordinate + box width).
+ * @param heightMax Maximum height (y coordinate + box height).
+ *
+ * @return Enlarged size bounding box.
+ */
+inline const computerVision::Rectangle increaseBoundingBox(const computerVision::Rectangle& box,
+                                                           const int& widthIncr,
+                                                           const int& heightIncr,
+                                                           const int& widthMax,
+                                                           const int& heightMax)
+{
+    // Axis
+    auto x{box.x - widthIncr / 2};  // Truncated
+    x = x < 0 ? 0 : x;              // Cannot be negative
+    auto y{box.y - heightIncr / 2}; // Truncated
+    y = y < 0 ? 0 : y;              // Cannot be negative
+
+    // Dimensions
+    auto width{box.width + widthIncr};
+    if ((x + width) > widthMax) {
+        width = widthMax - x;
+    }
+    auto height{box.height + heightIncr};
+    if ((y + height) > heightMax) {
+        height = heightMax - y;
+    }
+
+    return computerVision::Rectangle{x, y, width, height};
+}
 
 /**
  * @brief Finds the extreme points for the axis selected.
@@ -29,7 +65,7 @@ namespace imageProcessing {
  *
  * @return Pair of extreme points.
  *
- * @note The top is the points with smaller y coordinate.
+ * @note The top is the point with smaller y coordinate.
  */
 inline const std::pair<computerVision::Point, computerVision::Point>
     findExtremePoints(const std::vector<computerVision::Point>& points, const bool axisSel)
@@ -61,5 +97,5 @@ inline const std::pair<computerVision::Point, computerVision::Point>
     return pairPoints;
 }
 
-} // namespace imageProcessing
+} // namespace schematicSegmentation
 } // namespace circuitSegmentation

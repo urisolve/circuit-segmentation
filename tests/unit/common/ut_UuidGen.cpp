@@ -81,17 +81,3 @@ TEST_F(UuidGenTest, generatesMultipleIds)
     EXPECT_TRUE(id2 != id4);
     EXPECT_TRUE(id3 != id4);
 }
-
-// /**
-//  * @brief Main function.
-//  *
-//  * @param argc Number of command line arguments.
-//  * @param argv Command line arguments.
-//  *
-//  * @return 0 on success, 1 on failure.
-//  */
-// int main(int argc, char* argv[])
-// {
-//     testing::InitGoogleTest(&argc, argv);
-//     return RUN_ALL_TESTS();
-// }

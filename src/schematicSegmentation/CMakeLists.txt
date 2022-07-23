@@ -5,12 +5,15 @@ project(SchematicSegmentation)
 # ----------------------------------------------------------------------------
 # Source files
 set(Headers
-    ComponentSegmentation.h
-    ConnectionSegmentation.h
+    ComponentDetection.h
+    ConnectionDetection.h
+    SchematicSegmentation.h
+    SegmentationUtils.h
 )
 set(Sources
-    ComponentSegmentation.cpp
-    ConnectionSegmentation.cpp
+    ComponentDetection.cpp
+    ConnectionDetection.cpp
+    SchematicSegmentation.cpp
 )
 
 # ----------------------------------------------------------------------------

@@ -79,17 +79,3 @@ TEST_F(ImageReceiverTest, setsImageFilePath)
 
     EXPECT_EQ(filePath, mImageReceiver->getImageFilePath());
 }
-
-// /**
-//  * @brief Main function.
-//  *
-//  * @param argc Number of command line arguments.
-//  * @param argv Command line arguments.
-//  *
-//  * @return 0 on success, 1 on failure.
-//  */
-// int main(int argc, char* argv[])
-// {
-//     testing::InitGoogleTest(&argc, argv);
-//     return RUN_ALL_TESTS();
-// }

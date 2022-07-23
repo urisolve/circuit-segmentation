@@ -163,17 +163,3 @@ TEST_F(CmdLineParserTest, setsAppUsageInfo)
     EXPECT_EQ(optionsUsageInfo, mCmdLineParser.getOptionsUsageInfo());
     EXPECT_EQ(options, mCmdLineParser.getOptions());
 }
-
-// /**
-//  * @brief Main function.
-//  *
-//  * @param argc Number of command line arguments.
-//  * @param argv Command line arguments.
-//  *
-//  * @return 0 on success, 1 on failure.
-//  */
-// int main(int argc, char* argv[])
-// {
-//     testing::InitGoogleTest(&argc, argv);
-//     return RUN_ALL_TESTS();
-// }

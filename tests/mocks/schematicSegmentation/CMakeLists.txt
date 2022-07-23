@@ -5,8 +5,9 @@ project(MockSchematicSegmentation)
 # ----------------------------------------------------------------------------
 # Source files
 set(Headers
-    MockComponentSegmentation.h
-    MockConnectionSegmentation.h
+    MockComponentDetection.h
+    MockConnectionDetection.h
+    MockSchematicSegmentation.h
 )
 
 # ----------------------------------------------------------------------------

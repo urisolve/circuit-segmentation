@@ -46,7 +46,7 @@ struct Node
     /** Unique ID. */
     Id mId{};
     /** Type. */
-    std::string mType{"virtual"};
+    std::string mType{"real"};
     /** Position. */
     GlobalPosition mPosition{};
     /** Connection IDs. */
