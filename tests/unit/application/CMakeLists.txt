@@ -20,9 +20,6 @@ add_executable(${PROJECT_NAME}
 
 # ----------------------------------------------------------------------------
 # Tests
-# add_test(${PROJECT_NAME}
-#     ${PROJECT_NAME}
-# )
 gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------

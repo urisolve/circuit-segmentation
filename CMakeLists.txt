@@ -19,7 +19,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Option to build unit tests
-option(BUILD_TESTS "Builds unit tests" ON)
+option(BUILD_TESTS "Builds unit tests" OFF)
 
 # Option to build with code coverage
 option(BUILD_COVERAGE "Builds with code coverage" OFF)

@@ -9,8 +9,10 @@ enable_testing()
 # ----------------------------------------------------------------------------
 # Source files
 set(Sources
-    ut_ComponentSegmentation.cpp
-    ut_ConnectionSegmentation.cpp
+    ut_ComponentDetection.cpp
+    ut_ConnectionDetection.cpp
+    ut_SchematicSegmentation.cpp
+    ut_SegmentationUtils.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -21,9 +23,6 @@ add_executable(${PROJECT_NAME}
 
 # ----------------------------------------------------------------------------
 # Tests
-# add_test(${PROJECT_NAME}
-#     ${PROJECT_NAME}
-# )
 gtest_discover_tests(${PROJECT_NAME})
 
 # ----------------------------------------------------------------------------

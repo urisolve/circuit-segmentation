@@ -5,11 +5,9 @@ project(Common)
 # ----------------------------------------------------------------------------
 # Source files
 set(Headers
-    RandomNumberGen.h
     UuidGen.h
 )
 set(Sources
-    RandomNumberGen.cpp
     UuidGen.cpp
 )
 

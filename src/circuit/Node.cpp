@@ -22,7 +22,7 @@ void Node::setType(const Node::NodeType& type)
         mType = "virtual";
         break;
     default:
-        mType = "virtual";
+        mType = "real";
         break;
     }
 }

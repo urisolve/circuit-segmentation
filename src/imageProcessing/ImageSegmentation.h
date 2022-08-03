@@ -6,8 +6,9 @@
 
 #include "computerVision/OpenCvWrapper.h"
 #include "logging/Logger.h"
-#include "schematicSegmentation/ComponentSegmentation.h"
-#include "schematicSegmentation/ConnectionSegmentation.h"
+#include "schematicSegmentation/ComponentDetection.h"
+#include "schematicSegmentation/ConnectionDetection.h"
+#include "schematicSegmentation/SchematicSegmentation.h"
 #include <memory>
 
 namespace circuitSegmentation {
@@ -24,15 +25,17 @@ public:
      *
      * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
-     * @param componentSegmentation Component segmentation.
-     * @param connectionSegmentation Connection segmentation.
+     * @param componentDetection Component detection.
+     * @param connectionDetection Connection detection.
+     * @param schematicSegmentation Schematic segmentation.
      * @param saveImages Save images obtained during the processing.
      */
     explicit ImageSegmentation(
         const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
         const std::shared_ptr<logging::Logger>& logger,
-        const std::shared_ptr<schematicSegmentation::ComponentSegmentation>& componentSegmentation,
-        const std::shared_ptr<schematicSegmentation::ConnectionSegmentation>& connectionSegmentation,
+        const std::shared_ptr<schematicSegmentation::ComponentDetection>& componentDetection,
+        const std::shared_ptr<schematicSegmentation::ConnectionDetection>& connectionDetection,
+        const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
         const bool saveImages = false);
 
     /**
@@ -71,11 +74,14 @@ private:
     /** Logger. */
     std::shared_ptr<logging::Logger> mLogger;
 
-    /** Component segmentation. */
-    std::shared_ptr<schematicSegmentation::ComponentSegmentation> mComponentSegmentation;
+    /** Component detection. */
+    std::shared_ptr<schematicSegmentation::ComponentDetection> mComponentDetection;
 
-    /** Connection segmentation. */
-    std::shared_ptr<schematicSegmentation::ConnectionSegmentation> mConnectionSegmentation;
+    /** Connection detection. */
+    std::shared_ptr<schematicSegmentation::ConnectionDetection> mConnectionDetection;
+
+    /** Schematic segmentation. */
+    std::shared_ptr<schematicSegmentation::SchematicSegmentation> mSchematicSegmentation;
 
     /** Flag to save images obtained during the processing in the working directory. */
     bool mSaveImages{false};

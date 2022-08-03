@@ -43,8 +43,6 @@ struct Component
 
     /** Bounding box of the component. */
     computerVision::Rectangle mBoundingBox{};
-    /** Connections to the component. */
-    std::vector<Connection> mConnections{};
 };
 
 } // namespace circuit
