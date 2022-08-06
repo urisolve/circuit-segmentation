@@ -81,8 +81,12 @@ public:
     MOCK_METHOD(void, rectangle, (ImageMat&, const Rectangle&, const Scalar&, const int&, const LineTypes&), (override));
     /** Mocks method contains. */
     MOCK_METHOD(bool, contains, (const Rectangle&, const Point&), (override));
+    /** Mocks method rectangleArea. */
+    MOCK_METHOD(int, rectangleArea, (const Rectangle&), (override));
     /** Mocks method thinning. */
     MOCK_METHOD(void, thinning, (ImageMat&, ImageMat&, const ThinningAlgorithms&), (override));
+    /** Mocks method bitwiseAnd. */
+    MOCK_METHOD(void, bitwiseAnd, (InputOutputArray&, InputOutputArray&, InputOutputArray&), (override));
 };
 
 } // namespace computerVision

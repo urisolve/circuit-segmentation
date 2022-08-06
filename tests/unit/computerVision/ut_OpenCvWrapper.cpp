@@ -382,10 +382,10 @@ TEST_F(OpenCvWrapperTest, boundingAndDrawingRectNoThrow)
 TEST_F(OpenCvWrapperTest, rectangleContainsPoints)
 {
     // Rectangle parameters
-    const auto x{0};
-    const auto y{0};
-    const auto width{100};
-    const auto height{100};
+    constexpr auto x{0};
+    constexpr auto y{0};
+    constexpr auto width{100};
+    constexpr auto height{100};
     const Rectangle rect{x, y, width, height};
 
     // Points that rectangle should contain
@@ -424,6 +424,21 @@ TEST_F(OpenCvWrapperTest, rectangleContainsPoints)
 }
 
 /**
+ * @brief Tests that the rectangle area is calculated correctly.
+ */
+TEST_F(OpenCvWrapperTest, calculatesRectangleArea)
+{
+    // Rectangle parameters
+    constexpr auto x{0};
+    constexpr auto y{0};
+    constexpr auto width{10};
+    constexpr auto height{10};
+    const Rectangle rect{x, y, width, height};
+
+    EXPECT_EQ(100, mOpenCvWrapper->rectangleArea(rect));
+}
+
+/**
  * @brief Tests that the method for thinning operation does not throw an exception.
  */
 TEST_F(OpenCvWrapperTest, thinningNoThrow)
@@ -435,4 +450,13 @@ TEST_F(OpenCvWrapperTest, thinningNoThrow)
 
     EXPECT_NO_THROW(mOpenCvWrapper->thinning(mTestImage1chn, img, thinningAlg1));
     EXPECT_NO_THROW(mOpenCvWrapper->thinning(mTestImage1chn, img, thinningAlg2));
+}
+
+/**
+ * @brief Tests that the method for "bitwise and" operation does not throw an exception.
+ */
+TEST_F(OpenCvWrapperTest, bitwiseAndNoThrow)
+{
+    ImageMat img{};
+    EXPECT_NO_THROW(mOpenCvWrapper->bitwiseAnd(mTestImage3chn, mTestImage3chn, img));
 }

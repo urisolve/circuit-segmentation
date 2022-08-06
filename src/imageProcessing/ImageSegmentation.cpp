@@ -27,13 +27,19 @@ bool ImageSegmentation::segmentImage(computerVision::ImageMat imageInitial, comp
 {
     mLogger->logInfo("Starting image segmentation");
 
-    // Detect components
-    if (!mComponentDetection->detectComponents(imageInitial, imagePreprocessed, mSaveImages)) {
+    // Detect connections
+    if (!mConnectionDetection->detectConnections(imageInitial, imagePreprocessed, mSaveImages)) {
         return false;
     }
 
-    // Detect connections
-    if (!mConnectionDetection->detectConnections(
+    // Detect components
+    if (!mComponentDetection->detectComponents(
+            imageInitial, imagePreprocessed, mConnectionDetection->getDetectedConnections(), mSaveImages)) {
+        return false;
+    }
+
+    // Update connections
+    if (!mConnectionDetection->updateConnections(
             imageInitial, imagePreprocessed, mComponentDetection->getDetectedComponents(), mSaveImages)) {
         return false;
     }
@@ -64,7 +70,7 @@ bool ImageSegmentation::segmentImage(computerVision::ImageMat imageInitial, comp
         - Remove detected elements of the image
         - The rest is considered as a label
         - Check smaller distance between label and element to detect the owner
-    - Update labels of components and conections
+    - Update labels of components and connections
         - In SchematicSegmentation class
     */
 

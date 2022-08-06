@@ -40,12 +40,32 @@ protected:
                                                                                   mMockConnectionDetection,
                                                                                   mMockSchematicSegmentation,
                                                                                   true);
+
+        onGetElements();
     }
 
     /**
      * @brief Test suite teardown.
      */
     void TearDown() override {}
+
+    /**
+     * @brief Sets the behaviour when getting elements.
+     */
+    void onGetElements()
+    {
+        const std::vector<circuit::Component> emptyComponents{};
+        const std::vector<circuit::Connection> emptyConnections{};
+        const std::vector<circuit::Node> emptyNodes{};
+
+        ON_CALL(*mMockComponentDetection, getDetectedComponents)
+            .WillByDefault([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
+        ON_CALL(*mMockConnectionDetection, getDetectedConnections)
+            .WillByDefault(
+                [&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; });
+        ON_CALL(*mMockConnectionDetection, getDetectedNodes)
+            .WillByDefault([&emptyNodes]() -> const std::vector<circuit::Node>& { return emptyNodes; });
+    }
 
 protected:
     /** Image segmentation. */
@@ -67,29 +87,35 @@ protected:
  */
 TEST_F(ImageSegmentationTest, segmentsSuccessfully)
 {
-    const std::vector<circuit::Component> emptyComponents{};
-    const std::vector<circuit::Connection> emptyConnections{};
-    const std::vector<circuit::Node> emptyNodes{};
-
     // Setup expectations and behavior
-    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockComponentDetection, getDetectedComponents)
-        .Times(3)
-        .WillRepeatedly([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
     EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockConnectionDetection, updateConnections).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mMockConnectionDetection, detectNodesUpdateConnections).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockConnectionDetection, getDetectedConnections)
-        .Times(1)
-        .WillRepeatedly([&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; });
-    EXPECT_CALL(*mMockConnectionDetection, getDetectedNodes)
-        .Times(1)
-        .WillRepeatedly([&emptyNodes]() -> const std::vector<circuit::Node>& { return emptyNodes; });
     EXPECT_CALL(*mMockSchematicSegmentation, detectComponentConnections).Times(1);
     EXPECT_CALL(*mMockSchematicSegmentation, updateDetectedComponents).Times(1).WillOnce(Return(true));
+
+    EXPECT_CALL(*mMockConnectionDetection, getDetectedConnections).Times(2);
+    EXPECT_CALL(*mMockComponentDetection, getDetectedComponents).Times(3);
+    EXPECT_CALL(*mMockConnectionDetection, getDetectedNodes).Times(1);
 
     // Segment image
     ImageMat image{};
     ASSERT_TRUE(mImageSegmentation->segmentImage(image, image));
+}
+
+/**
+ * @brief Tests that segmentation fails when there are no connections detected.
+ */
+TEST_F(ImageSegmentationTest, segmentFailsWhenNoConnections)
+{
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(0);
+
+    // Segment image
+    ImageMat image{};
+    ASSERT_FALSE(mImageSegmentation->segmentImage(image, image));
 }
 
 /**
@@ -98,8 +124,9 @@ TEST_F(ImageSegmentationTest, segmentsSuccessfully)
 TEST_F(ImageSegmentationTest, segmentFailsWhenNoComponents)
 {
     // Setup expectations and behavior
+    EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(false));
-    EXPECT_CALL(*mMockComponentDetection, getDetectedComponents).Times(0);
+    EXPECT_CALL(*mMockConnectionDetection, updateConnections).Times(0);
 
     // Segment image
     ImageMat image{};
@@ -107,18 +134,14 @@ TEST_F(ImageSegmentationTest, segmentFailsWhenNoComponents)
 }
 
 /**
- * @brief Tests that segmentation fails when there are no connections detected.
+ * @brief Tests that segmentation fails when there are no connections detected after update.
  */
-TEST_F(ImageSegmentationTest, segmentFailsWhenNoConnections)
+TEST_F(ImageSegmentationTest, segmentFailsWhenNoUpdatedConnections)
 {
-    const std::vector<circuit::Component> emptyComponents{};
-
     // Setup expectations and behavior
+    EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockComponentDetection, getDetectedComponents)
-        .Times(1)
-        .WillRepeatedly([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
-    EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockConnectionDetection, updateConnections).Times(1).WillOnce(Return(false));
     EXPECT_CALL(*mMockConnectionDetection, detectNodesUpdateConnections).Times(0);
 
     // Segment image
@@ -131,14 +154,10 @@ TEST_F(ImageSegmentationTest, segmentFailsWhenNoConnections)
  */
 TEST_F(ImageSegmentationTest, segmentFailsWhenNoConnectionsNodes)
 {
-    const std::vector<circuit::Component> emptyComponents{};
-
     // Setup expectations and behavior
-    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockComponentDetection, getDetectedComponents)
-        .Times(2)
-        .WillRepeatedly([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
     EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockConnectionDetection, updateConnections).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mMockConnectionDetection, detectNodesUpdateConnections).Times(1).WillOnce(Return(false));
     EXPECT_CALL(*mMockSchematicSegmentation, detectComponentConnections).Times(0);
 
@@ -152,23 +171,11 @@ TEST_F(ImageSegmentationTest, segmentFailsWhenNoConnectionsNodes)
  */
 TEST_F(ImageSegmentationTest, segmentFailsWhenNoComponentsAfterUpdate)
 {
-    const std::vector<circuit::Component> emptyComponents{};
-    const std::vector<circuit::Connection> emptyConnections{};
-    const std::vector<circuit::Node> emptyNodes{};
-
     // Setup expectations and behavior
-    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockComponentDetection, getDetectedComponents)
-        .Times(3)
-        .WillRepeatedly([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
     EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockConnectionDetection, updateConnections).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mMockConnectionDetection, detectNodesUpdateConnections).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockConnectionDetection, getDetectedConnections)
-        .Times(1)
-        .WillRepeatedly([&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; });
-    EXPECT_CALL(*mMockConnectionDetection, getDetectedNodes)
-        .Times(1)
-        .WillRepeatedly([&emptyNodes]() -> const std::vector<circuit::Node>& { return emptyNodes; });
     EXPECT_CALL(*mMockSchematicSegmentation, detectComponentConnections).Times(1);
     EXPECT_CALL(*mMockSchematicSegmentation, updateDetectedComponents).Times(1).WillOnce(Return(false));
 

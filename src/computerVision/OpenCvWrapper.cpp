@@ -180,6 +180,11 @@ bool OpenCvWrapper::contains(const Rectangle& rectangle, const Point& point)
     return rectangle.contains(point);
 }
 
+int OpenCvWrapper::rectangleArea(const Rectangle& rectangle)
+{
+    return rectangle.area();
+}
+
 void OpenCvWrapper::thinning(ImageMat& srcImg, ImageMat& dstImg, const ThinningAlgorithms& thinningAlg)
 {
     ImageMat processed = srcImg.clone();
@@ -198,6 +203,11 @@ void OpenCvWrapper::thinning(ImageMat& srcImg, ImageMat& dstImg, const ThinningA
     processed *= 255;
 
     dstImg = processed;
+}
+
+void OpenCvWrapper::bitwiseAnd(InputOutputArray& src1, InputOutputArray& src2, InputOutputArray& dst)
+{
+    cv::bitwise_and(src1, src2, dst);
 }
 
 void OpenCvWrapper::thinningIter(ImageMat& img,

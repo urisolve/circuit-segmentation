@@ -121,7 +121,7 @@ void SchematicSegmentation::detectComponentConnections(computerVision::ImageMat&
             mOpenCvWrapper->drawContours(
                 image, portPoints, -1, cPortColor, cPortThickness, computerVision::OpenCvWrapper::LineTypes::LINE_8, {});
 
-            mOpenCvWrapper->writeImage("image_segment_detect_ports.png", image);
+            mOpenCvWrapper->writeImage("cs_segment_detect_components_ports.png", image);
             // TODO: Remove or comment.
             mOpenCvWrapper->showImage("Detecting components ports", image, 0);
         }

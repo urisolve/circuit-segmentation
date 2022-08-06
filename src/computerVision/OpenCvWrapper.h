@@ -417,6 +417,7 @@ public:
      * @brief Calculates the up-right bounding rectangle of a point set or non-zero pixels of gray-scale image.
      *
      * @param array Input gray-scale image or 2D point set.
+     *
      * @return Bounding rectangle.
      */
     virtual Rectangle boundingRect(InputOutputArray& array);
@@ -444,9 +445,19 @@ public:
      *
      * @param rectangle Rectangle.
      * @param point Point.
+     *
      * @return True if the rectangle contains the point, otherwise false.
      */
     virtual bool contains(const Rectangle& rectangle, const Point& point);
+
+    /**
+     * @brief Calculates a rectangle area.
+     *
+     * @param rectangle Rectangle.
+     *
+     * @return Rectangle area.
+     */
+    virtual int rectangleArea(const Rectangle& rectangle);
 
     /**
      * @brief Applies a binary blob thinning operation, for skeletonization of the input image.
@@ -459,6 +470,15 @@ public:
      * https://github.com/opencv/opencv_contrib/blob/4.x/modules/ximgproc/src/thinning.cpp
      */
     virtual void thinning(ImageMat& srcImg, ImageMat& dstImg, const ThinningAlgorithms& thinningAlg);
+
+    /**
+     * @brief Calculates the per-element bit-wise conjunction of two arrays or an array and a scalar.
+     *
+     * @param src1 First input array or a scalar.
+     * @param src2 Second input array or a scalar.
+     * @param dst Output array that has the same size and type as the input arrays.
+     */
+    virtual void bitwiseAnd(InputOutputArray& src1, InputOutputArray& src2, InputOutputArray& dst);
 
 private:
     /**

@@ -66,7 +66,7 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_initial.png", mImageInitial);
+        mOpenCvWrapper->writeImage("cs_initial_image.png", mImageInitial);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Initial image", mImageInitial, 0);
     }

@@ -2,8 +2,10 @@
  * @file
  */
 
+#include "mocks/computerVision/MockOpenCvWrapper.h"
 #include "schematicSegmentation/SegmentationUtils.h"
 #include <gtest/gtest.h>
+#include <memory>
 
 using namespace testing;
 using namespace circuitSegmentation;
@@ -84,6 +86,40 @@ TEST(SegmentationUtilsTest, increasesBoundingBoxBottomRightCorner)
     EXPECT_EQ(increasedBox.y, expectedY);
     EXPECT_EQ(increasedBox.width, expectedWidth);
     EXPECT_EQ(increasedBox.height, expectedHeight);
+}
+
+/**
+ * @brief Tests that a bounding box is generated correctly.
+ */
+TEST(SegmentationUtilsTest, generatesBoundingBox)
+{
+    const auto mockOpenCvWrapper{std::make_shared<NiceMock<computerVision::MockOpenCvWrapper>>()};
+    constexpr auto x{50};
+    constexpr auto y{50};
+    constexpr auto dimension{20};
+    const computerVision::Rectangle rect{x, y, dimension, dimension};
+
+    // Setup expectations and behavior
+    constexpr auto imgWidth{100};
+    constexpr auto imgHeight{100};
+    EXPECT_CALL(*mockOpenCvWrapper, getImageWidth).Times(1).WillOnce(Return(imgWidth));
+    EXPECT_CALL(*mockOpenCvWrapper, getImageHeight).Times(1).WillOnce(Return(imgHeight));
+    EXPECT_CALL(*mockOpenCvWrapper, boundingRect).Times(1).WillOnce(Return(rect));
+
+    // Generate bounding box
+    computerVision::Contour contour{};
+    computerVision::ImageMat img{};
+    constexpr auto widthIncr{2};
+    constexpr auto heightIncr{2};
+    const auto box{schematicSegmentation::generateBoundingBox(mockOpenCvWrapper, contour, img, widthIncr, heightIncr)};
+
+    // Check generated boc
+    const auto expectedBox{
+        schematicSegmentation::increaseBoundingBox(rect, widthIncr, heightIncr, imgWidth, imgHeight)};
+    EXPECT_EQ(box.x, expectedBox.x);
+    EXPECT_EQ(box.y, expectedBox.y);
+    EXPECT_EQ(box.width, expectedBox.width);
+    EXPECT_EQ(box.height, expectedBox.height);
 }
 
 /**
