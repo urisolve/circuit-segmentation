@@ -99,7 +99,7 @@ void ImagePreprocessing::convertImageToGray(computerVision::ImageMat& image)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_grayscale.png", image);
+        mOpenCvWrapper->writeImage("cs_preproc_grayscale.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Converted image to grayscale", image, 0);
     }
@@ -118,7 +118,7 @@ void ImagePreprocessing::blurImage(computerVision::ImageMat& image)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_blur.png", image);
+        mOpenCvWrapper->writeImage("cs_preproc_blur.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Blurred image", image, 0);
     }
@@ -142,7 +142,7 @@ void ImagePreprocessing::thresholdImage(computerVision::ImageMat& image)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_threshold.png", image);
+        mOpenCvWrapper->writeImage("cs_preproc_threshold.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Thresholding image", image, 0);
     }
@@ -168,7 +168,7 @@ void ImagePreprocessing::morphologicalOpenImage(computerVision::ImageMat& image)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_morph_open.png", image);
+        mOpenCvWrapper->writeImage("cs_preproc_morph_open.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Morphological opening image", image, 0);
     }
@@ -194,7 +194,7 @@ void ImagePreprocessing::morphologicalDilateImage(computerVision::ImageMat& imag
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_morph_dilation.png", image);
+        mOpenCvWrapper->writeImage("cs_preproc_morph_dilation.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Morphological dilation image", image, 0);
     }
@@ -215,7 +215,7 @@ void ImagePreprocessing::thinningImage(computerVision::ImageMat& image)
 
     // Save image
     if (mSaveImages) {
-        mOpenCvWrapper->writeImage("image_preproc_thinning.png", image);
+        mOpenCvWrapper->writeImage("cs_preproc_thinning.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Thinning image", image, 0);
     }

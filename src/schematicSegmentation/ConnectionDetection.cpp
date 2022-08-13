@@ -18,13 +18,23 @@ ConnectionDetection::ConnectionDetection(const std::shared_ptr<computerVision::O
 
 bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageInitial,
                                             computerVision::ImageMat& imagePreprocessed,
-                                            const std::vector<circuit::Component>& components,
                                             const bool saveImages)
 {
     /*
      * Detection of connections
-     * - Separation of components found and circuit (bounding boxes as black pixels), so the components are removed
-     * - Contour finding algorithm is applied to identify each connection (wire = contour)
+     * - Generate an image with only the circuit connections (image A)
+     *      - Morphological closing for dilation of circuit elements
+     *      - Morphological opening to remove the circuit connections leaving only the dilated circuit elements (image
+     * B)
+     *      - Intersect the preprocessed image with the image B to obtain only the circuit elements (image C)
+     *      - Find contours in image C
+     *      - For each contour:
+     *          - Generate a bounding box
+     *          - Remove that box in the preprocessed image (bounding boxes with black pixels)
+     * - Find contours in image A to identify each connection (wire = contour)
+     * - For each contour:
+     *      - Check contour length
+     *      - If it has the minimum length, consider it as a connection
      */
 
     mLogger->logInfo("Detecting connections of the circuit");
@@ -32,33 +42,85 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
     // Image used during the process
     computerVision::ImageMat image{};
 
-    // Set bounding boxes as black pixels, so the components are removed
-    image = mOpenCvWrapper->cloneImage(imagePreprocessed);
-    for (const auto& component : components) {
-        mOpenCvWrapper->rectangle(
-            image, component.mBoundingBox, {0, 0, 0}, -1, computerVision::OpenCvWrapper::LineTypes::LINE_8);
-    }
+    // Morphological closing for dilation of circuit elements
+    auto kernelMorph{mOpenCvWrapper->getStructuringElement(computerVision::OpenCvWrapper::MorphShapes::MORPH_RECT,
+                                                           cMorphCloseKernelSize)};
+    mOpenCvWrapper->morphologyEx(
+        imagePreprocessed, image, computerVision::OpenCvWrapper::MorphTypes::MORPH_CLOSE, kernelMorph, cMorphCloseIter);
+
+    mLogger->logInfo("Morphological closing applied to the image");
 
     // Save image
     if (saveImages) {
-        mOpenCvWrapper->writeImage("image_segment_remove_components.png", image);
+        mOpenCvWrapper->writeImage("cs_segment_connections_morph_close.png", image);
         // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Remove components", image, 0);
+        mOpenCvWrapper->showImage("Morphological closing to detect connections", image, 0);
+    }
+
+    // Morphological opening to remove the circuit connections leaving only the dilated circuit elements
+    kernelMorph = mOpenCvWrapper->getStructuringElement(computerVision::OpenCvWrapper::MorphShapes::MORPH_RECT,
+                                                        cMorphOpenKernelSize);
+    mOpenCvWrapper->morphologyEx(
+        image, image, computerVision::OpenCvWrapper::MorphTypes::MORPH_OPEN, kernelMorph, cMorphOpenIter);
+
+    mLogger->logInfo("Morphological opening applied to the image");
+
+    // Save image
+    if (saveImages) {
+        mOpenCvWrapper->writeImage("cs_segment_connections_morph_open.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Morphological opening to detect connections", image, 0);
+    }
+
+    // Intersect the preprocessed image with the image without circuit connections
+    mOpenCvWrapper->bitwiseAnd(imagePreprocessed, image, image);
+
+    mLogger->logInfo("Intersection between the preprocessed image and the image without connections");
+
+    // Save image
+    if (saveImages) {
+        mOpenCvWrapper->writeImage("cs_segment_connections_intersection.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Intersection between images to detect connections", image, 0);
+    }
+
+    // At this point, the circuit elements are in the image, so we need to find the contours
+    computerVision::Contours contours{};
+    computerVision::ContoursHierarchy hierarchy{};
+    mOpenCvWrapper->findContours(image, contours, hierarchy, cFindContourMode, cFindContourMethod);
+
+    mLogger->logDebug("Contours found in the intersection image: " + std::to_string(contours.size()));
+
+    // Generate bounding box for each contour and remove it from the image
+    image = mOpenCvWrapper->cloneImage(imagePreprocessed);
+    for (const auto& contour : contours) {
+        constexpr int widthIncr{2};  // 2 pixels to allow centering
+        constexpr int heightIncr{2}; // 2 pixels to allow centering
+
+        // Bounding box
+        const auto box{generateBoundingBox(mOpenCvWrapper, contour, imagePreprocessed, widthIncr, heightIncr)};
+
+        // Remove box (bounding box with black pixels)
+        mOpenCvWrapper->rectangle(image, box, {0, 0, 0}, -1, computerVision::OpenCvWrapper::LineTypes::LINE_8);
+    }
+
+    mLogger->logInfo("Generated image with only the circuit connections");
+
+    // Save image
+    if (saveImages) {
+        mOpenCvWrapper->writeImage("cs_segment_connections_only_conn.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Image with only the circuit connections to detect connections", image, 0);
     }
 
     // At this point, the connections are represented as wires in the image, so we need to find those wires
-
     computerVision::Contours wires{};
-    computerVision::ContoursHierarchy hierarchy{};
-
-    mOpenCvWrapper->findContours(image, wires, hierarchy, cConnectionFindContourMode, cConnectionFindContourMethod);
+    mOpenCvWrapper->findContours(image, wires, hierarchy, cFindContourMode, cFindContourMethod);
 
     mLogger->logDebug("Contours found in the image, to detect connections: " + std::to_string(wires.size()));
 
     // Wire for each connection
-
     mConnections.clear();
-
     for (const auto& wire : wires) {
         // Check wire length
         if (mOpenCvWrapper->arcLength(wire, false) >= cConnectionMinLength) {
@@ -91,9 +153,91 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
                                      computerVision::OpenCvWrapper::LineTypes::LINE_8,
                                      {});
 
-        mOpenCvWrapper->writeImage("image_segment_detect_connections.png", image);
+        mOpenCvWrapper->writeImage("cs_segment_connections_detected.png", image);
         // TODO: Remove or comment.
         mOpenCvWrapper->showImage("Detecting connections", image, 0);
+    }
+
+    return true;
+}
+
+bool ConnectionDetection::updateConnections(computerVision::ImageMat& imageInitial,
+                                            computerVision::ImageMat& imagePreprocessed,
+                                            const std::vector<circuit::Component>& components,
+                                            const bool saveImages)
+{
+    /*
+     * Update of detected connections
+     * - Remove the detected components (set components with black pixels)
+     * - Find contours to identify each connection (wire = contour)
+     * - For each contour:
+     *      - Check contour length
+     *      - If it has the minimum length, consider it as a connection
+     */
+
+    mLogger->logInfo("Updating connections of the circuit");
+
+    // Image used during the process
+    computerVision::ImageMat image{};
+
+    // Remove the detected components (set components with black pixels)
+    image = mOpenCvWrapper->cloneImage(imagePreprocessed);
+    for (const auto& component : components) {
+        mOpenCvWrapper->rectangle(
+            image, component.mBoundingBox, {0, 0, 0}, -1, computerVision::OpenCvWrapper::LineTypes::LINE_8);
+    }
+
+    // Save image
+    if (saveImages) {
+        mOpenCvWrapper->writeImage("image_segment_connections_remove_components.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Remove components", image, 0);
+    }
+
+    // At this point, the connections are represented as wires in the image, so we need to find those wires
+    computerVision::Contours wires{};
+    computerVision::ContoursHierarchy hierarchy{};
+    mOpenCvWrapper->findContours(image, wires, hierarchy, cFindContourMode, cFindContourMethod);
+
+    mLogger->logDebug("Contours found in the image, to update connections: " + std::to_string(wires.size()));
+
+    // Wire for each connection
+    mConnections.clear();
+    for (const auto& wire : wires) {
+        // Check wire length
+        if (mOpenCvWrapper->arcLength(wire, false) >= cConnectionMinLength) {
+            // Add connection
+            circuit::Connection connection{};
+            connection.mWire = wire;
+            mConnections.push_back(connection);
+        }
+    }
+
+    mLogger->logInfo("Connections found in the circuit: " + std::to_string(mConnections.size()));
+
+    // If there are no connections detected, it makes no sense to continue
+    if (mConnections.empty()) {
+        return false;
+    }
+
+    // Save image
+    if (saveImages) {
+        image = mOpenCvWrapper->cloneImage(imageInitial);
+        computerVision::Contours wires{};
+        for (const auto& connection : mConnections) {
+            wires.push_back(connection.mWire);
+        }
+        mOpenCvWrapper->drawContours(image,
+                                     wires,
+                                     -1,
+                                     cConnectionColor,
+                                     cConnectionThickness,
+                                     computerVision::OpenCvWrapper::LineTypes::LINE_8,
+                                     {});
+
+        mOpenCvWrapper->writeImage("image_segment_connections_updated.png", image);
+        // TODO: Remove or comment.
+        mOpenCvWrapper->showImage("Updating connections", image, 0);
     }
 
     return true;
@@ -156,7 +300,7 @@ bool ConnectionDetection::detectNodesUpdateConnections(computerVision::ImageMat&
                                       + std::to_string(point.x) + ", " + std::to_string(point.y) + "}");
 
                     intersectionPoints.push_back(point);
-                    // There is at least one intersection point, so no need to check other points
+                    // There is at least one intersection point, so no need to check other points of this wire
                     break;
                 }
             }
@@ -249,9 +393,9 @@ bool ConnectionDetection::detectNodesUpdateConnections(computerVision::ImageMat&
                 image, nodePoints, -1, cNodeColor, cNodeThickness, computerVision::OpenCvWrapper::LineTypes::LINE_8, {});
         }
 
-        mOpenCvWrapper->writeImage("image_segment_detect_nodes.png", image);
+        mOpenCvWrapper->writeImage("cs_segment_nodes_detected_connections_updated.png", image);
         // TODO: Remove or comment.
-        mOpenCvWrapper->showImage("Detecting nodes", image, 0);
+        mOpenCvWrapper->showImage("Detecting nodes and updating connections", image, 0);
     }
 
     return true;

@@ -9,6 +9,7 @@
 #include "computerVision/OpenCvWrapper.h"
 #include "logging/Logger.h"
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace circuitSegmentation {
@@ -20,8 +21,8 @@ namespace schematicSegmentation {
 class ComponentDetection
 {
 public:
-    /** Bounding box minimum area. */
-    static constexpr double cBoundingBoxMinArea{200};
+    /** Minimum area for bounding boxes. */
+    static constexpr int cBoxMinArea{300};
 
     /**
      * @brief Constructor.
@@ -42,12 +43,14 @@ public:
      *
      * @param imageInitial Initial image without preprocessing.
      * @param imagePreprocessed Image preprocessed for segmentation.
+     * @param connections Connections detected.
      * @param saveImages Save images obtained during the processing.
      *
      * @return True if there are components detected, otherwise false.
      */
     virtual bool detectComponents(computerVision::ImageMat& imageInitial,
                                   computerVision::ImageMat& imagePreprocessed,
+                                  const std::vector<circuit::Connection>& connections,
                                   const bool saveImages = false);
 
     /**
@@ -61,39 +64,45 @@ public:
 private:
 #endif
     /**
-     * @brief Generates bounding boxes for the circuit components.
+     * @brief Removes the connections from image (set connections with black pixels).
      *
-     * @param blobs Components represented as blobs.
-     * @param imagePreprocessed Image preprocessed for segmentation.
+     * @param image Image to remove connections.
+     * @param connections Connections.
      */
-    virtual void
-        boundingBoxComponents(const computerVision::Contours& blobs, computerVision::ImageMat& imagePreprocessed);
+    virtual void removeConnectionsFromImage(computerVision::ImageMat& image,
+                                            const std::vector<circuit::Connection>& connections);
+
+    /**
+     * @brief Check if the contour has intersection points with connections.
+     *
+     * @param imagePreprocessed Image preprocessed for segmentation.
+     * @param contour Contour.
+     * @param connections Connections.
+     *
+     * @return Bounding box for the contour if the contour has intersection points with connections, otherwise a null
+     * optional.
+     */
+    virtual std::optional<computerVision::Rectangle> checkContour(computerVision::ImageMat& imagePreprocessed,
+                                                                  const computerVision::Contour& contour,
+                                                                  const std::vector<circuit::Connection>& connections);
 
 private:
-    /** Size of the kernel for morphological closing. */
-    const unsigned int cMorphCloseKernelSize{11};
-    /** Iterations for morphological closing. */
-    const unsigned int cMorphCloseIter{4};
-
-    /** Size of the kernel for morphological opening. */
-    const unsigned int cMorphOpenKernelSize{3};
-    /** Iterations for morphological opening. */
-    const unsigned int cMorphOpenIter{1};
-
-    /** Mode of contour retrieval algorithm for bounding boxes. */
-    const computerVision::OpenCvWrapper::RetrievalModes cBoundingBoxFindContourMode{
+    /** Mode of contour retrieval algorithm to find contours. */
+    const computerVision::OpenCvWrapper::RetrievalModes cFindContourMode{
         computerVision::OpenCvWrapper::RetrievalModes::RETR_EXTERNAL};
-    /** Contour approximation algorithm for bounding boxes. */
-    const computerVision::OpenCvWrapper::ContourApproximationModes cBoundingBoxFindContourMethod{
+    /** Contour approximation algorithm to find contours. */
+    const computerVision::OpenCvWrapper::ContourApproximationModes cFindContourMethod{
         computerVision::OpenCvWrapper::ContourApproximationModes::CHAIN_APPROX_SIMPLE};
-    /** Bounding boxes color. */
-    const computerVision::Scalar cBoundingBoxColor{0, 255, 0};
-    /** Bounding boxes thickness. */
-    const int cBoundingBoxThickness{2};
-    /** Width to increase the bounding box. */
-    const int cBoundingBoxWidthIncrease{20};
-    /** Height to increase the bounding box. */
-    const int cBoundingBoxHeightIncrease{20};
+
+    /** Bounding box color. */
+    const computerVision::Scalar cBoxColor{0, 255, 0};
+    /** Bounding box thickness. */
+    const int cBoxThickness{2};
+
+    /** Size of the kernel for morphological closing. */
+    const unsigned int cMorphCloseKernelSize{7};
+    /** Iterations for morphological closing. */
+    const unsigned int cMorphCloseIter{3};
 
     /** OpenCV wrapper. */
     std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;

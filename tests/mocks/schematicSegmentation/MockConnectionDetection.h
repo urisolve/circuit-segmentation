@@ -29,9 +29,11 @@ public:
     }
 
     /** Mocks method detectConnections. */
+    MOCK_METHOD(bool, detectConnections, (computerVision::ImageMat&, computerVision::ImageMat&, const bool), (override));
+    /** Mocks method updateConnections. */
     MOCK_METHOD(
         bool,
-        detectConnections,
+        updateConnections,
         (computerVision::ImageMat&, computerVision::ImageMat&, const std::vector<circuit::Component>&, const bool),
         (override));
     /** Mocks method detectNodesUpdateConnections. */

@@ -48,6 +48,36 @@ inline const computerVision::Rectangle increaseBoundingBox(const computerVision:
 }
 
 /**
+ * @brief Generates a bounding box for a contour.
+ *
+ * @param openCvWrapper OpenCV wrapper.
+ * @param contour Contour to get a bounding box.
+ * @param image Image used in processing.
+ * @param widthIncr Increment on bounding box width.
+ * @param heightIncr Increment on bounding box height.
+ *
+ * @return Bounding box for the contour.
+ */
+inline computerVision::Rectangle
+    generateBoundingBox(const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+                        const computerVision::Contour& contour,
+                        computerVision::ImageMat& image,
+                        const int& widthIncr,
+                        const int& heightIncr)
+{
+    const auto imgWidth{openCvWrapper->getImageWidth(image)};
+    const auto imgHeight{openCvWrapper->getImageHeight(image)};
+
+    // Bounding rectangle
+    auto rect{openCvWrapper->boundingRect(contour)};
+
+    // Increase dimensions because bounding boxes may not completely enclose the contour
+    rect = increaseBoundingBox(rect, widthIncr, heightIncr, imgWidth, imgHeight);
+
+    return rect;
+}
+
+/**
  * @brief Finds the extreme points for the axis selected.
  *
  * Way that the points are returned:

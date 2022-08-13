@@ -23,6 +23,8 @@ class ConnectionDetection
 public:
     /** Connection minimum length. */
     static constexpr double cConnectionMinLength{20};
+    // /** Contour maximum length to consider as a eventual connection after morphological opening. */
+    // static constexpr double cContourMaxLength{100};
 
     /**
      * @brief Constructor.
@@ -39,7 +41,20 @@ public:
     virtual ~ConnectionDetection() = default;
 
     /**
-     * @brief Detects the connections of the circuit.
+     * @brief Detects connections of the circuit.
+     *
+     * @param imageInitial Initial image without preprocessing.
+     * @param imagePreprocessed Image preprocessed for segmentation.
+     * @param saveImages Save images obtained during the processing.
+     *
+     * @return True if there are connections detected, otherwise false.
+     */
+    virtual bool detectConnections(computerVision::ImageMat& imageInitial,
+                                   computerVision::ImageMat& imagePreprocessed,
+                                   const bool saveImages = false);
+
+    /**
+     * @brief Updates the detected connections of the circuit.
      *
      * @param imageInitial Initial image without preprocessing.
      * @param imagePreprocessed Image preprocessed for segmentation.
@@ -48,13 +63,13 @@ public:
      *
      * @return True if there are connections detected, otherwise false.
      */
-    virtual bool detectConnections(computerVision::ImageMat& imageInitial,
+    virtual bool updateConnections(computerVision::ImageMat& imageInitial,
                                    computerVision::ImageMat& imagePreprocessed,
                                    const std::vector<circuit::Component>& components,
                                    const bool saveImages = false);
 
     /**
-     * @brief Detects the nodes of the circuit, and updates connections.
+     * @brief Detects the nodes of the circuit, and updates detected connections.
      *
      * @param imageInitial Initial image without preprocessing.
      * @param imagePreprocessed Image preprocessed for segmentation.
@@ -93,12 +108,23 @@ public:
 #endif
 
 private:
-    /** Mode of contour retrieval algorithm for connections detection. */
-    const computerVision::OpenCvWrapper::RetrievalModes cConnectionFindContourMode{
+    /** Size of the kernel for morphological closing. */
+    const unsigned int cMorphCloseKernelSize{11};
+    /** Iterations for morphological closing. */
+    const unsigned int cMorphCloseIter{4};
+
+    /** Size of the kernel for morphological opening. */
+    const unsigned int cMorphOpenKernelSize{3};
+    /** Iterations for morphological opening. */
+    const unsigned int cMorphOpenIter{1};
+
+    /** Mode of contour retrieval algorithm to find contours. */
+    const computerVision::OpenCvWrapper::RetrievalModes cFindContourMode{
         computerVision::OpenCvWrapper::RetrievalModes::RETR_EXTERNAL};
-    /** Contour approximation algorithm for connections detection. */
-    const computerVision::OpenCvWrapper::ContourApproximationModes cConnectionFindContourMethod{
+    /** Contour approximation algorithm to find contours. */
+    const computerVision::OpenCvWrapper::ContourApproximationModes cFindContourMethod{
         computerVision::OpenCvWrapper::ContourApproximationModes::CHAIN_APPROX_SIMPLE};
+
     /** Connection contour color. */
     const computerVision::Scalar cConnectionColor{0, 0, 255};
     /** Connection contour thickness. */

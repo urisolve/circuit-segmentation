@@ -89,6 +89,15 @@ if (BUILD_TESTS)
 endif()
 
 # ----------------------------------------------------------------------------
+# OpenCV variables are set with find_package, the full list with descriptions is in the OpenCVConfig.cmake file
+message(STATUS)
+message(STATUS "OpenCV configuration:")
+message(STATUS "- OpenCV_VERSION = ${OpenCV_VERSION}")
+message(STATUS "- OpenCV_DIR = ${OpenCV_DIR}")
+message(STATUS "- OpenCV_INCLUDE_DIRS = ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "- OpenCV_LIBS = ${OpenCV_LIBS}")
+
+# ----------------------------------------------------------------------------
 # Status
 message(STATUS)
 message(STATUS "${PROJECT_NAME} configuration:")
@@ -98,10 +107,4 @@ message(STATUS "- CMAKE_CXX_STANDARD = ${CMAKE_CXX_STANDARD}")
 message(STATUS "- CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
 message(STATUS "- BUILD_TESTS = ${BUILD_TESTS}")
 message(STATUS "- BUILD_COVERAGE = ${BUILD_COVERAGE}")
-# OpenCV variables are set with find_package, the full list with descriptions is in the OpenCVConfig.cmake file
-message(STATUS "OpenCV configuration:")
-message(STATUS "- OpenCV_VERSION = ${OpenCV_VERSION}")
-message(STATUS "- OpenCV_DIR = ${OpenCV_DIR}")
-message(STATUS "- OpenCV_INCLUDE_DIRS = ${OpenCV_INCLUDE_DIRS}")
-message(STATUS "- OpenCV_LIBS = ${OpenCV_LIBS}")
 message(STATUS)
