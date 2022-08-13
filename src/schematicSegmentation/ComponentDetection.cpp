@@ -4,7 +4,6 @@
 
 #include "ComponentDetection.h"
 #include "SegmentationUtils.h"
-#include <algorithm>
 
 namespace circuitSegmentation {
 namespace schematicSegmentation {

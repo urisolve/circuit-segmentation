@@ -73,14 +73,14 @@ private:
                                             const std::vector<circuit::Connection>& connections);
 
     /**
-     * @brief Check if the contour has intersection points with connections.
+     * @brief Check if the contour has the minimum area and intersection points with connections.
      *
      * @param imagePreprocessed Image preprocessed for segmentation.
      * @param contour Contour.
      * @param connections Connections.
      *
-     * @return Bounding box for the contour if the contour has intersection points with connections, otherwise a null
-     * optional.
+     * @return Bounding box for the contour if the contour has the minimum area and intersection points with
+     * connections, otherwise a null optional.
      */
     virtual std::optional<computerVision::Rectangle> checkContour(computerVision::ImageMat& imagePreprocessed,
                                                                   const computerVision::Contour& contour,

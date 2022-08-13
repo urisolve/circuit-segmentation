@@ -75,6 +75,47 @@ protected:
     }
 
     /**
+     * @brief Sets up a dummy node.
+     *
+     * @param x X coordinate for node position.
+     * @param y Y coordinate for node position.
+     */
+    void setupDummyNode(const int& x, const int& y)
+    {
+        // Position
+        circuit::GlobalPosition pos{};
+        pos.mX = x;
+        pos.mY = y;
+        pos.mAngle = 0;
+
+        // Dummy node
+        circuit::Node dummyNode{};
+        dummyNode.mPosition = pos;
+
+        // Set
+        mDummyNodes.push_back(dummyNode);
+    }
+
+    /**
+     * @brief Sets up a dummy label.
+     *
+     * @param x X coordinate for label box.
+     * @param y Y coordinate for label box.
+     */
+    void setupDummyLabel(const int& x, const int& y)
+    {
+        // Bounding box
+        const Rectangle rectangle{x, y, cDimension, cDimension};
+
+        // Dummy label
+        circuit::Label dummyLabel{};
+        dummyLabel.mBoundingBox = rectangle;
+
+        // Set
+        mDummyLabels.push_back(dummyLabel);
+    }
+
+    /**
      * @brief Sets the behavior when checking if a rectangle contains a given point.
      */
     void onCheckContainsPoint()
@@ -99,6 +140,10 @@ protected:
     std::vector<circuit::Component> mDummyComponents;
     /** Dummy connections to be used in tests. */
     std::vector<circuit::Connection> mDummyConnections;
+    /** Dummy nodes to be used in tests. */
+    std::vector<circuit::Node> mDummyNodes;
+    /** Dummy labels to be used in tests. */
+    std::vector<circuit::Label> mDummyLabels;
 };
 
 /**
@@ -156,7 +201,7 @@ TEST_F(SchematicSegmentationTest, detectsSingleComponentConnectionPoint)
  *
  * Scenario:
  * - 2 components, A and B
- * - 2 connections, C and D:
+ * - 2 connections, C and D
  *      - Connection C with components A and B
  *      - Connection D with component B only
  *
@@ -191,7 +236,7 @@ TEST_F(SchematicSegmentationTest, detectsMultipleComponentConnectionPoints)
     setupDummyConnection(xCoordBox1 + cDimension, yCoordBox1 + cDimension);
     setupDummyConnection(xCoordBox2 + cDimension, yCoordBox2 + cDimension);
 
-    // Detect component connections
+    // Detect component connections points
     ImageMat img{};
     mSchematicSegmentation->detectComponentConnections(img, img, mDummyComponents, mDummyConnections, {}, false);
 
@@ -426,7 +471,7 @@ TEST_F(SchematicSegmentationTest, updatesDetectedComponentsKept)
     setupDummyComponent(xCoordBox2, yCoordBox2);
     setupDummyConnection(xCoordBox1 + cDimension, yCoordBox1 + cDimension);
 
-    // Detect component connections
+    // Detect component connections points
     ImageMat img{};
     mSchematicSegmentation->detectComponentConnections(img, img, mDummyComponents, mDummyConnections, {}, false);
 
@@ -474,7 +519,7 @@ TEST_F(SchematicSegmentationTest, updatesDetectedComponents)
     setupDummyComponent(xCoordBox2, yCoordBox2);
     setupDummyConnection(xCoordBox1 + cDimension, yCoordBox1 + cDimension);
 
-    // Detect component connections
+    // Detect component connections points
     ImageMat img{};
     mSchematicSegmentation->detectComponentConnections(img, img, mDummyComponents, mDummyConnections, {}, false);
 
@@ -520,7 +565,7 @@ TEST_F(SchematicSegmentationTest, updatesDetectedComponentsEmpty)
     setupDummyComponent(xCoordBox1, yCoordBox1);
     setupDummyComponent(xCoordBox2, yCoordBox2);
 
-    // Detect component connections
+    // Detect component connections points
     ImageMat img{};
     mSchematicSegmentation->detectComponentConnections(img, img, mDummyComponents, {}, {}, false);
 
@@ -534,6 +579,374 @@ TEST_F(SchematicSegmentationTest, updatesDetectedComponentsEmpty)
     // Check detected components
     const auto detectedComponents{mSchematicSegmentation->getComponents()};
     EXPECT_EQ(detectedComponents.size(), 0);
+}
+
+/**
+ * @brief Tests that a label is associated to the closest element.
+ *
+ * Scenario:
+ * - 1 component, A
+ * - 1 connection, B
+ * - 1 node, C
+ * - 3 label, D, E and F
+ *
+ * Expected:
+ * - Owner ID of label D is the ID of component A
+ * - Label D is associated to component A
+ * - Owner ID of label E is the ID of connection B
+ * - Label E is associated to connection B
+ * - Owner ID of label F is the ID of node C
+ * - Label F is associated to node C
+ */
+TEST_F(SchematicSegmentationTest, associatesLabelToElement)
+{
+    constexpr auto imgWidth{200};
+    constexpr auto imgHeight{200};
+
+    constexpr auto xBoxComp{30};
+    constexpr auto yBoxComp{30};
+
+    constexpr auto xBoxConn{60};
+    constexpr auto yBoxConn{60};
+
+    constexpr auto xBoxNode{100};
+    constexpr auto yBoxNode{100};
+
+    constexpr auto xBoxLabel1{30};
+    constexpr auto yBoxLabel1{15};
+    constexpr auto xBoxLabel2{60};
+    constexpr auto yBoxLabel2{45};
+    constexpr auto xBoxLabel3{100};
+    constexpr auto yBoxLabel3{75};
+
+    const Rectangle rectConn{xBoxConn, yBoxConn, cDimension, cDimension};
+    const Rectangle rectNode{xBoxNode, yBoxNode, 1, 1};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth).Times(3).WillRepeatedly(Return(imgWidth));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight).Times(3).WillRepeatedly(Return(imgHeight));
+    onCheckContainsPoint();
+    EXPECT_CALL(*mMockOpenCvWrapper, contains).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, boundingRect).Times(2).WillOnce(Return(rectConn)).WillOnce(Return(rectNode));
+
+    // Prepare circuit
+    setupDummyComponent(xBoxComp, yBoxComp);
+    setupDummyConnection(xBoxConn, yBoxConn);
+    setupDummyNode(xBoxNode, yBoxNode);
+    setupDummyLabel(xBoxLabel1, yBoxLabel1);
+    setupDummyLabel(xBoxLabel2, yBoxLabel2);
+    setupDummyLabel(xBoxLabel3, yBoxLabel3);
+
+    // Detect component connections points
+    ImageMat img{};
+    mSchematicSegmentation->detectComponentConnections(
+        img, img, mDummyComponents, mDummyConnections, mDummyNodes, false);
+
+    // Associate labels
+    mSchematicSegmentation->associateLabels(img, img, mDummyLabels, false);
+
+    const auto components{mSchematicSegmentation->getComponents()};
+    const auto connections{mSchematicSegmentation->getConnections()};
+    const auto nodes{mSchematicSegmentation->getNodes()};
+    const auto labels{mSchematicSegmentation->getLabels()};
+    EXPECT_EQ(labels.size(), 3);
+    const auto labelD{labels.at(0)};
+    const auto labelE{labels.at(1)};
+    const auto labelF{labels.at(2)};
+
+    // Check owner ID of label D
+    auto expectedLabelOwnerID{components.back().mId};
+    EXPECT_EQ(labelD.mOwnerId, expectedLabelOwnerID);
+    // Check labels vector of element
+    EXPECT_EQ(components.back().mLabels.size(), 1);
+    EXPECT_EQ(components.back().mLabels.back().mId, labelD.mId);
+
+    // Check owner ID of label E
+    expectedLabelOwnerID = connections.back().mId;
+    EXPECT_EQ(labelE.mOwnerId, expectedLabelOwnerID);
+    // Check labels vector of element
+    EXPECT_EQ(connections.back().mLabels.size(), 1);
+    EXPECT_EQ(connections.back().mLabels.back().mId, labelE.mId);
+
+    // Check owner ID of label F
+    expectedLabelOwnerID = nodes.back().mId;
+    EXPECT_EQ(labelF.mOwnerId, expectedLabelOwnerID);
+    // Check labels vector of element
+    EXPECT_EQ(nodes.back().mLabels.size(), 1);
+    EXPECT_EQ(nodes.back().mLabels.back().mId, labelF.mId);
+}
+
+/**
+ * @brief Tests that a label is associated to the closest element, when there are multiple components, connections and
+ * nodes.
+ *
+ * Scenario:
+ * - 2 components, A and B
+ * - 2 connections, C and D
+ * - 2 nodes, E and F
+ * - 3 label, G, H and I
+ *
+ * Expected:
+ * - Owner ID of label G is the ID of component B
+ * - Label G is associated to component B
+ * - Owner ID of label H is the ID of connection D
+ * - Label H is associated to connection D
+ * - Owner ID of label I is the ID of node F
+ * - Label I is associated to node F
+ */
+TEST_F(SchematicSegmentationTest, associatesLabelToElementWhenMultipleElements)
+{
+    constexpr auto imgWidth{200};
+    constexpr auto imgHeight{200};
+
+    constexpr auto xBoxComp1{30};
+    constexpr auto yBoxComp1{30};
+    constexpr auto xBoxComp2{30};
+    constexpr auto yBoxComp2{50};
+
+    constexpr auto xBoxConn1{60};
+    constexpr auto yBoxConn1{60};
+    constexpr auto xBoxConn2{60};
+    constexpr auto yBoxConn2{80};
+
+    constexpr auto xBoxNode1{100};
+    constexpr auto yBoxNode1{100};
+    constexpr auto xBoxNode2{100};
+    constexpr auto yBoxNode2{130};
+
+    constexpr auto xBoxLabel1{30};
+    constexpr auto yBoxLabel1{65};
+    constexpr auto xBoxLabel2{60};
+    constexpr auto yBoxLabel2{95};
+    constexpr auto xBoxLabel3{100};
+    constexpr auto yBoxLabel3{145};
+
+    const Rectangle rectConn1{xBoxConn1, yBoxConn1, cDimension, cDimension};
+    const Rectangle rectConn2{xBoxConn2, yBoxConn2, cDimension, cDimension};
+    const Rectangle rectNode1{xBoxNode1, yBoxNode1, 1, 1};
+    const Rectangle rectNode2{xBoxNode2, yBoxNode2, 1, 1};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth).Times(5).WillRepeatedly(Return(imgWidth));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight).Times(5).WillRepeatedly(Return(imgHeight));
+    onCheckContainsPoint();
+    EXPECT_CALL(*mMockOpenCvWrapper, contains).Times(4);
+    EXPECT_CALL(*mMockOpenCvWrapper, boundingRect)
+        .Times(4)
+        .WillOnce(Return(rectConn1))
+        .WillOnce(Return(rectConn2))
+        .WillOnce(Return(rectNode1))
+        .WillOnce(Return(rectNode2));
+
+    // Prepare circuit
+    setupDummyComponent(xBoxComp1, yBoxComp1);
+    setupDummyComponent(xBoxComp2, yBoxComp2);
+    setupDummyConnection(xBoxConn1, yBoxConn1);
+    setupDummyConnection(xBoxConn2, yBoxConn2);
+    setupDummyNode(xBoxNode1, yBoxNode1);
+    setupDummyNode(xBoxNode2, yBoxNode2);
+    setupDummyLabel(xBoxLabel1, yBoxLabel1);
+    setupDummyLabel(xBoxLabel2, yBoxLabel2);
+    setupDummyLabel(xBoxLabel3, yBoxLabel3);
+
+    // Detect component connections points
+    ImageMat img{};
+    mSchematicSegmentation->detectComponentConnections(
+        img, img, mDummyComponents, mDummyConnections, mDummyNodes, false);
+
+    // Associate labels
+    mSchematicSegmentation->associateLabels(img, img, mDummyLabels, false);
+
+    const auto components{mSchematicSegmentation->getComponents()};
+    EXPECT_EQ(components.size(), 2);
+    const auto componentA{components.at(0)};
+    const auto componentB{components.at(1)};
+
+    const auto connections{mSchematicSegmentation->getConnections()};
+    EXPECT_EQ(connections.size(), 2);
+    const auto connectionC{connections.at(0)};
+    const auto connectionD{connections.at(1)};
+
+    const auto nodes{mSchematicSegmentation->getNodes()};
+    EXPECT_EQ(nodes.size(), 2);
+    const auto nodeE{nodes.at(0)};
+    const auto nodeF{nodes.at(1)};
+
+    const auto labels{mSchematicSegmentation->getLabels()};
+    EXPECT_EQ(labels.size(), 3);
+    const auto labelG{labels.at(0)};
+    const auto labelH{labels.at(1)};
+    const auto labelI{labels.at(2)};
+
+    // Check owner ID of label G
+    EXPECT_EQ(labelG.mOwnerId, componentB.mId);
+    // Check labels vector of element
+    EXPECT_EQ(componentA.mLabels.size(), 0);
+    EXPECT_EQ(componentB.mLabels.size(), 1);
+    EXPECT_EQ(componentB.mLabels.back().mId, labelG.mId);
+
+    // Check owner ID of label H
+    EXPECT_EQ(labelH.mOwnerId, connectionD.mId);
+    // Check labels vector of element
+    EXPECT_EQ(connectionC.mLabels.size(), 0);
+    EXPECT_EQ(connectionD.mLabels.size(), 1);
+    EXPECT_EQ(connectionD.mLabels.back().mId, labelH.mId);
+
+    // Check owner ID of label I
+    EXPECT_EQ(labelI.mOwnerId, nodeF.mId);
+    // Check labels vector of element
+    EXPECT_EQ(nodeE.mLabels.size(), 0);
+    EXPECT_EQ(nodeF.mLabels.size(), 1);
+    EXPECT_EQ(nodeF.mLabels.back().mId, labelI.mId);
+}
+
+/**
+ * @brief Tests that multiple labels are associated to the closest element.
+ *
+ * Scenario:
+ * - 1 component, A
+ * - 1 connection, B
+ * - 1 node, C
+ * - 2 label, D and E
+ *
+ * Expected:
+ * - Owner ID of labels D and E is the ID of component A
+ * - Labels D and E are associated to component A
+ * - No labels associated to connection B
+ * - No labels associated to node C
+ */
+TEST_F(SchematicSegmentationTest, associatesMultipleLabelsToElement)
+{
+    constexpr auto imgWidth{200};
+    constexpr auto imgHeight{200};
+
+    constexpr auto xBoxComp{30};
+    constexpr auto yBoxComp{30};
+
+    constexpr auto xBoxConn{60};
+    constexpr auto yBoxConn{60};
+
+    constexpr auto xBoxNode{100};
+    constexpr auto yBoxNode{100};
+
+    constexpr auto xBoxLabel1{30};
+    constexpr auto yBoxLabel1{15};
+    constexpr auto xBoxLabel2{30};
+    constexpr auto yBoxLabel2{45};
+
+    const Rectangle rectConn{xBoxConn, yBoxConn, cDimension, cDimension};
+    const Rectangle rectNode{xBoxNode, yBoxNode, 1, 1};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth).Times(3).WillRepeatedly(Return(imgWidth));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight).Times(3).WillRepeatedly(Return(imgHeight));
+    onCheckContainsPoint();
+    EXPECT_CALL(*mMockOpenCvWrapper, contains).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, boundingRect).Times(2).WillOnce(Return(rectConn)).WillOnce(Return(rectNode));
+
+    // Prepare circuit
+    setupDummyComponent(xBoxComp, yBoxComp);
+    setupDummyConnection(xBoxConn, yBoxConn);
+    setupDummyNode(xBoxNode, yBoxNode);
+    setupDummyLabel(xBoxLabel1, yBoxLabel1);
+    setupDummyLabel(xBoxLabel2, yBoxLabel2);
+
+    // Detect component connections points
+    ImageMat img{};
+    mSchematicSegmentation->detectComponentConnections(
+        img, img, mDummyComponents, mDummyConnections, mDummyNodes, false);
+
+    // Associate labels
+    mSchematicSegmentation->associateLabels(img, img, mDummyLabels, false);
+
+    const auto components{mSchematicSegmentation->getComponents()};
+    const auto connections{mSchematicSegmentation->getConnections()};
+    const auto nodes{mSchematicSegmentation->getNodes()};
+    const auto labels{mSchematicSegmentation->getLabels()};
+    EXPECT_EQ(labels.size(), 2);
+    const auto labelD{labels.at(0)};
+    const auto labelE{labels.at(1)};
+
+    // Check owner ID of labels D and E
+    auto expectedLabelOwnerID{components.back().mId};
+    EXPECT_EQ(labelD.mOwnerId, expectedLabelOwnerID);
+    EXPECT_EQ(labelE.mOwnerId, expectedLabelOwnerID);
+    // Check labels vector of element
+    EXPECT_EQ(components.back().mLabels.size(), 2);
+    EXPECT_EQ(components.back().mLabels.at(0).mId, labelD.mId);
+    EXPECT_EQ(components.back().mLabels.at(1).mId, labelE.mId);
+    EXPECT_EQ(connections.back().mLabels.size(), 0);
+    EXPECT_EQ(nodes.back().mLabels.size(), 0);
+}
+
+/**
+ * @brief Tests that the image with boxes for labels association is saved during processing, when there are boxes for
+ * connections and/or for nodes.
+ */
+TEST_F(SchematicSegmentationTest, savesImagesWhenBoxesWhileAssociatingLabels)
+{
+    constexpr auto imgWidth{200};
+    constexpr auto imgHeight{200};
+    constexpr auto saveImages{true};
+
+    constexpr auto xBoxComp{30};
+    constexpr auto yBoxComp{30};
+
+    constexpr auto xBoxConn{xBoxComp + cDimension};
+    constexpr auto yBoxConn{yBoxComp + cDimension};
+
+    constexpr auto xBoxNode{100};
+    constexpr auto yBoxNode{100};
+
+    const Rectangle rectConn{xBoxConn, yBoxConn, cDimension, cDimension};
+    const Rectangle rectNode{xBoxNode, yBoxNode, 1, 1};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth).Times(3).WillRepeatedly(Return(imgWidth));
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight).Times(3).WillRepeatedly(Return(imgHeight));
+    onCheckContainsPoint();
+    EXPECT_CALL(*mMockOpenCvWrapper, contains).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, boundingRect).Times(2).WillOnce(Return(rectConn)).WillOnce(Return(rectNode));
+    EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(2);
+    EXPECT_CALL(*mMockOpenCvWrapper, drawContours).Times(1);
+    EXPECT_CALL(*mMockOpenCvWrapper, rectangle).Times(2);
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage).Times(2);
+
+    // Prepare circuit
+    setupDummyComponent(xBoxComp, yBoxComp);
+    setupDummyConnection(xBoxConn, yBoxConn);
+    setupDummyNode(xBoxNode, yBoxNode);
+
+    // Detect component connection points
+    ImageMat img{};
+    mSchematicSegmentation->detectComponentConnections(
+        img, img, mDummyComponents, mDummyConnections, mDummyNodes, saveImages);
+
+    // Associate labels
+    mSchematicSegmentation->associateLabels(img, img, mDummyLabels, saveImages);
+}
+
+/**
+ * @brief Tests that the image with boxes for labels association is not saved during processing, when there are no boxes
+ * for connections and for nodes.
+ */
+TEST_F(SchematicSegmentationTest, savesNoImagesWhenNoBoxesWhileAssociatingLabels)
+{
+    constexpr auto imgWidth{200};
+    constexpr auto imgHeight{200};
+    constexpr auto saveImages{true};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageWidth).Times(0);
+    EXPECT_CALL(*mMockOpenCvWrapper, getImageHeight).Times(0);
+    EXPECT_CALL(*mMockOpenCvWrapper, boundingRect).Times(0);
+    EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(0);
+    EXPECT_CALL(*mMockOpenCvWrapper, rectangle).Times(0);
+    EXPECT_CALL(*mMockOpenCvWrapper, writeImage).Times(0);
+
+    // Associate labels
+    ImageMat img{};
+    mSchematicSegmentation->associateLabels(img, img, {}, saveImages);
 }
 
 /**

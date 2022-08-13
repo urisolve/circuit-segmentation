@@ -37,6 +37,13 @@ struct Connection
 
     /** Connection wire. */
     Wire mWire{};
+    /**
+     * @brief Labels associated to this element.
+     *
+     * @note As an element can have more than one label, this vector is useful to group all labels associated to this
+     * element, to be used on generation of the ROIs of labels.
+     */
+    std::vector<Label> mLabels{};
 };
 
 } // namespace circuit

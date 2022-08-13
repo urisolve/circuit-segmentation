@@ -7,12 +7,14 @@ project(SchematicSegmentation)
 set(Headers
     ComponentDetection.h
     ConnectionDetection.h
+    LabelDetection.h
     SchematicSegmentation.h
     SegmentationUtils.h
 )
 set(Sources
     ComponentDetection.cpp
     ConnectionDetection.cpp
+    LabelDetection.cpp
     SchematicSegmentation.cpp
 )
 

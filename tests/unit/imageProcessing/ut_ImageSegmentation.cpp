@@ -7,6 +7,7 @@
 #include "mocks/computerVision/MockOpenCvWrapper.h"
 #include "mocks/schematicSegmentation/MockComponentDetection.h"
 #include "mocks/schematicSegmentation/MockConnectionDetection.h"
+#include "mocks/schematicSegmentation/MockLabelDetection.h"
 #include "mocks/schematicSegmentation/MockSchematicSegmentation.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -32,14 +33,16 @@ protected:
         mLogger = std::make_shared<logging::Logger>(std::cout);
         mMockComponentDetection = std::make_shared<NiceMock<MockComponentDetection>>(nullptr, nullptr);
         mMockConnectionDetection = std::make_shared<NiceMock<MockConnectionDetection>>(nullptr, nullptr);
+        mMockLabelDetection = std::make_shared<NiceMock<MockLabelDetection>>(nullptr, nullptr);
         mMockSchematicSegmentation = std::make_shared<NiceMock<MockSchematicSegmentation>>(nullptr, nullptr);
 
         mImageSegmentation = std::make_unique<imageProcessing::ImageSegmentation>(mMockOpenCvWrapper,
                                                                                   mLogger,
                                                                                   mMockComponentDetection,
                                                                                   mMockConnectionDetection,
+                                                                                  mMockLabelDetection,
                                                                                   mMockSchematicSegmentation,
-                                                                                  true);
+                                                                                  false);
 
         onGetElements();
     }
@@ -57,6 +60,7 @@ protected:
         const std::vector<circuit::Component> emptyComponents{};
         const std::vector<circuit::Connection> emptyConnections{};
         const std::vector<circuit::Node> emptyNodes{};
+        const std::vector<circuit::Label> emptyLabels{};
 
         ON_CALL(*mMockComponentDetection, getDetectedComponents)
             .WillByDefault([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
@@ -65,6 +69,13 @@ protected:
                 [&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; });
         ON_CALL(*mMockConnectionDetection, getDetectedNodes)
             .WillByDefault([&emptyNodes]() -> const std::vector<circuit::Node>& { return emptyNodes; });
+        ON_CALL(*mMockSchematicSegmentation, getComponents)
+            .WillByDefault([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; });
+        ON_CALL(*mMockSchematicSegmentation, getConnections)
+            .WillByDefault(
+                [&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; });
+        ON_CALL(*mMockLabelDetection, getDetectedLabels)
+            .WillByDefault([&emptyLabels]() -> const std::vector<circuit::Label>& { return emptyLabels; });
     }
 
 protected:
@@ -78,6 +89,8 @@ protected:
     std::shared_ptr<NiceMock<MockComponentDetection>> mMockComponentDetection;
     /** Connection detection. */
     std::shared_ptr<NiceMock<MockConnectionDetection>> mMockConnectionDetection;
+    /** Label detection. */
+    std::shared_ptr<NiceMock<MockLabelDetection>> mMockLabelDetection;
     /** Schematic segmentation. */
     std::shared_ptr<NiceMock<MockSchematicSegmentation>> mMockSchematicSegmentation;
 };
@@ -94,10 +107,35 @@ TEST_F(ImageSegmentationTest, segmentsSuccessfully)
     EXPECT_CALL(*mMockConnectionDetection, detectNodesUpdateConnections).Times(1).WillOnce(Return(true));
     EXPECT_CALL(*mMockSchematicSegmentation, detectComponentConnections).Times(1);
     EXPECT_CALL(*mMockSchematicSegmentation, updateDetectedComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockLabelDetection, detectLabels).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, associateLabels).Times(1);
 
     EXPECT_CALL(*mMockConnectionDetection, getDetectedConnections).Times(2);
     EXPECT_CALL(*mMockComponentDetection, getDetectedComponents).Times(3);
     EXPECT_CALL(*mMockConnectionDetection, getDetectedNodes).Times(1);
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(1);
+    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(1);
+    EXPECT_CALL(*mMockLabelDetection, getDetectedLabels).Times(1);
+
+    // Segment image
+    ImageMat image{};
+    ASSERT_TRUE(mImageSegmentation->segmentImage(image, image));
+}
+
+/**
+ * @brief Tests that segmentation occurs successfully when there are no labels detected.
+ */
+TEST_F(ImageSegmentationTest, segmentsSuccessfullyWhenNoLabels)
+{
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockConnectionDetection, detectConnections).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockComponentDetection, detectComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockConnectionDetection, updateConnections).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockConnectionDetection, detectNodesUpdateConnections).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, detectComponentConnections).Times(1);
+    EXPECT_CALL(*mMockSchematicSegmentation, updateDetectedComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockLabelDetection, detectLabels).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockSchematicSegmentation, associateLabels).Times(0);
 
     // Segment image
     ImageMat image{};

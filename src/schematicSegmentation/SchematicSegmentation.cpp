@@ -15,6 +15,7 @@ SchematicSegmentation::SchematicSegmentation(const std::shared_ptr<computerVisio
     , mComponents{}
     , mConnections{}
     , mNodes{}
+    , mLabels{}
 {
 }
 
@@ -121,7 +122,7 @@ void SchematicSegmentation::detectComponentConnections(computerVision::ImageMat&
             mOpenCvWrapper->drawContours(
                 image, portPoints, -1, cPortColor, cPortThickness, computerVision::OpenCvWrapper::LineTypes::LINE_8, {});
 
-            mOpenCvWrapper->writeImage("cs_segment_detect_components_ports.png", image);
+            mOpenCvWrapper->writeImage("cs_segment_components_ports_detected.png", image);
             // TODO: Remove or comment.
             mOpenCvWrapper->showImage("Detecting components ports", image, 0);
         }
@@ -161,6 +162,186 @@ bool SchematicSegmentation::updateDetectedComponents()
     return !mComponents.empty();
 }
 
+void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageInitial,
+                                            computerVision::ImageMat& imagePreprocessed,
+                                            const std::vector<circuit::Label>& labelsDetected,
+                                            const bool saveImages)
+{
+    /*
+     * Association of labels to the elements of the circuit
+     * - Create bounding boxes for connections
+     * - Create bounding boxes for nodes
+     * - For each label:
+     *      - Get and check the minimum distance between label and component
+     *      - Get and check the minimum distance between label and connection
+     *      - Get and check the minimum distance between label and node
+     *      - Compare minimum distances of each element
+     *      - Set label owner ID with the element ID with the minimum distance
+     *      - Add to the labels vector of that element
+     */
+
+    mLogger->logInfo("Associating labels to the circuit elements");
+
+    mLabels = labelsDetected;
+
+    // Create bounding boxes for connections
+    std::vector<computerVision::Rectangle> connectionsBoxes{};
+    for (const auto& connection : mConnections) {
+        constexpr int widthIncr{2};  // 2 pixels to allow centering
+        constexpr int heightIncr{2}; // 2 pixels to allow centering
+        const auto box{generateBoundingBox(mOpenCvWrapper, connection.mWire, imagePreprocessed, widthIncr, heightIncr)};
+        connectionsBoxes.push_back(box);
+    }
+
+    // Create bounding boxes for nodes
+    std::vector<computerVision::Rectangle> nodesBoxes{};
+    for (const auto& node : mNodes) {
+        // Node point
+        const computerVision::Point point{node.mPosition.mX, node.mPosition.mY};
+
+        constexpr int widthIncr{20};  // 20 pixels to allow centering and to expand node area
+        constexpr int heightIncr{20}; // 20 pixels to allow centering and to expand node area
+        const auto box{generateBoundingBox(
+            mOpenCvWrapper, computerVision::Contour{point}, imagePreprocessed, widthIncr, heightIncr)};
+        nodesBoxes.push_back(box);
+    }
+
+    // Save image
+    if (saveImages) {
+        if (!connectionsBoxes.empty() || !nodesBoxes.empty()) {
+            computerVision::ImageMat image{mOpenCvWrapper->cloneImage(imageInitial)};
+            for (const auto& box : connectionsBoxes) {
+                mOpenCvWrapper->rectangle(
+                    image, box, cBoxColor, cBoxThickness, computerVision::OpenCvWrapper::LineTypes::LINE_8);
+            }
+            for (const auto& box : nodesBoxes) {
+                mOpenCvWrapper->rectangle(
+                    image, box, cBoxColor, cBoxThickness, computerVision::OpenCvWrapper::LineTypes::LINE_8);
+            }
+
+            mOpenCvWrapper->writeImage("cs_segment_labels_associate_boxes_connections_nodes.png", image);
+            // TODO: Remove or comment.
+            mOpenCvWrapper->showImage("Associating labels (boxes for connections and nodes)", image, 0);
+        }
+    }
+
+    for (auto& label : mLabels) {
+        // Distance between label and components
+        double minDistanceToComponent{0};
+        auto componentIndex{0};
+        for (auto it{mComponents.begin()}; it != mComponents.end(); ++it) {
+            const auto distance = schematicSegmentation::distanceRectangles(label.mBoundingBox, it->mBoundingBox);
+
+            const auto index{it - mComponents.begin()};
+            if (index == 0) {
+                // For the first iteration, the distance calculated is the minimum distance
+                minDistanceToComponent = distance;
+                componentIndex = index;
+            } else if (distance < minDistanceToComponent) {
+                minDistanceToComponent = distance;
+                componentIndex = index;
+            }
+        }
+
+        mLogger->logDebug("Minimum distance between label " + label.mId + " and component "
+                          + mComponents.at(componentIndex).mId + " = " + std::to_string(minDistanceToComponent));
+
+        // Distance between label and connections
+        double minDistanceToConnection{0};
+        auto connectionIndex{0};
+        for (auto it{connectionsBoxes.begin()}; it != connectionsBoxes.end(); ++it) {
+            const auto index{it - connectionsBoxes.begin()};
+            const auto distance
+                = schematicSegmentation::distanceRectangles(label.mBoundingBox, connectionsBoxes.at(index));
+
+            if (index == 0) {
+                // For the first iteration, the distance calculated is the minimum distance
+                minDistanceToConnection = distance;
+                connectionIndex = index;
+            } else if (distance < minDistanceToConnection) {
+                minDistanceToConnection = distance;
+                connectionIndex = index;
+            }
+        }
+
+        mLogger->logDebug("Minimum distance between label " + label.mId + " and connection "
+                          + mConnections.at(connectionIndex).mId + " = " + std::to_string(minDistanceToConnection));
+
+        // Distance between label and nodes
+        double minDistanceToNode{0};
+        auto nodeIndex{0};
+        for (auto it{nodesBoxes.begin()}; it != nodesBoxes.end(); ++it) {
+            const auto index{it - nodesBoxes.begin()};
+            const auto distance = schematicSegmentation::distanceRectangles(label.mBoundingBox, nodesBoxes.at(index));
+
+            if (index == 0) {
+                // For the first iteration, the distance calculated is the minimum distance
+                minDistanceToNode = distance;
+                nodeIndex = index;
+            } else if (distance < minDistanceToNode) {
+                minDistanceToNode = distance;
+                nodeIndex = index;
+            }
+        }
+
+        // The circuit can have no nodes, so we need to check if nodes are empty
+        if (!mNodes.empty()) {
+            mLogger->logDebug("Minimum distance between label " + label.mId + " and node " + mNodes.at(nodeIndex).mId
+                              + " = " + std::to_string(minDistanceToNode));
+        }
+
+        // Compare the minimum distances
+        auto distance{minDistanceToComponent};
+        auto elemIndex{componentIndex};
+        enum class ElemTypeEnum : unsigned char { COMPONENT, CONNECTION, NODE };
+        auto elemType{ElemTypeEnum::COMPONENT};
+        if (minDistanceToConnection < distance) {
+            distance = minDistanceToConnection;
+            elemIndex = connectionIndex;
+            elemType = ElemTypeEnum::CONNECTION;
+        }
+        if (minDistanceToNode < distance && !mNodes.empty()) {
+            distance = minDistanceToNode;
+            elemIndex = nodeIndex;
+            elemType = ElemTypeEnum::NODE;
+        }
+
+        switch (elemType) {
+        case ElemTypeEnum::COMPONENT:
+            // Set label owner ID
+            label.mOwnerId = mComponents.at(elemIndex).mId;
+            // Add to the labels vector
+            mComponents.at(elemIndex).mLabels.push_back(label);
+            mLogger->logDebug("Label " + label.mId + " is associated to the component "
+                              + mComponents.at(elemIndex).mId);
+            break;
+        case ElemTypeEnum::CONNECTION:
+            // Set label owner ID
+            label.mOwnerId = mConnections.at(elemIndex).mId;
+            // Add to the labels vector
+            mConnections.at(elemIndex).mLabels.push_back(label);
+            mLogger->logDebug("Label " + label.mId + " is associated to the connection "
+                              + mConnections.at(elemIndex).mId);
+            break;
+        case ElemTypeEnum::NODE:
+            // Set label owner ID
+            label.mOwnerId = mNodes.at(elemIndex).mId;
+            // Add to the labels vector
+            mNodes.at(elemIndex).mLabels.push_back(label);
+            mLogger->logDebug("Label " + label.mId + " is associated to the node " + mNodes.at(elemIndex).mId);
+            break;
+        default:
+            // Set label owner ID
+            label.mOwnerId = mComponents.at(elemIndex).mId;
+            // Add to the labels vector
+            mComponents.at(elemIndex).mLabels.push_back(label);
+            mLogger->logDebug("Label " + label.mId + " is associated to the component "
+                              + mComponents.at(elemIndex).mId);
+            break;
+        }
+    }
+}
+
 const std::vector<circuit::Component>& SchematicSegmentation::getComponents() const
 {
     return mComponents;
@@ -174,6 +355,11 @@ const std::vector<circuit::Connection>& SchematicSegmentation::getConnections() 
 const std::vector<circuit::Node>& SchematicSegmentation::getNodes() const
 {
     return mNodes;
+}
+
+const std::vector<circuit::Label>& SchematicSegmentation::getLabels() const
+{
+    return mLabels;
 }
 
 circuit::RelativePosition SchematicSegmentation::calcPortPosition(const computerVision::Point& connectionPoint,

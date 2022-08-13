@@ -23,6 +23,7 @@ public:
      * @param logger Logger.
      * @param componentDetection Component detection.
      * @param connectionDetection Connection detection.
+     * @param labelDetection Label detection.
      * @param schematicSegmentation Schematic segmentation.
      * @param saveImages Save images obtained during the processing.
      */
@@ -31,10 +32,16 @@ public:
         const std::shared_ptr<logging::Logger>& logger,
         const std::shared_ptr<schematicSegmentation::ComponentDetection>& componentDetection,
         const std::shared_ptr<schematicSegmentation::ConnectionDetection>& connectionDetection,
+        const std::shared_ptr<schematicSegmentation::LabelDetection>& labelDetection,
         const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
         const bool saveImages = false)
-        : ImageSegmentation(
-            openCvWrapper, logger, componentDetection, connectionDetection, schematicSegmentation, saveImages)
+        : ImageSegmentation(openCvWrapper,
+                            logger,
+                            componentDetection,
+                            connectionDetection,
+                            labelDetection,
+                            schematicSegmentation,
+                            saveImages)
     {
     }
 

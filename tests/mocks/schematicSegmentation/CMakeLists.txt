@@ -7,6 +7,7 @@ project(MockSchematicSegmentation)
 set(Headers
     MockComponentDetection.h
     MockConnectionDetection.h
+    MockLabelDetection.h
     MockSchematicSegmentation.h
 )
 

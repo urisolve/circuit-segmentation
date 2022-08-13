@@ -10,6 +10,8 @@ namespace circuit {
 Node::Node()
     : mId{generateId()}
 {
+    // Set label owner ID
+    mLabel.mOwnerId = mId;
 }
 
 void Node::setType(const Node::NodeType& type)

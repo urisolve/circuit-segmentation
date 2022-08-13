@@ -6,6 +6,7 @@
 
 #include "computerVision/OpenCvWrapper.h"
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 namespace circuitSegmentation {
@@ -125,6 +126,67 @@ inline const std::pair<computerVision::Point, computerVision::Point>
     }
 
     return pairPoints;
+}
+
+/**
+ * @brief Calculates the distance between two points.
+ *
+ * @param x1 X coordinate of point 1.
+ * @param y1 Y coordinate of point 1.
+ * @param x2 X coordinate of point 2.
+ * @param y2 Y coordinate of point 2.
+ *
+ * @return Distance between the two points.
+ */
+inline const double distancePoints(const int& x1, const int& y1, const int& x2, const int& y2)
+{
+    return std::sqrt(static_cast<double>(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2)));
+}
+
+/**
+ * @brief Calculates the distance between two rectangles.
+ *
+ * @param rect1 Rectangle 1.
+ * @param rect2 Rectangle 2.
+ *
+ * @return Distance between the two rectangles.
+ *
+ * @note This method does not account for the rotation of the rectangles.
+ */
+inline const double distanceRectangles(const computerVision::Rectangle& rect1, const computerVision::Rectangle& rect2)
+{
+    // Corners
+    const computerVision::Point leftTop1{rect1.x, rect1.y};
+    const computerVision::Point rightBottom1{rect1.x + rect1.width, rect1.y + rect1.height};
+    const computerVision::Point leftTop2{rect2.x, rect2.y};
+    const computerVision::Point rightBottom2{rect2.x + rect2.width, rect2.y + rect2.height};
+
+    // Positions for rectangle 2 relative to rectangle 1
+    const auto left{rightBottom2.x < leftTop1.x};
+    const auto right{leftTop2.x > rightBottom1.x};
+    const auto top{rightBottom2.y < leftTop1.y};
+    const auto bottom{leftTop2.y > rightBottom1.y};
+
+    if (top && left) {
+        return distancePoints(rightBottom2.x, rightBottom2.y, leftTop1.x, leftTop1.y);
+    } else if (top && right) {
+        return distancePoints(leftTop2.x, rightBottom2.y, rightBottom1.x, leftTop1.y);
+    } else if (bottom && left) {
+        return distancePoints(rightBottom2.x, leftTop2.y, leftTop1.x, rightBottom1.y);
+    } else if (bottom && right) {
+        return distancePoints(leftTop2.x, leftTop2.y, rightBottom1.x, rightBottom1.y);
+    } else if (left) {
+        return leftTop1.x - rightBottom2.x;
+    } else if (right) {
+        return leftTop2.x - rightBottom1.x;
+    } else if (top) {
+        return leftTop1.y - rightBottom2.y;
+    } else if (bottom) {
+        return leftTop2.y - rightBottom1.y;
+    }
+
+    // Intersection case
+    return 0;
 }
 
 } // namespace schematicSegmentation

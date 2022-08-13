@@ -40,12 +40,19 @@ public:
                 (override));
     /** Mocks method updateDetectedComponents. */
     MOCK_METHOD(bool, updateDetectedComponents, (), (override));
+    /** Mocks method associateLabels. */
+    MOCK_METHOD(void,
+                associateLabels,
+                (computerVision::ImageMat&, computerVision::ImageMat&, const std::vector<circuit::Label>&, const bool),
+                (override));
     /** Mocks method getComponents. */
     MOCK_METHOD(const std::vector<circuit::Component>&, getComponents, (), (const, override));
     /** Mocks method getConnections. */
     MOCK_METHOD(const std::vector<circuit::Connection>&, getConnections, (), (const, override));
     /** Mocks method getNodes. */
     MOCK_METHOD(const std::vector<circuit::Node>&, getNodes, (), (const, override));
+    /** Mocks method getLabels. */
+    MOCK_METHOD(const std::vector<circuit::Label>&, getLabels, (), (const, override));
     /** Mocks method calcPortPosition. */
     MOCK_METHOD(circuit::RelativePosition,
                 calcPortPosition,
