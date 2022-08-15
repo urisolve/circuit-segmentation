@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "computerVision/OpenCvWrapper.h"
 #include "Id.h"
 #include "Position.h"
 
@@ -38,6 +39,9 @@ struct Label
     bool mIsNameHidden{true};
     /** Flag that controls if value is hidden. */
     bool mIsValueHidden{true};
+
+    /** Bounding box of the label. */
+    computerVision::Rectangle mBoundingBox{};
 };
 
 } // namespace circuit

@@ -8,6 +8,7 @@
 #include "logging/Logger.h"
 #include "schematicSegmentation/ComponentDetection.h"
 #include "schematicSegmentation/ConnectionDetection.h"
+#include "schematicSegmentation/LabelDetection.h"
 #include "schematicSegmentation/SchematicSegmentation.h"
 #include <memory>
 
@@ -27,6 +28,7 @@ public:
      * @param logger Logger.
      * @param componentDetection Component detection.
      * @param connectionDetection Connection detection.
+     * @param labelDetection Label detection.
      * @param schematicSegmentation Schematic segmentation.
      * @param saveImages Save images obtained during the processing.
      */
@@ -35,6 +37,7 @@ public:
         const std::shared_ptr<logging::Logger>& logger,
         const std::shared_ptr<schematicSegmentation::ComponentDetection>& componentDetection,
         const std::shared_ptr<schematicSegmentation::ConnectionDetection>& connectionDetection,
+        const std::shared_ptr<schematicSegmentation::LabelDetection>& labelDetection,
         const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
         const bool saveImages = false);
 
@@ -79,6 +82,9 @@ private:
 
     /** Connection detection. */
     std::shared_ptr<schematicSegmentation::ConnectionDetection> mConnectionDetection;
+
+    /** Label detection. */
+    std::shared_ptr<schematicSegmentation::LabelDetection> mLabelDetection;
 
     /** Schematic segmentation. */
     std::shared_ptr<schematicSegmentation::SchematicSegmentation> mSchematicSegmentation;

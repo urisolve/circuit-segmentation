@@ -43,9 +43,9 @@ public:
      *
      * @param imageInitial Initial image without preprocessing.
      * @param imagePreprocessed Image preprocessed for segmentation.
-     * @param components Components detected.
-     * @param connections Connections detected.
-     * @param nodes Nodes detected.
+     * @param componentsDetected Components detected.
+     * @param connectionsDetected Connections detected.
+     * @param nodesDetected Nodes detected.
      * @param saveImages Save images obtained during the processing.
      */
     virtual void detectComponentConnections(computerVision::ImageMat& imageInitial,
@@ -53,7 +53,7 @@ public:
                                             const std::vector<circuit::Component>& componentsDetected,
                                             const std::vector<circuit::Connection>& connectionsDetected,
                                             const std::vector<circuit::Node>& nodesDetected,
-                                            const bool saveImages);
+                                            const bool saveImages = false);
 
     /**
      * @brief Updates detected components of the circuit.
@@ -64,6 +64,19 @@ public:
      * @return True if there are components detected, otherwise false.
      */
     virtual bool updateDetectedComponents();
+
+    /**
+     * @brief Associates labels to the elements of the circuit.
+     *
+     * @param imageInitial Initial image without preprocessing.
+     * @param imagePreprocessed Image preprocessed for segmentation.
+     * @param labelsDetected Labels detected.
+     * @param saveImages Save images obtained during the processing.
+     */
+    virtual void associateLabels(computerVision::ImageMat& imageInitial,
+                                 computerVision::ImageMat& imagePreprocessed,
+                                 const std::vector<circuit::Label>& labelsDetected,
+                                 const bool saveImages = false);
 
     /**
      * @brief Gets the segmented components.
@@ -85,6 +98,13 @@ public:
      * @return Segmented nodes.
      */
     [[nodiscard]] virtual const std::vector<circuit::Node>& getNodes() const;
+
+    /**
+     * @brief Gets the segmented labels.
+     *
+     * @return Segmented labels.
+     */
+    [[nodiscard]] virtual const std::vector<circuit::Label>& getLabels() const;
 
 #ifndef BUILD_TESTS
 private:
@@ -110,6 +130,11 @@ private:
     /** Port contour thickness. */
     const int cPortThickness{10};
 
+    /** Bounding box color. */
+    const computerVision::Scalar cBoxColor{0, 255, 0};
+    /** Bounding box thickness. */
+    const int cBoxThickness{2};
+
     /** OpenCV wrapper. */
     std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;
 
@@ -124,6 +149,9 @@ private:
 
     /** Nodes segmented. */
     std::vector<circuit::Node> mNodes;
+
+    /** Labels segmented. */
+    std::vector<circuit::Label> mLabels;
 };
 
 } // namespace schematicSegmentation

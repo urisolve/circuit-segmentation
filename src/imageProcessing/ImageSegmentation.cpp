@@ -12,12 +12,14 @@ ImageSegmentation::ImageSegmentation(
     const std::shared_ptr<logging::Logger>& logger,
     const std::shared_ptr<schematicSegmentation::ComponentDetection>& componentDetection,
     const std::shared_ptr<schematicSegmentation::ConnectionDetection>& connectionDetection,
+    const std::shared_ptr<schematicSegmentation::LabelDetection>& labelDetection,
     const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
     const bool saveImages)
     : mOpenCvWrapper{openCvWrapper}
     , mLogger{logger}
     , mComponentDetection{componentDetection}
     , mConnectionDetection{connectionDetection}
+    , mLabelDetection{labelDetection}
     , mSchematicSegmentation{schematicSegmentation}
     , mSaveImages{std::move(saveImages)}
 {
@@ -63,16 +65,16 @@ bool ImageSegmentation::segmentImage(computerVision::ImageMat imageInitial, comp
         return false;
     }
 
-    // TODO: Label segmentation.
-    /*
-    - Detect labels
-        - In LabelDetection class
-        - Remove detected elements of the image
-        - The rest is considered as a label
-        - Check smaller distance between label and element to detect the owner
-    - Update labels of components and connections
-        - In SchematicSegmentation class
-    */
+    // Detect labels
+    if (mLabelDetection->detectLabels(imageInitial,
+                                      imagePreprocessed,
+                                      mSchematicSegmentation->getComponents(),
+                                      mSchematicSegmentation->getConnections(),
+                                      mSaveImages)) {
+        // Associate labels
+        mSchematicSegmentation->associateLabels(
+            imageInitial, imagePreprocessed, mLabelDetection->getDetectedLabels(), mSaveImages);
+    }
 
     return true;
 }

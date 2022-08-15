@@ -10,6 +10,7 @@ enable_testing()
 # Source files
 set(Sources
     ut_ImagePreprocessing.cpp
+    ut_ImageProcManager.cpp
     ut_ImageReceiver.cpp
     ut_ImageSegmentation.cpp
 )
