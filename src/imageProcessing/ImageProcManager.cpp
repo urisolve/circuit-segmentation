@@ -6,21 +6,25 @@
 #include "schematicSegmentation/ComponentDetection.h"
 #include "schematicSegmentation/ConnectionDetection.h"
 #include "schematicSegmentation/LabelDetection.h"
-#include "schematicSegmentation/SchematicSegmentation.h"
 
 namespace circuitSegmentation {
 namespace imageProcessing {
 
-ImageProcManager::ImageProcManager(const std::shared_ptr<ImageReceiver>& imageReceiver,
-                                   const std::shared_ptr<ImagePreprocessing>& imagePreprocessing,
-                                   const std::shared_ptr<ImageSegmentation>& imageSegmentation,
-                                   const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
-                                   const std::shared_ptr<logging::Logger>& logger,
-                                   const bool logMode,
-                                   const bool saveImages)
+ImageProcManager::ImageProcManager(
+    const std::shared_ptr<ImageReceiver>& imageReceiver,
+    const std::shared_ptr<ImagePreprocessing>& imagePreprocessing,
+    const std::shared_ptr<ImageSegmentation>& imageSegmentation,
+    const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
+    const std::shared_ptr<schematicSegmentation::RoiSegmentation>& roiSegmentation,
+    const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
+    const std::shared_ptr<logging::Logger>& logger,
+    const bool logMode,
+    const bool saveImages)
     : mImageReceiver{imageReceiver}
     , mImagePreprocessing{imagePreprocessing}
     , mImageSegmentation{imageSegmentation}
+    , mSchematicSegmentation{schematicSegmentation}
+    , mRoiSegmentation{roiSegmentation}
     , mOpenCvWrapper{openCvWrapper}
     , mLogger{logger}
     , mLogMode{std::move(logMode)}
@@ -51,6 +55,8 @@ ImageProcManager
         std::make_shared<ImagePreprocessing>(openCvWrapper, logger),
         std::make_shared<ImageSegmentation>(
             openCvWrapper, logger, componentDetection, connectionDetection, labelDetection, schematicSegmentation),
+        schematicSegmentation,
+        std::make_shared<schematicSegmentation::RoiSegmentation>(openCvWrapper, logger),
         openCvWrapper,
         logger,
         logMode,
@@ -63,7 +69,7 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Receive image
     if (!receiveImage(imageFilePath)) {
-        mLogger->logInfo("Failed during image reception");
+        mLogger->logError("Failed during image reception");
         return false;
     }
     mLogger->logInfo("Image received successfully");
@@ -81,14 +87,19 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
 
     // Segmentation
     if (!segmentImage()) {
-        mLogger->logInfo("Failed during image segmentation");
+        mLogger->logError("Failed during image segmentation");
         return false;
     }
     mLogger->logInfo("Image segmentation occurred successfully");
 
-    // TODO: Segmentation map.
+    // Images with regions of interest (ROI) for components and labels
+    if (!generateImageRoi()) {
+        mLogger->logError("Failed during generation of images with ROI");
+        return false;
+    }
+    mLogger->logInfo("Generation of images with ROI occurred successfully");
 
-    // TODO: Images (ROI) of components with ID (ID in the file name).
+    // TODO: Segmentation map.
 
     return true;
 }
@@ -157,6 +168,24 @@ bool ImageProcManager::segmentImage()
 {
     // Segment the image
     return mImageSegmentation->segmentImage(mImageInitial, mImageProcessed);
+}
+
+bool ImageProcManager::generateImageRoi()
+{
+    // Generate images with (ROI) for components
+    if (!mRoiSegmentation->generateRoiComponents(mImageInitial, mSchematicSegmentation->getComponents())) {
+        return false;
+    }
+
+    // Generate images with (ROI) for labels
+    if (!mRoiSegmentation->generateRoiLabels(mImageInitial,
+                                             mSchematicSegmentation->getComponents(),
+                                             mSchematicSegmentation->getConnections(),
+                                             mSchematicSegmentation->getNodes())) {
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace imageProcessing

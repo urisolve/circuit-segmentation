@@ -125,6 +125,98 @@ TEST_F(OpenCvWrapperTest, cloneImageNoThrow)
 }
 
 /**
+ * @brief Tests that an image is cropped successfully when the region of interest has valid dimensions.
+ */
+TEST_F(OpenCvWrapperTest, cropsImageSuccessfully)
+{
+    constexpr auto widthImg{300};
+    constexpr auto heightImg{300};
+    ImageMat src{heightImg, widthImg, CV_8UC3, cv::Scalar(128, 128, 128)};
+
+    ImageMat dst{};
+
+    constexpr auto x{0};
+    constexpr auto y{0};
+    constexpr auto widthRoi{100};
+    constexpr auto heightRoi{100};
+    const Rectangle roi{x, y, widthRoi, heightRoi};
+
+    // Crop image
+    ASSERT_TRUE(mOpenCvWrapper->cropImage(src, dst, roi));
+
+    // Dimensions of destination image are equal to the ROI
+    const auto width{mOpenCvWrapper->getImageWidth(dst)};
+    const auto height{mOpenCvWrapper->getImageHeight(dst)};
+    const auto expectWidth{roi.width};
+    const auto expectHeight{roi.height};
+    EXPECT_EQ(width, expectWidth);
+    EXPECT_EQ(height, expectHeight);
+}
+
+/**
+ * @brief Tests that an image is cropped unsuccessfully when the region of interest has invalid dimensions.
+ */
+TEST_F(OpenCvWrapperTest, cropsImageUnsuccessfully)
+{
+    constexpr auto widthImg{300};
+    constexpr auto heightImg{300};
+    ImageMat src{heightImg, widthImg, CV_8UC3, cv::Scalar(128, 128, 128)};
+
+    ImageMat dst{};
+
+    // Case when ROI has width and/or height larger than the source image
+    constexpr auto x1{0};
+    constexpr auto y1{0};
+    constexpr auto widthRoi1{widthImg + 1};
+    constexpr auto heightRoi1{heightImg + 1};
+    const Rectangle roi1{x1, y1, widthRoi1, heightRoi1};
+
+    // Crop image
+    ASSERT_FALSE(mOpenCvWrapper->cropImage(src, dst, roi1));
+
+    // Case when ROI occupies area that is outside of the source image
+    constexpr auto x2{100};
+    constexpr auto y2{100};
+    constexpr auto widthRoi2{201};
+    constexpr auto heightRoi2{201};
+    const Rectangle roi2{x2, y2, widthRoi2, heightRoi2};
+
+    // Crop image
+    ASSERT_FALSE(mOpenCvWrapper->cropImage(src, dst, roi2));
+}
+
+/**
+ * @brief Tests that an image updates its size when used to receive a cropped image.
+ */
+TEST_F(OpenCvWrapperTest, cropsImageUpdateSize)
+{
+    constexpr auto widthImg{300};
+    constexpr auto heightImg{300};
+    ImageMat src{heightImg, widthImg, CV_8UC3, cv::Scalar(128, 128, 128)};
+
+    constexpr auto widthDstImg{200};
+    constexpr auto heightDstImg{200};
+    ImageMat dst{heightDstImg, widthDstImg, CV_8UC3};
+
+    constexpr auto x{50};
+    constexpr auto y{50};
+    constexpr auto widthRoi{100};
+    constexpr auto heightRoi{100};
+    const Rectangle roi{x, y, widthRoi, heightRoi};
+
+    // Crop image
+    ASSERT_TRUE(mOpenCvWrapper->cropImage(src, dst, roi));
+
+    // Dimensions of destination image update to the ROI dimensions
+    const auto width{mOpenCvWrapper->getImageWidth(dst)};
+    const auto height{mOpenCvWrapper->getImageHeight(dst)};
+    const auto expectWidth{roi.width};
+    const auto expectHeight{roi.height};
+    EXPECT_EQ(width, expectWidth);
+    EXPECT_EQ(height, expectHeight);
+}
+
+/**
  * @brief Tests if an image is empty when it is empty.
  */
 TEST_F(OpenCvWrapperTest, checksImageEmpty)

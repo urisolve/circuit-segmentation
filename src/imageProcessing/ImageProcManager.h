@@ -9,6 +9,8 @@
 #include "ImageReceiver.h"
 #include "ImageSegmentation.h"
 #include "logging/Logger.h"
+#include "schematicSegmentation/RoiSegmentation.h"
+#include "schematicSegmentation/SchematicSegmentation.h"
 #include <memory>
 #include <string>
 
@@ -27,6 +29,8 @@ public:
      * @param imageReceiver Image receiver.
      * @param imagePreprocessing Image preprocessing.
      * @param imageSegmentation Image segmentation.
+     * @param schematicSegmentation Schematic segmentation.
+     * @param roiSegmentation ROI segmentation.
      * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      * @param logMode Log mode: verbose = true, silent = false.
@@ -35,6 +39,8 @@ public:
     ImageProcManager(const std::shared_ptr<ImageReceiver>& imageReceiver,
                      const std::shared_ptr<ImagePreprocessing>& imagePreprocessing,
                      const std::shared_ptr<ImageSegmentation>& imageSegmentation,
+                     const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
+                     const std::shared_ptr<schematicSegmentation::RoiSegmentation>& roiSegmentation,
                      const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
                      const std::shared_ptr<logging::Logger>& logger,
                      const bool logMode = false,
@@ -121,6 +127,13 @@ private:
      */
     virtual bool segmentImage();
 
+    /**
+     * @brief Generates images with regions of interest (ROI) for components and labels.
+     *
+     * @return True if images generation occurred successfully, otherwise false.
+     */
+    virtual bool generateImageRoi();
+
 private:
     /** Image receiver. */
     std::shared_ptr<ImageReceiver> mImageReceiver;
@@ -132,6 +145,12 @@ private:
 
     /** Image segmentation. */
     std::shared_ptr<ImageSegmentation> mImageSegmentation;
+
+    /** Schematic segmentation. */
+    std::shared_ptr<schematicSegmentation::SchematicSegmentation> mSchematicSegmentation;
+
+    /** ROI segmentation. */
+    std::shared_ptr<schematicSegmentation::RoiSegmentation> mRoiSegmentation;
 
     /** OpenCV wrapper. */
     std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;

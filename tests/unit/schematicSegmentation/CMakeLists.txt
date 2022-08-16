@@ -12,6 +12,7 @@ set(Sources
     ut_ComponentDetection.cpp
     ut_ConnectionDetection.cpp
     ut_LabelDetection.cpp
+    ut_RoiSegmentation.cpp
     ut_SchematicSegmentation.cpp
     ut_SegmentationUtils.cpp
 )

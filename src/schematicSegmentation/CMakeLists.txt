@@ -8,6 +8,7 @@ set(Headers
     ComponentDetection.h
     ConnectionDetection.h
     LabelDetection.h
+    RoiSegmentation.h
     SchematicSegmentation.h
     SegmentationUtils.h
 )
@@ -15,6 +16,7 @@ set(Sources
     ComponentDetection.cpp
     ConnectionDetection.cpp
     LabelDetection.cpp
+    RoiSegmentation.cpp
     SchematicSegmentation.cpp
 )
 
