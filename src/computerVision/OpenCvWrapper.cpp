@@ -70,6 +70,31 @@ ImageMat OpenCvWrapper::cloneImage(ImageMat& image)
     return image.clone();
 }
 
+bool OpenCvWrapper::cropImage(ImageMat& srcImg, ImageMat& dstImg, const Rectangle& roi)
+{
+    const auto valid{0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= srcImg.cols && 0 <= roi.y && 0 <= roi.height
+                     && roi.y + roi.height <= srcImg.rows};
+
+    if (!valid) {
+        return false;
+    }
+
+    try {
+        // Crop image
+        // Note that this does not copy the data, it only creates a reference to that image region. This means that if
+        // the cropped image changes, it also changes the source image.
+        cv::Mat croppedRef = srcImg(roi);
+
+        // Copy the data
+        croppedRef.copyTo(dstImg);
+    }
+    catch ([[maybe_unused]] const cv::Exception& ex) {
+        return false;
+    }
+
+    return true;
+}
+
 bool OpenCvWrapper::isImageEmpty(ImageMat& image)
 {
     return image.empty();

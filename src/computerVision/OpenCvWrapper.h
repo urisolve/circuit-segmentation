@@ -231,6 +231,17 @@ public:
     virtual ImageMat cloneImage(ImageMat& image);
 
     /**
+     * @brief Crops an image from a region of interest (ROI).
+     *
+     * @param srcImg Image to be cropped.
+     * @param dstImg Image with region of interest.
+     * @param roi Region of interest to crop the image.
+     *
+     * @return True if operation occurred successfully, false otherwise.
+     */
+    virtual bool cropImage(ImageMat& srcImg, ImageMat& dstImg, const Rectangle& roi);
+
+    /**
      * @brief Checks if an image is empty.
      *
      * @param image Image.

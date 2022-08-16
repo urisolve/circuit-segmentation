@@ -13,6 +13,7 @@ ConnectionDetection::ConnectionDetection(const std::shared_ptr<computerVision::O
     : mOpenCvWrapper{openCvWrapper}
     , mLogger{logger}
     , mConnections{}
+    , mNodes{}
 {
 }
 

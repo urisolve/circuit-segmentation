@@ -28,6 +28,8 @@ public:
     MOCK_METHOD(ImageMat, readImage, (const std::string&), (override));
     /** Mocks method cloneImage. */
     MOCK_METHOD(ImageMat, cloneImage, (ImageMat&), (override));
+    /** Mocks method cropImage. */
+    MOCK_METHOD(bool, cropImage, (ImageMat&, ImageMat&, const Rectangle&), (override));
     /** Mocks method isImageEmpty. */
     MOCK_METHOD(bool, isImageEmpty, (ImageMat&), (override));
     /** Mocks method resizeImage. */

@@ -8,6 +8,8 @@
 #include "mocks/imageProcessing/MockImagePreprocessing.h"
 #include "mocks/imageProcessing/MockImageReceiver.h"
 #include "mocks/imageProcessing/MockImageSegmentation.h"
+#include "mocks/schematicSegmentation/MockRoiSegmentation.h"
+#include "mocks/schematicSegmentation/MockSchematicSegmentation.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -16,6 +18,7 @@ using namespace testing;
 using namespace circuitSegmentation;
 using namespace circuitSegmentation::computerVision;
 using namespace circuitSegmentation::imageProcessing;
+using namespace circuitSegmentation::schematicSegmentation;
 
 /**
  * @brief Test class of ImageProcManager.
@@ -32,6 +35,8 @@ protected:
         mMockImagePreprocessing = std::make_shared<NiceMock<MockImagePreprocessing>>(nullptr, nullptr);
         mMockImageSegmentation
             = std::make_shared<NiceMock<MockImageSegmentation>>(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        mMockSchematicSegmentation = std::make_shared<NiceMock<MockSchematicSegmentation>>(nullptr, nullptr);
+        mMockRoiSegmentation = std::make_shared<NiceMock<MockRoiSegmentation>>(nullptr, nullptr);
         mMockOpenCvWrapper = std::make_shared<NiceMock<MockOpenCvWrapper>>();
         mLogger = std::make_shared<logging::Logger>(std::cout);
 
@@ -45,10 +50,14 @@ protected:
         mImageProcManager = std::make_unique<ImageProcManager>(mMockImageReceiver,
                                                                mMockImagePreprocessing,
                                                                mMockImageSegmentation,
+                                                               mMockSchematicSegmentation,
+                                                               mMockRoiSegmentation,
                                                                mMockOpenCvWrapper,
                                                                mLogger,
                                                                logMode,
                                                                saveImages);
+
+        onGetElements();
     }
 
     /**
@@ -79,6 +88,25 @@ protected:
         EXPECT_CALL(*mMockImageSegmentation, setSaveImages(saveImages)).Times(1);
     }
 
+    /**
+     * @brief Sets the behaviour when getting elements.
+     */
+    void onGetElements()
+    {
+        const std::vector<circuit::Component> emptyComponents{};
+        const std::vector<circuit::Connection> emptyConnections{};
+        const std::vector<circuit::Node> emptyNodes{};
+
+        ON_CALL(*mMockSchematicSegmentation, getComponents)
+            .WillByDefault(
+                Invoke([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; }));
+        ON_CALL(*mMockSchematicSegmentation, getConnections)
+            .WillByDefault(
+                Invoke([&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; }));
+        ON_CALL(*mMockSchematicSegmentation, getNodes)
+            .WillByDefault(Invoke([&emptyNodes]() -> const std::vector<circuit::Node>& { return emptyNodes; }));
+    }
+
 protected:
     /** Image processing manager. */
     std::unique_ptr<ImageProcManager> mImageProcManager;
@@ -88,6 +116,10 @@ protected:
     std::shared_ptr<NiceMock<MockImagePreprocessing>> mMockImagePreprocessing;
     /** Image segmentation. */
     std::shared_ptr<NiceMock<MockImageSegmentation>> mMockImageSegmentation;
+    /** Schematic segmentation. */
+    std::shared_ptr<NiceMock<MockSchematicSegmentation>> mMockSchematicSegmentation;
+    /** ROI segmentation. */
+    std::shared_ptr<NiceMock<MockRoiSegmentation>> mMockRoiSegmentation;
     /** OpenCV wrapper. */
     std::shared_ptr<NiceMock<MockOpenCvWrapper>> mMockOpenCvWrapper;
     /** Logger. */
@@ -120,6 +152,11 @@ TEST_F(ImageProcManagerTest, processesSuccessfully)
     EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
     EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
     EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(2);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(1);
+    EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(1);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(1).WillOnce(Return(true));
 
     // Process image
     const std::string imageFilePath{""};
@@ -158,6 +195,55 @@ TEST_F(ImageProcManagerTest, processFailsWhenImageSegmentationFailed)
     EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
     EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
     EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(0);
+
+    // Process image
+    const std::string imageFilePath{""};
+    ASSERT_FALSE(mImageProcManager->processImage(imageFilePath));
+}
+
+/**
+ * @brief Tests that processing fails when image generation with ROI for components failed.
+ */
+TEST_F(ImageProcManagerTest, processFailsWhenImageRoiComponentsFailed)
+{
+    ImageMat image{};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockImageReceiver, setImageFilePath).Times(1);
+    EXPECT_CALL(*mMockImageReceiver, receiveImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockImageReceiver, getImageReceived).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
+    EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(1);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiComponents).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(0);
+
+    // Process image
+    const std::string imageFilePath{""};
+    ASSERT_FALSE(mImageProcManager->processImage(imageFilePath));
+}
+
+/**
+ * @brief Tests that processing fails when image generation with ROI for labels failed.
+ */
+TEST_F(ImageProcManagerTest, processFailsWhenImageRoiLabelsFailed)
+{
+    ImageMat image{};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockImageReceiver, setImageFilePath).Times(1);
+    EXPECT_CALL(*mMockImageReceiver, receiveImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockImageReceiver, getImageReceived).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
+    EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(2);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(1);
+    EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(1);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(1).WillOnce(Return(false));
 
     // Process image
     const std::string imageFilePath{""};

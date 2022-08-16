@@ -8,6 +8,7 @@ set(Headers
     MockComponentDetection.h
     MockConnectionDetection.h
     MockLabelDetection.h
+    MockRoiSegmentation.h
     MockSchematicSegmentation.h
 )
 
