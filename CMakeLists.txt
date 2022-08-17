@@ -35,6 +35,9 @@ include(FetchDependencies)
 # OpenCV
 find_package(OpenCV REQUIRED)
 
+# stduuid
+add_subdirectory(external/stduuid)
+
 # ----------------------------------------------------------------------------
 # Compile definitions
 

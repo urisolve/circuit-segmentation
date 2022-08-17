@@ -34,9 +34,15 @@ This project has the following structure:
 
 The following libraries are used in this project:
 
-- **OpenCV 4.5.5**: needs to be installed on the system
-- **GoogleTest**: fetched with CMake (if `BUILD_TESTS` is ON)
-- **stduuid**: available in `external` directory
+- [**OpenCV**](https://github.com/opencv/opencv): Open Source Computer Vision Library
+    - It needs to be installed on the system
+    - Version used during the development of this project: 4.5.5
+- [**GoogleTest**](https://github.com/google/googletest): Google Testing and Mocking Framework
+    - It is fetched with CMake (if `BUILD_TESTS` option is ON)
+    - Version used during the development of this project: 1.11.0
+- [**stduuid**](https://github.com/mariusbancila/stduuid): a C++17 cross-platform implementation for universally unique identifiers (UUIDs)
+    - It is available in `external` directory
+    - Version used during the development of this project: commit hash `3afe7193facd5d674de709fccc44d5055e144d7a`
 
 ## Compilation
 
@@ -71,12 +77,12 @@ $ ctest
 
 ## Code coverage
 
-This project uses the Gcovr tool to obtain the code coverage. Gcovr is available as a Python package that can be installed via pip:
+This project uses the [Gcovr](https://github.com/gcovr/gcovr) tool to obtain the code coverage. Gcovr is available as a Python package that can be installed via pip:
 ```sh
 $ pip install gcovr
 ```
 
-For Windows, as Gcovr uses the GNU `gcov` utility, the MinGW-w64 needs to be installed on the system.
+For Windows, as Gcovr uses the GNU `gcov` utility, the [MinGW-w64](https://www.mingw-w64.org/) needs to be installed on the system.
 
 The project can be compiled for code coverage analysis, using the following commands:
 ```sh
