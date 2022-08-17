@@ -16,6 +16,33 @@ function(fetch_googletest)
     FetchContent_MakeAvailable(googletest)
 endfunction()
 
+# Fetch stduuid
+function(fetch_stduuid)
+    FetchContent_Declare(
+        stduuid
+        GIT_REPOSITORY https://github.com/mariusbancila/stduuid.git
+        GIT_TAG 3afe7193facd5d674de709fccc44d5055e144d7a
+    )
+    FetchContent_MakeAvailable(stduuid)
+endfunction()
+
+# Fetch json
+function(fetch_json)
+    FetchContent_Declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.2
+    )
+    FetchContent_MakeAvailable(json)
+endfunction()
+
+# GoogleTest
 if (BUILD_TESTS)
     fetch_googletest()
 endif()
+
+# stduuid
+fetch_stduuid()
+
+# json
+fetch_json()

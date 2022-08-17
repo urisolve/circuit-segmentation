@@ -20,7 +20,6 @@ endif()
 
 # Option to build unit tests
 option(BUILD_TESTS "Builds unit tests" OFF)
-
 # Option to build with code coverage
 option(BUILD_COVERAGE "Builds with code coverage" OFF)
 
@@ -34,9 +33,6 @@ include(FetchDependencies)
 
 # OpenCV
 find_package(OpenCV REQUIRED)
-
-# stduuid
-add_subdirectory(external/stduuid)
 
 # ----------------------------------------------------------------------------
 # Compile definitions
