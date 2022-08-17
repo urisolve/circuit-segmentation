@@ -42,7 +42,7 @@ public:
      * @param components Components.
      *
      * @note The image files are written to the working directory and have the following format for naming:
-     * "roi_component_\<component_id\>.png".
+     * "roi_component_<component_id>.png".
      *
      * @return True if all images generation occurred successfully, otherwise false.
      */
@@ -58,7 +58,7 @@ public:
      * @param nodes Nodes.
      *
      * @note The image files are written to the working directory and have the following format for naming:
-     * "roi_label_\<associated_element_id\>_\<n\>.png". Meaning of fields:
+     * "roi_label_<associated_element_id>_<n>.png". Meaning of fields:
      * - associated_element_id: ID of the associated element to this label. Note that this is not the ID of the label.
      * - n: label number. As the element can have more than one label associated, this just specifies a number for the
      * label.

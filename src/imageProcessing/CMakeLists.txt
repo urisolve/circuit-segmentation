@@ -37,4 +37,5 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::Logger
     PRIVATE CircuitSegmentation::SchematicSegmentation
     PUBLIC stduuid
+    PUBLIC nlohmann_json::nlohmann_json
 )

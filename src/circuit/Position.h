@@ -31,8 +31,8 @@ struct Position
     T mX{};
     /** Y coordinate. */
     T mY{};
-    /** Angle (optional, in some cases it is not necessary). */
-    std::optional<int> mAngle{};
+    /** Angle. */
+    int mAngle{};
 };
 
 /**

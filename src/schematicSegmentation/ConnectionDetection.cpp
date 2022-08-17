@@ -3,6 +3,7 @@
  */
 
 #include "ConnectionDetection.h"
+#include "application/Config.h"
 #include "SegmentationUtils.h"
 
 namespace circuitSegmentation {
@@ -54,8 +55,9 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_connections_morph_close.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological closing to detect connections", image, 0);
+#endif
     }
 
     // Morphological opening to remove the circuit connections leaving only the dilated circuit elements
@@ -69,8 +71,9 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_connections_morph_open.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological opening to detect connections", image, 0);
+#endif
     }
 
     // Intersect the preprocessed image with the image without circuit connections
@@ -81,8 +84,9 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_connections_intersection.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Intersection between images to detect connections", image, 0);
+#endif
     }
 
     // At this point, the circuit elements are in the image, so we need to find the contours
@@ -110,8 +114,9 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_connections_only_conn.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Image with only the circuit connections to detect connections", image, 0);
+#endif
     }
 
     // At this point, the connections are represented as wires in the image, so we need to find those wires
@@ -155,8 +160,9 @@ bool ConnectionDetection::detectConnections(computerVision::ImageMat& imageIniti
                                      {});
 
         mOpenCvWrapper->writeImage("cs_segment_connections_detected.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Detecting connections", image, 0);
+#endif
     }
 
     return true;
@@ -190,9 +196,10 @@ bool ConnectionDetection::updateConnections(computerVision::ImageMat& imageIniti
 
     // Save image
     if (saveImages) {
-        mOpenCvWrapper->writeImage("image_segment_connections_remove_components.png", image);
-        // TODO: Remove or comment.
+        mOpenCvWrapper->writeImage("cs_segment_connections_remove_components.png", image);
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Remove components", image, 0);
+#endif
     }
 
     // At this point, the connections are represented as wires in the image, so we need to find those wires
@@ -236,9 +243,10 @@ bool ConnectionDetection::updateConnections(computerVision::ImageMat& imageIniti
                                      computerVision::OpenCvWrapper::LineTypes::LINE_8,
                                      {});
 
-        mOpenCvWrapper->writeImage("image_segment_connections_updated.png", image);
-        // TODO: Remove or comment.
+        mOpenCvWrapper->writeImage("cs_segment_connections_updated.png", image);
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Updating connections", image, 0);
+#endif
     }
 
     return true;
@@ -395,8 +403,9 @@ bool ConnectionDetection::detectNodesUpdateConnections(computerVision::ImageMat&
         }
 
         mOpenCvWrapper->writeImage("cs_segment_nodes_detected_connections_updated.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Detecting nodes and updating connections", image, 0);
+#endif
     }
 
     return true;

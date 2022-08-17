@@ -12,7 +12,6 @@ set(Headers
     Node.h
     Port.h
     Position.h
-    Schematic.h
 )
 set(Sources
     Component.cpp

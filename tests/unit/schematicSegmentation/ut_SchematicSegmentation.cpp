@@ -593,10 +593,13 @@ TEST_F(SchematicSegmentationTest, updatesDetectedComponentsEmpty)
  * Expected:
  * - Owner ID of label D is the ID of component A
  * - Label D is associated to component A
+ * - Label D is the label of component A
  * - Owner ID of label E is the ID of connection B
  * - Label E is associated to connection B
+ * - Label E is the label of connection B
  * - Owner ID of label F is the ID of node C
  * - Label F is associated to node C
+ * - Label F is the label of node C
  */
 TEST_F(SchematicSegmentationTest, associatesLabelToElement)
 {
@@ -660,6 +663,8 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElement)
     // Check labels vector of element
     EXPECT_EQ(components.back().mLabels.size(), 1);
     EXPECT_EQ(components.back().mLabels.back().mId, labelD.mId);
+    // Check label of element
+    EXPECT_EQ(components.back().mLabel.mId, labelD.mId);
 
     // Check owner ID of label E
     expectedLabelOwnerID = connections.back().mId;
@@ -667,6 +672,8 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElement)
     // Check labels vector of element
     EXPECT_EQ(connections.back().mLabels.size(), 1);
     EXPECT_EQ(connections.back().mLabels.back().mId, labelE.mId);
+    // Check label of element
+    EXPECT_EQ(connections.back().mLabel.mId, labelE.mId);
 
     // Check owner ID of label F
     expectedLabelOwnerID = nodes.back().mId;
@@ -674,6 +681,8 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElement)
     // Check labels vector of element
     EXPECT_EQ(nodes.back().mLabels.size(), 1);
     EXPECT_EQ(nodes.back().mLabels.back().mId, labelF.mId);
+    // Check label of element
+    EXPECT_EQ(nodes.back().mLabel.mId, labelF.mId);
 }
 
 /**
@@ -689,10 +698,13 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElement)
  * Expected:
  * - Owner ID of label G is the ID of component B
  * - Label G is associated to component B
+ * - Label G is the label of component B
  * - Owner ID of label H is the ID of connection D
  * - Label H is associated to connection D
+ * - Label H is the label of connection D
  * - Owner ID of label I is the ID of node F
  * - Label I is associated to node F
+ * - Label I is the label of node F
  */
 TEST_F(SchematicSegmentationTest, associatesLabelToElementWhenMultipleElements)
 {
@@ -784,6 +796,8 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElementWhenMultipleElements)
     EXPECT_EQ(componentA.mLabels.size(), 0);
     EXPECT_EQ(componentB.mLabels.size(), 1);
     EXPECT_EQ(componentB.mLabels.back().mId, labelG.mId);
+    // Check label of element
+    EXPECT_EQ(componentB.mLabel.mId, labelG.mId);
 
     // Check owner ID of label H
     EXPECT_EQ(labelH.mOwnerId, connectionD.mId);
@@ -791,6 +805,8 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElementWhenMultipleElements)
     EXPECT_EQ(connectionC.mLabels.size(), 0);
     EXPECT_EQ(connectionD.mLabels.size(), 1);
     EXPECT_EQ(connectionD.mLabels.back().mId, labelH.mId);
+    // Check label of element
+    EXPECT_EQ(connectionD.mLabel.mId, labelH.mId);
 
     // Check owner ID of label I
     EXPECT_EQ(labelI.mOwnerId, nodeF.mId);
@@ -798,6 +814,8 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElementWhenMultipleElements)
     EXPECT_EQ(nodeE.mLabels.size(), 0);
     EXPECT_EQ(nodeF.mLabels.size(), 1);
     EXPECT_EQ(nodeF.mLabels.back().mId, labelI.mId);
+    // Check label of element
+    EXPECT_EQ(nodeF.mLabel.mId, labelI.mId);
 }
 
 /**
@@ -812,6 +830,7 @@ TEST_F(SchematicSegmentationTest, associatesLabelToElementWhenMultipleElements)
  * Expected:
  * - Owner ID of labels D and E is the ID of component A
  * - Labels D and E are associated to component A
+ * - Label E is the label of component A
  * - No labels associated to connection B
  * - No labels associated to node C
  */
@@ -877,6 +896,8 @@ TEST_F(SchematicSegmentationTest, associatesMultipleLabelsToElement)
     EXPECT_EQ(components.back().mLabels.at(1).mId, labelE.mId);
     EXPECT_EQ(connections.back().mLabels.size(), 0);
     EXPECT_EQ(nodes.back().mLabels.size(), 0);
+    // Check label of element
+    EXPECT_EQ(components.back().mLabel.mId, labelE.mId);
 }
 
 /**

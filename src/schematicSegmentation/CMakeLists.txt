@@ -10,6 +10,7 @@ set(Headers
     LabelDetection.h
     RoiSegmentation.h
     SchematicSegmentation.h
+    SegmentationMap.h
     SegmentationUtils.h
 )
 set(Sources
@@ -18,6 +19,7 @@ set(Sources
     LabelDetection.cpp
     RoiSegmentation.cpp
     SchematicSegmentation.cpp
+    SegmentationMap.cpp
 )
 
 # ----------------------------------------------------------------------------
@@ -40,4 +42,5 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::Logger
     PRIVATE CircuitSegmentation::Circuit
     PUBLIC stduuid
+    PUBLIC nlohmann_json::nlohmann_json
 )

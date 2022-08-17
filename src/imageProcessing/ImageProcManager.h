@@ -11,6 +11,7 @@
 #include "logging/Logger.h"
 #include "schematicSegmentation/RoiSegmentation.h"
 #include "schematicSegmentation/SchematicSegmentation.h"
+#include "schematicSegmentation/SegmentationMap.h"
 #include <memory>
 #include <string>
 
@@ -31,6 +32,7 @@ public:
      * @param imageSegmentation Image segmentation.
      * @param schematicSegmentation Schematic segmentation.
      * @param roiSegmentation ROI segmentation.
+     * @param segmentationMap Segmentation map.
      * @param openCvWrapper OpenCV wrapper.
      * @param logger Logger.
      * @param logMode Log mode: verbose = true, silent = false.
@@ -41,6 +43,7 @@ public:
                      const std::shared_ptr<ImageSegmentation>& imageSegmentation,
                      const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
                      const std::shared_ptr<schematicSegmentation::RoiSegmentation>& roiSegmentation,
+                     const std::shared_ptr<schematicSegmentation::SegmentationMap>& segmentationMap,
                      const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
                      const std::shared_ptr<logging::Logger>& logger,
                      const bool logMode = false,
@@ -134,6 +137,13 @@ private:
      */
     virtual bool generateImageRoi();
 
+    /**
+     * @brief Generates the segmentation map file.
+     *
+     * @return True if segmentation map generation occurred successfully, otherwise false.
+     */
+    virtual bool generateSegmentationMap();
+
 private:
     /** Image receiver. */
     std::shared_ptr<ImageReceiver> mImageReceiver;
@@ -151,6 +161,9 @@ private:
 
     /** ROI segmentation. */
     std::shared_ptr<schematicSegmentation::RoiSegmentation> mRoiSegmentation;
+
+    /** Segmentation map. */
+    std::shared_ptr<schematicSegmentation::SegmentationMap> mSegmentationMap;
 
     /** OpenCV wrapper. */
     std::shared_ptr<computerVision::OpenCvWrapper> mOpenCvWrapper;

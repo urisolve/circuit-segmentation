@@ -306,3 +306,35 @@ TEST(SegmentationUtilsTest, distanceRectanglesSameRectangle)
 
     EXPECT_DOUBLE_EQ(distance, expectDistance);
 }
+
+/**
+ * @brief Tests that a double value is rounded to the decimal places provided.
+ */
+TEST(SegmentationUtilsTest, roundsDouble)
+{
+    constexpr auto value1{1.2255};
+    constexpr auto decimalPlaces1{2};
+    constexpr auto value2{1.2245};
+    constexpr auto decimalPlaces2{2};
+    constexpr auto value3{-2.07};
+    constexpr auto decimalPlaces3{1};
+    constexpr auto value4{-2.32};
+    constexpr auto decimalPlaces4{1};
+
+    // Round
+    const auto roundedValue1{schematicSegmentation::roundDouble(value1, decimalPlaces1)};
+    const auto roundedValue2{schematicSegmentation::roundDouble(value2, decimalPlaces2)};
+    const auto roundedValue3{schematicSegmentation::roundDouble(value3, decimalPlaces3)};
+    const auto roundedValue4{schematicSegmentation::roundDouble(value4, decimalPlaces4)};
+
+    // Expectations
+    constexpr auto expectValue1{1.23};
+    constexpr auto expectValue2{1.22};
+    constexpr auto expectValue3{-2.1};
+    constexpr auto expectValue4{-2.3};
+
+    EXPECT_DOUBLE_EQ(roundedValue1, expectValue1);
+    EXPECT_DOUBLE_EQ(roundedValue2, expectValue2);
+    EXPECT_DOUBLE_EQ(roundedValue3, expectValue3);
+    EXPECT_DOUBLE_EQ(roundedValue4, expectValue4);
+}

@@ -3,6 +3,7 @@
  */
 
 #include "SchematicSegmentation.h"
+#include "application/Config.h"
 #include "SegmentationUtils.h"
 
 namespace circuitSegmentation {
@@ -123,8 +124,9 @@ void SchematicSegmentation::detectComponentConnections(computerVision::ImageMat&
                 image, portPoints, -1, cPortColor, cPortThickness, computerVision::OpenCvWrapper::LineTypes::LINE_8, {});
 
             mOpenCvWrapper->writeImage("cs_segment_components_ports_detected.png", image);
-            // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
             mOpenCvWrapper->showImage("Detecting components ports", image, 0);
+#endif
         }
     }
 }
@@ -176,8 +178,10 @@ void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageIniti
      *      - Get and check the minimum distance between label and connection
      *      - Get and check the minimum distance between label and node
      *      - Compare minimum distances of each element
+     *      - Set label position
      *      - Set label owner ID with the element ID with the minimum distance
      *      - Add to the labels vector of that element
+     *      - Set label of that element (label of the element is equal to the last associated label)
      */
 
     mLogger->logInfo("Associating labels to the circuit elements");
@@ -220,8 +224,9 @@ void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageIniti
             }
 
             mOpenCvWrapper->writeImage("cs_segment_labels_associate_boxes_connections_nodes.png", image);
-            // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
             mOpenCvWrapper->showImage("Associating labels (boxes for connections and nodes)", image, 0);
+#endif
         }
     }
 
@@ -306,12 +311,19 @@ void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageIniti
             elemType = ElemTypeEnum::NODE;
         }
 
+        // Set label position
+        label.mPosition.mX = label.mBoundingBox.x;
+        label.mPosition.mY = label.mBoundingBox.y;
+        label.mPosition.mAngle = 0;
+
         switch (elemType) {
         case ElemTypeEnum::COMPONENT:
             // Set label owner ID
             label.mOwnerId = mComponents.at(elemIndex).mId;
             // Add to the labels vector
             mComponents.at(elemIndex).mLabels.push_back(label);
+            // Set label of the element
+            mComponents.at(elemIndex).mLabel = label;
             mLogger->logDebug("Label " + label.mId + " is associated to the component "
                               + mComponents.at(elemIndex).mId);
             break;
@@ -320,6 +332,8 @@ void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageIniti
             label.mOwnerId = mConnections.at(elemIndex).mId;
             // Add to the labels vector
             mConnections.at(elemIndex).mLabels.push_back(label);
+            // Set label of the element
+            mConnections.at(elemIndex).mLabel = label;
             mLogger->logDebug("Label " + label.mId + " is associated to the connection "
                               + mConnections.at(elemIndex).mId);
             break;
@@ -328,6 +342,8 @@ void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageIniti
             label.mOwnerId = mNodes.at(elemIndex).mId;
             // Add to the labels vector
             mNodes.at(elemIndex).mLabels.push_back(label);
+            // Set label of the element
+            mNodes.at(elemIndex).mLabel = label;
             mLogger->logDebug("Label " + label.mId + " is associated to the node " + mNodes.at(elemIndex).mId);
             break;
         default:
@@ -335,6 +351,8 @@ void SchematicSegmentation::associateLabels(computerVision::ImageMat& imageIniti
             label.mOwnerId = mComponents.at(elemIndex).mId;
             // Add to the labels vector
             mComponents.at(elemIndex).mLabels.push_back(label);
+            // Set label of the element
+            mComponents.at(elemIndex).mLabel = label;
             mLogger->logDebug("Label " + label.mId + " is associated to the component "
                               + mComponents.at(elemIndex).mId);
             break;

@@ -189,5 +189,19 @@ inline const double distanceRectangles(const computerVision::Rectangle& rect1, c
     return 0;
 }
 
+/**
+ * @brief Rounds a double to the decimal places provided.
+ *
+ * @param value Value to be rounded.
+ * @param decimalPlaces Decimal places to round the value.
+ *
+ * @return Double rounded to the decimal places provided.
+ */
+inline const double roundDouble(const double& value, const int& decimalPlaces)
+{
+    const double multiplier{std::pow(10.0, decimalPlaces)};
+    return std::round(value * multiplier) / multiplier;
+}
+
 } // namespace schematicSegmentation
 } // namespace circuitSegmentation

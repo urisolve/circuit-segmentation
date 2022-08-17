@@ -10,6 +10,7 @@
 #include "mocks/imageProcessing/MockImageSegmentation.h"
 #include "mocks/schematicSegmentation/MockRoiSegmentation.h"
 #include "mocks/schematicSegmentation/MockSchematicSegmentation.h"
+#include "mocks/schematicSegmentation/MockSegmentationMap.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -37,6 +38,7 @@ protected:
             = std::make_shared<NiceMock<MockImageSegmentation>>(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         mMockSchematicSegmentation = std::make_shared<NiceMock<MockSchematicSegmentation>>(nullptr, nullptr);
         mMockRoiSegmentation = std::make_shared<NiceMock<MockRoiSegmentation>>(nullptr, nullptr);
+        mMockSegmentationMap = std::make_shared<NiceMock<MockSegmentationMap>>(nullptr);
         mMockOpenCvWrapper = std::make_shared<NiceMock<MockOpenCvWrapper>>();
         mLogger = std::make_shared<logging::Logger>(std::cout);
 
@@ -52,6 +54,7 @@ protected:
                                                                mMockImageSegmentation,
                                                                mMockSchematicSegmentation,
                                                                mMockRoiSegmentation,
+                                                               mMockSegmentationMap,
                                                                mMockOpenCvWrapper,
                                                                mLogger,
                                                                logMode,
@@ -120,6 +123,8 @@ protected:
     std::shared_ptr<NiceMock<MockSchematicSegmentation>> mMockSchematicSegmentation;
     /** ROI segmentation. */
     std::shared_ptr<NiceMock<MockRoiSegmentation>> mMockRoiSegmentation;
+    /** Segmentation map. */
+    std::shared_ptr<NiceMock<MockSegmentationMap>> mMockSegmentationMap;
     /** OpenCV wrapper. */
     std::shared_ptr<NiceMock<MockOpenCvWrapper>> mMockOpenCvWrapper;
     /** Logger. */
@@ -152,11 +157,13 @@ TEST_F(ImageProcManagerTest, processesSuccessfully)
     EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
     EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
     EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(2);
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(3);
     EXPECT_CALL(*mMockRoiSegmentation, generateRoiComponents).Times(1).WillOnce(Return(true));
-    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(1);
-    EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(1);
+    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(2);
+    EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(2);
     EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSegmentationMap, generateSegmentationMap).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSegmentationMap, writeSegmentationMapJsonFile).Times(1).WillOnce(Return(true));
 
     // Process image
     const std::string imageFilePath{""};
@@ -168,8 +175,6 @@ TEST_F(ImageProcManagerTest, processesSuccessfully)
  */
 TEST_F(ImageProcManagerTest, processFailsWhenImageReceptionFailed)
 {
-    ImageMat image{};
-
     // Setup expectations and behavior
     EXPECT_CALL(*mMockImageReceiver, setImageFilePath).Times(1);
     EXPECT_CALL(*mMockImageReceiver, receiveImage).Times(1).WillOnce(Return(false));
@@ -244,6 +249,61 @@ TEST_F(ImageProcManagerTest, processFailsWhenImageRoiLabelsFailed)
     EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(1);
     EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(1);
     EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockSegmentationMap, generateSegmentationMap).Times(0);
+
+    // Process image
+    const std::string imageFilePath{""};
+    ASSERT_FALSE(mImageProcManager->processImage(imageFilePath));
+}
+
+/**
+ * @brief Tests that processing fails when segmentation map generation failed.
+ */
+TEST_F(ImageProcManagerTest, processFailsWhenSegmentationMapFailed)
+{
+    ImageMat image{};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockImageReceiver, setImageFilePath).Times(1);
+    EXPECT_CALL(*mMockImageReceiver, receiveImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockImageReceiver, getImageReceived).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
+    EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(3);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(2);
+    EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(2);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSegmentationMap, generateSegmentationMap).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*mMockSegmentationMap, writeSegmentationMapJsonFile).Times(0);
+
+    // Process image
+    const std::string imageFilePath{""};
+    ASSERT_FALSE(mImageProcManager->processImage(imageFilePath));
+}
+
+/**
+ * @brief Tests that processing fails when writing segmentation map to a file failed.
+ */
+TEST_F(ImageProcManagerTest, processFailsWhenSegmentationMapWriteFailed)
+{
+    ImageMat image{};
+
+    // Setup expectations and behavior
+    EXPECT_CALL(*mMockImageReceiver, setImageFilePath).Times(1);
+    EXPECT_CALL(*mMockImageReceiver, receiveImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockImageReceiver, getImageReceived).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockOpenCvWrapper, cloneImage).Times(1).WillOnce(Return(image));
+    EXPECT_CALL(*mMockImagePreprocessing, preprocessImage).Times(1);
+    EXPECT_CALL(*mMockImageSegmentation, segmentImage).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getComponents).Times(3);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiComponents).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSchematicSegmentation, getConnections).Times(2);
+    EXPECT_CALL(*mMockSchematicSegmentation, getNodes).Times(2);
+    EXPECT_CALL(*mMockRoiSegmentation, generateRoiLabels).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSegmentationMap, generateSegmentationMap).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*mMockSegmentationMap, writeSegmentationMapJsonFile).Times(1).WillOnce(Return(false));
 
     // Process image
     const std::string imageFilePath{""};

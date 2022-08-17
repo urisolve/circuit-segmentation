@@ -10,6 +10,7 @@
 namespace circuitSegmentation {
 namespace circuit {
 
+/** Alias for ID. */
 using Id = std::string;
 
 /**

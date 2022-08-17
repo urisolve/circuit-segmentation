@@ -10,6 +10,7 @@ set(Headers
     MockLabelDetection.h
     MockRoiSegmentation.h
     MockSchematicSegmentation.h
+    MockSegmentationMap.h
 )
 
 # ----------------------------------------------------------------------------

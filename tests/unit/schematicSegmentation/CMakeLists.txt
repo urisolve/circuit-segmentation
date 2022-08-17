@@ -14,6 +14,7 @@ set(Sources
     ut_LabelDetection.cpp
     ut_RoiSegmentation.cpp
     ut_SchematicSegmentation.cpp
+    ut_SegmentationMap.cpp
     ut_SegmentationUtils.cpp
 )
 
