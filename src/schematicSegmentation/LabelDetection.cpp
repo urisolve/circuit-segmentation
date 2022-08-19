@@ -3,6 +3,7 @@
  */
 
 #include "LabelDetection.h"
+#include "application/Config.h"
 #include "SegmentationUtils.h"
 
 namespace circuitSegmentation {
@@ -47,8 +48,9 @@ bool LabelDetection::detectLabels(computerVision::ImageMat& imageInitial,
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_labels_remove_elements.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Removing the elements from the preprocessed image", image, 0);
+#endif
     }
 
     // Morphological closing for dilation of labels
@@ -62,8 +64,9 @@ bool LabelDetection::detectLabels(computerVision::ImageMat& imageInitial,
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_labels_morph_close.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological closing to detect labels", image, 0);
+#endif
     }
 
     // Morphological opening to remove the circuit connections
@@ -77,8 +80,9 @@ bool LabelDetection::detectLabels(computerVision::ImageMat& imageInitial,
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_labels_morph_open.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological opening to detect labels", image, 0);
+#endif
     }
 
     // At this point, the labels are in the image, so we need to find the contours
@@ -116,8 +120,9 @@ bool LabelDetection::detectLabels(computerVision::ImageMat& imageInitial,
         }
 
         mOpenCvWrapper->writeImage("cs_segment_labels_detected.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Detecting labels", image, 0);
+#endif
     }
 
     return true;

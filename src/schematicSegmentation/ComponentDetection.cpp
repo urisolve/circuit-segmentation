@@ -3,6 +3,7 @@
  */
 
 #include "ComponentDetection.h"
+#include "application/Config.h"
 #include "SegmentationUtils.h"
 
 namespace circuitSegmentation {
@@ -47,8 +48,9 @@ bool ComponentDetection::detectComponents(computerVision::ImageMat& imageInitial
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_components_remove_connections.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Removing the connections from the preprocessed image", image, 0);
+#endif
     }
 
     // Morphological closing for dilation of circuit elements
@@ -62,8 +64,9 @@ bool ComponentDetection::detectComponents(computerVision::ImageMat& imageInitial
     // Save image
     if (saveImages) {
         mOpenCvWrapper->writeImage("cs_segment_components_morph_close.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological closing to detect components", image, 0);
+#endif
     }
 
     // At this point, the circuit elements are in the image, so we need to find the contours
@@ -104,8 +107,9 @@ bool ComponentDetection::detectComponents(computerVision::ImageMat& imageInitial
         }
 
         mOpenCvWrapper->writeImage("cs_segment_components_detected.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Detecting components", image, 0);
+#endif
     }
 
     return true;

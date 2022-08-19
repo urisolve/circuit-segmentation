@@ -31,4 +31,5 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE CircuitSegmentation::ImageProcessing
     PRIVATE CircuitSegmentation::CmdLineParser
     PRIVATE CircuitSegmentation::Logger
+    PUBLIC nlohmann_json::nlohmann_json
 )

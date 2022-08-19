@@ -3,6 +3,7 @@
  */
 
 #include "ImagePreprocessing.h"
+#include "application/Config.h"
 
 namespace circuitSegmentation {
 namespace imageProcessing {
@@ -100,8 +101,9 @@ void ImagePreprocessing::convertImageToGray(computerVision::ImageMat& image)
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_preproc_grayscale.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Converted image to grayscale", image, 0);
+#endif
     }
 }
 
@@ -119,8 +121,9 @@ void ImagePreprocessing::blurImage(computerVision::ImageMat& image)
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_preproc_blur.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Blurred image", image, 0);
+#endif
     }
 }
 
@@ -143,8 +146,9 @@ void ImagePreprocessing::thresholdImage(computerVision::ImageMat& image)
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_preproc_threshold.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Thresholding image", image, 0);
+#endif
     }
 }
 
@@ -169,8 +173,9 @@ void ImagePreprocessing::morphologicalOpenImage(computerVision::ImageMat& image)
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_preproc_morph_open.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological opening image", image, 0);
+#endif
     }
 }
 
@@ -195,8 +200,9 @@ void ImagePreprocessing::morphologicalDilateImage(computerVision::ImageMat& imag
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_preproc_morph_dilation.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Morphological dilation image", image, 0);
+#endif
     }
 }
 
@@ -216,8 +222,9 @@ void ImagePreprocessing::thinningImage(computerVision::ImageMat& image)
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_preproc_thinning.png", image);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Thinning image", image, 0);
+#endif
     }
 }
 

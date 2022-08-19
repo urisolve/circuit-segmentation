@@ -3,6 +3,7 @@
  */
 
 #include "ImageProcManager.h"
+#include "application/Config.h"
 #include "schematicSegmentation/ComponentDetection.h"
 #include "schematicSegmentation/ConnectionDetection.h"
 #include "schematicSegmentation/LabelDetection.h"
@@ -16,6 +17,7 @@ ImageProcManager::ImageProcManager(
     const std::shared_ptr<ImageSegmentation>& imageSegmentation,
     const std::shared_ptr<schematicSegmentation::SchematicSegmentation>& schematicSegmentation,
     const std::shared_ptr<schematicSegmentation::RoiSegmentation>& roiSegmentation,
+    const std::shared_ptr<schematicSegmentation::SegmentationMap>& segmentationMap,
     const std::shared_ptr<computerVision::OpenCvWrapper>& openCvWrapper,
     const std::shared_ptr<logging::Logger>& logger,
     const bool logMode,
@@ -25,6 +27,7 @@ ImageProcManager::ImageProcManager(
     , mImageSegmentation{imageSegmentation}
     , mSchematicSegmentation{schematicSegmentation}
     , mRoiSegmentation{roiSegmentation}
+    , mSegmentationMap{segmentationMap}
     , mOpenCvWrapper{openCvWrapper}
     , mLogger{logger}
     , mLogMode{std::move(logMode)}
@@ -57,6 +60,7 @@ ImageProcManager
             openCvWrapper, logger, componentDetection, connectionDetection, labelDetection, schematicSegmentation),
         schematicSegmentation,
         std::make_shared<schematicSegmentation::RoiSegmentation>(openCvWrapper, logger),
+        std::make_shared<schematicSegmentation::SegmentationMap>(logger),
         openCvWrapper,
         logger,
         logMode,
@@ -77,8 +81,9 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
     // Save image
     if (mSaveImages) {
         mOpenCvWrapper->writeImage("cs_initial_image.png", mImageInitial);
-        // TODO: Remove or comment.
+#ifdef SHOW_IMAGES
         mOpenCvWrapper->showImage("Initial image", mImageInitial, 0);
+#endif
     }
 
     // Preprocessing
@@ -99,7 +104,12 @@ bool ImageProcManager::processImage(const std::string imageFilePath)
     }
     mLogger->logInfo("Generation of images with ROI occurred successfully");
 
-    // TODO: Segmentation map.
+    // Segmentation map
+    if (!generateSegmentationMap()) {
+        mLogger->logError("Failed during generation of segmentation map file");
+        return false;
+    }
+    mLogger->logInfo("Generation of segmentation map file occurred successfully");
 
     return true;
 }
@@ -182,6 +192,23 @@ bool ImageProcManager::generateImageRoi()
                                              mSchematicSegmentation->getComponents(),
                                              mSchematicSegmentation->getConnections(),
                                              mSchematicSegmentation->getNodes())) {
+        return false;
+    }
+
+    return true;
+}
+
+bool ImageProcManager::generateSegmentationMap()
+{
+    // Generate segmentation map
+    if (!mSegmentationMap->generateSegmentationMap(mSchematicSegmentation->getComponents(),
+                                                   mSchematicSegmentation->getConnections(),
+                                                   mSchematicSegmentation->getNodes())) {
+        return false;
+    }
+
+    // Write segmentation map file
+    if (!mSegmentationMap->writeSegmentationMapJsonFile()) {
         return false;
     }
 

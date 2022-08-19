@@ -162,6 +162,7 @@ interface Connection {
     id: ID;
     start: ID;
     end: ID;
+    label: Label;
     properties?: Properties;
 }
 ```
