@@ -23,4 +23,5 @@ add_library(CircuitSegmentation::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC stduuid
+    PUBLIC uuid
 )

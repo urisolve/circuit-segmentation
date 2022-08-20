@@ -81,7 +81,7 @@ protected:
         dummyComponent.mLabel = generateDummyLabel(dummyComponent.mId);
 
         // Ports
-        for (auto i{0}; i < numPorts; ++i) {
+        for (unsigned int i{0}; i < numPorts; ++i) {
             circuit::Connection dummyConnection{};
             dummyComponent.mPorts.push_back(generateDummyPort(dummyComponent.mId, dummyConnection.mId));
         }
@@ -128,7 +128,7 @@ protected:
         // Label
         dummyNode.mLabel = generateDummyLabel(dummyNode.mId);
         // Connections IDs
-        for (auto i{0}; i < numConnectionsIds; ++i) {
+        for (unsigned int i{0}; i < numConnectionsIds; ++i) {
             circuit::Connection dummyConnection{};
             dummyNode.mConnectionIds.push_back(dummyConnection.mId);
         }
@@ -168,7 +168,7 @@ protected:
             const auto index{it - jsonComponent["ports"].begin()};
 
             // Port
-            const auto jsonPort{jsonComponent["ports"].at(index)};
+            const auto jsonPort = jsonComponent["ports"].at(index);
             const auto port{component.mPorts.at(index)};
 
             EXPECT_EQ(jsonPort["id"], port.mId);
@@ -297,7 +297,7 @@ TEST_F(SegmentationMapTest, generatesMapSuccessfully)
     ASSERT_TRUE(mSegmentationMap->generateSegmentationMap(mDummyComponents, mDummyConnections, mDummyNodes));
 
     // Get generated map
-    const auto map{mSegmentationMap->getSegmentationMap()};
+    const auto map = mSegmentationMap->getSegmentationMap();
 
     // Check components in map
     const auto expectNumComponents{mDummyComponents.size()};

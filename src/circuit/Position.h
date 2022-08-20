@@ -25,7 +25,7 @@ struct Position
     /**
      * @brief Destructor.
      */
-    virtual ~Position() = default;
+    virtual ~Position() = default; // LCOV_EXCL_LINE
 
     /** X coordinate. */
     T mX{};
@@ -48,7 +48,7 @@ struct GlobalPosition : public Position<int>
     /**
      * @brief Destructor.
      */
-    virtual ~GlobalPosition() = default;
+    virtual ~GlobalPosition() = default; // LCOV_EXCL_LINE
 };
 
 /**
@@ -64,7 +64,7 @@ struct RelativePosition : public Position<double>
     /**
      * @brief Destructor.
      */
-    virtual ~RelativePosition() = default;
+    virtual ~RelativePosition() = default; // LCOV_EXCL_LINE
 };
 
 } // namespace circuit

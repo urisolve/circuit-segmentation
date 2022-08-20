@@ -953,8 +953,6 @@ TEST_F(SchematicSegmentationTest, savesImagesWhenBoxesWhileAssociatingLabels)
  */
 TEST_F(SchematicSegmentationTest, savesNoImagesWhenNoBoxesWhileAssociatingLabels)
 {
-    constexpr auto imgWidth{200};
-    constexpr auto imgHeight{200};
     constexpr auto saveImages{true};
 
     // Setup expectations and behavior
@@ -997,7 +995,7 @@ TEST_F(SchematicSegmentationTest, calculatesPortPositionCorners)
     constexpr auto expectedTopLeftX{0};
     constexpr auto expectedTopLeftY{0};
     EXPECT_DOUBLE_EQ(positionTopLeft.mX, expectedTopLeftX);
-    EXPECT_DOUBLE_EQ(positionTopLeft.mY, expectedTopLeftX);
+    EXPECT_DOUBLE_EQ(positionTopLeft.mY, expectedTopLeftY);
     // Bottom left
     const auto positionBottomLeft{
         mSchematicSegmentation->calcPortPosition(pointBottomLeft, box, widthIncr, heightIncr)};

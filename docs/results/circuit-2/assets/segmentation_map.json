@@ -1,0 +1,312 @@
+{
+    "components": [
+        {
+            "id": "0fcbc564-ee6f-4b8b-ad96-5c59cd4bffbc",
+            "type": "",
+            "fullName": "",
+            "label": {
+                "id": "91a8bb39-f122-4560-bb80-02a302e90ce8",
+                "owner": "0fcbc564-ee6f-4b8b-ad96-5c59cd4bffbc",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            },
+            "ports": [
+                {
+                    "id": "c6724690-497d-4518-9dd2-855342a85615",
+                    "owner": "0fcbc564-ee6f-4b8b-ad96-5c59cd4bffbc",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 0.4,
+                        "y": 0.0,
+                        "angle": 0
+                    },
+                    "connection": "0e27769a-d84e-4808-935d-6dae427654e5"
+                }
+            ],
+            "position": {
+                "x": 256,
+                "y": 343,
+                "angle": 0
+            }
+        },
+        {
+            "id": "19c61ed6-1a49-4c78-891d-bc10db407e9f",
+            "type": "",
+            "fullName": "",
+            "label": {
+                "id": "711ecd98-ca70-426a-b9a4-aaed3fc20c1e",
+                "owner": "19c61ed6-1a49-4c78-891d-bc10db407e9f",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 471,
+                    "y": 155,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            },
+            "ports": [
+                {
+                    "id": "0c40ac2b-ccc8-44ba-97c4-aa039134a49e",
+                    "owner": "19c61ed6-1a49-4c78-891d-bc10db407e9f",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 0.5,
+                        "y": 1.0,
+                        "angle": 0
+                    },
+                    "connection": "4cdab47d-a5fc-4f1b-80be-5705bde6e4c5"
+                },
+                {
+                    "id": "871969fe-1cfa-4502-a7e7-5960af667e56",
+                    "owner": "19c61ed6-1a49-4c78-891d-bc10db407e9f",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 0.5,
+                        "y": 0.0,
+                        "angle": 0
+                    },
+                    "connection": "9b5f98a7-5851-469d-8645-294a2acbee7a"
+                }
+            ],
+            "position": {
+                "x": 384,
+                "y": 173,
+                "angle": 0
+            }
+        },
+        {
+            "id": "a0535f49-8386-4dca-8f7d-6e09c0c3eb9e",
+            "type": "",
+            "fullName": "",
+            "label": {
+                "id": "bba774f8-4e34-4db7-8b7f-080d887150f1",
+                "owner": "a0535f49-8386-4dca-8f7d-6e09c0c3eb9e",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 15,
+                    "y": 166,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            },
+            "ports": [
+                {
+                    "id": "99302f6e-e3c6-414e-ab76-cfc925a25ba5",
+                    "owner": "a0535f49-8386-4dca-8f7d-6e09c0c3eb9e",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 0.4,
+                        "y": 1.0,
+                        "angle": 0
+                    },
+                    "connection": "47411d3c-36e3-44a5-8a92-fb11263cf2e1"
+                },
+                {
+                    "id": "dd5d220d-f836-4044-9a0b-d47fe18b3cee",
+                    "owner": "a0535f49-8386-4dca-8f7d-6e09c0c3eb9e",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 0.5,
+                        "y": 0.0,
+                        "angle": 0
+                    },
+                    "connection": "4c9887ac-67ef-411c-b5c4-5f47169380e2"
+                }
+            ],
+            "position": {
+                "x": 120,
+                "y": 172,
+                "angle": 0
+            }
+        },
+        {
+            "id": "a8ccc791-b529-4bc3-bd61-4c87c769af2d",
+            "type": "",
+            "fullName": "",
+            "label": {
+                "id": "56187dfa-aa02-4b5a-b7be-66f6fb69088f",
+                "owner": "a8ccc791-b529-4bc3-bd61-4c87c769af2d",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 242,
+                    "y": 21,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            },
+            "ports": [
+                {
+                    "id": "29d080b8-6a4e-4825-afdc-ddd966151b7a",
+                    "owner": "a8ccc791-b529-4bc3-bd61-4c87c769af2d",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.5,
+                        "angle": 0
+                    },
+                    "connection": "4c9887ac-67ef-411c-b5c4-5f47169380e2"
+                },
+                {
+                    "id": "67e97f70-85d1-494c-aa9f-dae3628497f3",
+                    "owner": "a8ccc791-b529-4bc3-bd61-4c87c769af2d",
+                    "type": "hybrid",
+                    "position": {
+                        "x": 1.0,
+                        "y": 0.5,
+                        "angle": 0
+                    },
+                    "connection": "9b5f98a7-5851-469d-8645-294a2acbee7a"
+                }
+            ],
+            "position": {
+                "x": 242,
+                "y": 65,
+                "angle": 0
+            }
+        }
+    ],
+    "nodes": [
+        {
+            "id": "37a185f5-81f4-4d20-8421-af89a66adc72",
+            "label": {
+                "id": "c1274439-57cb-4258-94fb-75921a4d68d1",
+                "owner": "37a185f5-81f4-4d20-8421-af89a66adc72",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            },
+            "position": {
+                "x": 281,
+                "y": 278,
+                "angle": 0
+            },
+            "connections": [
+                "0e27769a-d84e-4808-935d-6dae427654e5",
+                "4cdab47d-a5fc-4f1b-80be-5705bde6e4c5",
+                "47411d3c-36e3-44a5-8a92-fb11263cf2e1"
+            ],
+            "type": "real"
+        }
+    ],
+    "connections": [
+        {
+            "id": "0e27769a-d84e-4808-935d-6dae427654e5",
+            "start": "c6724690-497d-4518-9dd2-855342a85615",
+            "end": "37a185f5-81f4-4d20-8421-af89a66adc72",
+            "label": {
+                "id": "f64a8aa7-af9a-435d-8eee-deb0aa318fcd",
+                "owner": "0e27769a-d84e-4808-935d-6dae427654e5",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            }
+        },
+        {
+            "id": "4cdab47d-a5fc-4f1b-80be-5705bde6e4c5",
+            "start": "0c40ac2b-ccc8-44ba-97c4-aa039134a49e",
+            "end": "37a185f5-81f4-4d20-8421-af89a66adc72",
+            "label": {
+                "id": "720ff297-f1b6-4c9c-ac1e-e52ca2af71d4",
+                "owner": "4cdab47d-a5fc-4f1b-80be-5705bde6e4c5",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            }
+        },
+        {
+            "id": "47411d3c-36e3-44a5-8a92-fb11263cf2e1",
+            "start": "99302f6e-e3c6-414e-ab76-cfc925a25ba5",
+            "end": "37a185f5-81f4-4d20-8421-af89a66adc72",
+            "label": {
+                "id": "69a56f63-caed-4da8-a7fe-e35b57e72a59",
+                "owner": "47411d3c-36e3-44a5-8a92-fb11263cf2e1",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            }
+        },
+        {
+            "id": "4c9887ac-67ef-411c-b5c4-5f47169380e2",
+            "start": "dd5d220d-f836-4044-9a0b-d47fe18b3cee",
+            "end": "29d080b8-6a4e-4825-afdc-ddd966151b7a",
+            "label": {
+                "id": "ce5710fc-849e-44e8-8efd-1d7826e08726",
+                "owner": "4c9887ac-67ef-411c-b5c4-5f47169380e2",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            }
+        },
+        {
+            "id": "9b5f98a7-5851-469d-8645-294a2acbee7a",
+            "start": "871969fe-1cfa-4502-a7e7-5960af667e56",
+            "end": "67e97f70-85d1-494c-aa9f-dae3628497f3",
+            "label": {
+                "id": "6838bdb1-125f-4dca-870b-376438415930",
+                "owner": "9b5f98a7-5851-469d-8645-294a2acbee7a",
+                "name": "",
+                "value": "",
+                "unit": "",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0
+                },
+                "isNameHidden": true,
+                "isValueHidden": true
+            }
+        }
+    ]
+}

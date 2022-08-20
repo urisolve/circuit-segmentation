@@ -170,12 +170,12 @@ public:
     /**
      * @brief Constructor.
      */
-    OpenCvWrapper() = default; // GCOVR_EXCL_LINE
+    OpenCvWrapper() = default; // LCOV_EXCL_LINE
 
     /**
      * @brief Destructor.
      */
-    virtual ~OpenCvWrapper() = default; // GCOVR_EXCL_LINE
+    virtual ~OpenCvWrapper() = default; // LCOV_EXCL_LINE
 
     /**
      * @brief Sets the log mode.

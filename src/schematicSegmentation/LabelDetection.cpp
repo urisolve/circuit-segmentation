@@ -163,8 +163,6 @@ std::optional<computerVision::Rectangle>
     // Bounding box
     const auto box{generateBoundingBox(mOpenCvWrapper, contour, imagePreprocessed, widthIncr, heightIncr)};
 
-    auto intersect{false};
-
     // Check bounding box area
     if (mOpenCvWrapper->rectangleArea(box) >= cBoxMinArea) {
         return box;
