@@ -341,7 +341,7 @@ bool ConnectionDetection::detectNodesUpdateConnections(computerVision::ImageMat&
                               + std::to_string(node.mPosition.mY) + "}");
 
             // Create new connections
-            for (auto i{0}; i < numIntersections; ++i) {
+            for (size_t i{0}; i < numIntersections; ++i) {
                 circuit::Connection newConnection{};
 
                 // Set connection wire with 2 points: intersection and node

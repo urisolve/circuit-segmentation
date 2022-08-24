@@ -26,7 +26,7 @@ public:
     /**
      * @brief Destructor.
      */
-    virtual ~CommandLineParser() = default; // GCOVR_EXCL_LINE
+    virtual ~CommandLineParser() = default; // LCOV_EXCL_LINE
 
     /**
      * @brief Parses the command line arguments.

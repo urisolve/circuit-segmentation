@@ -12,6 +12,8 @@ Port::Port()
 {
 }
 
+// LCOV_EXCL_START
+// Rationale: Currently this method is not used.
 void Port::setType(const Port::PortType& type)
 {
     switch (type) {
@@ -29,6 +31,7 @@ void Port::setType(const Port::PortType& type)
         break;
     }
 }
+// LCOV_EXCL_STOP
 
 } // namespace circuit
 } // namespace circuitSegmentation

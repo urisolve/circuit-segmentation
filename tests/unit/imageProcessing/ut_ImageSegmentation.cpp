@@ -63,17 +63,19 @@ protected:
         const std::vector<circuit::Label> emptyLabels{};
 
         ON_CALL(*mMockComponentDetection, getDetectedComponents)
-            .WillByDefault(Invoke([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; }));
+            .WillByDefault(
+                Invoke([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; }));
         ON_CALL(*mMockConnectionDetection, getDetectedConnections)
-            .WillByDefault(Invoke(
-                [&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; }));
+            .WillByDefault(
+                Invoke([&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; }));
         ON_CALL(*mMockConnectionDetection, getDetectedNodes)
             .WillByDefault(Invoke([&emptyNodes]() -> const std::vector<circuit::Node>& { return emptyNodes; }));
         ON_CALL(*mMockSchematicSegmentation, getComponents)
-            .WillByDefault(Invoke([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; }));
+            .WillByDefault(
+                Invoke([&emptyComponents]() -> const std::vector<circuit::Component>& { return emptyComponents; }));
         ON_CALL(*mMockSchematicSegmentation, getConnections)
-            .WillByDefault(Invoke(
-                [&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; }));
+            .WillByDefault(
+                Invoke([&emptyConnections]() -> const std::vector<circuit::Connection>& { return emptyConnections; }));
         ON_CALL(*mMockLabelDetection, getDetectedLabels)
             .WillByDefault(Invoke([&emptyLabels]() -> const std::vector<circuit::Label>& { return emptyLabels; }));
     }

@@ -31,7 +31,7 @@ bool OpenCvWrapper::getLogMode() const
     }
 }
 
-// GCOVR_EXCL_START
+// LCOV_EXCL_START
 // Rationale: It is not worth to test this logic.
 void OpenCvWrapper::showImage(const std::string& windowName, ImageMat& image, int delay)
 {
@@ -40,7 +40,7 @@ void OpenCvWrapper::showImage(const std::string& windowName, ImageMat& image, in
     // Wait for a pressed key
     cv::waitKey(std::move(delay));
 }
-// GCOVR_EXCL_STOP
+// LCOV_EXCL_STOP
 
 bool OpenCvWrapper::writeImage(const std::string& fileName, ImageMat& image)
 {
