@@ -7,7 +7,7 @@ The elements that this software is able to segment are:
 - Components
 - Nodes
 - Connections between the circuit elements
-- Labels (like symbols and values) associated to the circuit elements
+- Labels (like names and values) associated to the circuit elements
 
 This software module generates:
 
