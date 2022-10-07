@@ -61,8 +61,8 @@ interface Position {
     angle?: number;
 }
 
-type GlobalPosition = Position
-type RelativePosition = Position
+type GlobalPosition = Position;
+type RelativePosition = Position;
 ```
 
 > Note: `x` and `y` refer to the distance, in pixels, to the origin, and `angle` refers to the rotation, in degrees, of the element.

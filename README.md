@@ -62,7 +62,7 @@ The next libraries are used by the project but are automatically fetched during 
     - Version used during the development of this project: 1.11.0
 - [**stduuid**](https://github.com/mariusbancila/stduuid): a C++17 cross-platform implementation for universally unique identifiers (UUIDs)
     - Version used during the development of this project: commit hash `3afe7193facd5d674de709fccc44d5055e144d7a`
-- [**json**](https://github.com/nlohmann/json): JSON for Modern C++
+- [**JSON for Modern C++**](https://github.com/nlohmann/json): a popular JSON library for C++
     - Version used during the development of this project: 3.11.2
 
 ## Compilation

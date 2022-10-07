@@ -20,7 +20,7 @@ This directory contains some examples of results using this software module.
 
 ## Limitations
 
-1. Constant values for kernel size used on morphological transformations can produce different results when different images with the same circuit are of different size
+1. Image dimensions affects the segmentation results, due to the constant values for kernel sizes used in morphological transformations
     - [Example 1](./limitations/example-1/) shows an example using the circuit 2 with larger image
 1. Labels very close to the components can lead to these labels being considered as belonging to the components
     - [Example 2](./limitations/example-2/) shows an example of this limitation
